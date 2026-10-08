@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Guitar Vault</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f3f4f6;
+            color: #111827;
+        }
+        nav {
+            background: #111827;
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 16px;
+            font-weight: bold;
+        }
+        .container {
+            padding: 32px;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div>
+            <a href="/">Guitar Vault</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/instruments">Instruments</a>
+            <a href="/profile">Profil</a>
+        </div>
+        <div>
+            <a href="/login">Login</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="card" th:replace="~{${contentTemplate} :: content}">
+            Contenu
+        </div>
+    </div>
+</body>
+</html>

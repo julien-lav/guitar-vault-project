@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f5f7fa;
+            color: #1f2937;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+        .panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1 th:text="${title}">Dashboard</h1>
+
+    <div class="stats">
+        <div class="stat-card" th:each="stat : ${stats}">
+            <div class="stat-label" th:text="${stat.label}">Label</div>
+            <div class="stat-value" th:text="${stat.value}">0</div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Instruments récents</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Instrument</th>
+                    <th>Propriétaire</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="instrument : ${recentInstruments}">
+                    <td th:text="${instrument.name}">Nom</td>
+                    <td th:text="${instrument.owner}">Propriétaire</td>
+                    <td>
+                        <span class="badge" th:text="${instrument.status}">Statut</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel">
+        <h2>Événements récents</h2>
+        <ul>
+            <li th:each="event : ${recentEvents}" th:text="${event}">Événement</li>
+        </ul>
+    </div>
+</body>
+</html>

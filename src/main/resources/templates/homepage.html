@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${title}">Guitar Vault</title>
+</head>
+<body>
+    <div th:fragment="content">
+        <h1 th:text="${title}">Guitar Vault</h1>
+        <p th:text="${message}">Bienvenue</p>
+        <p>Bienvenue dans votre passeport numérique pour les instruments.</p>
+    </div>
+</body>
+</html>
