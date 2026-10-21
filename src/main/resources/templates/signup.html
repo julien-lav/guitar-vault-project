@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title th:text="#{page.signup}">Créer un compte — Guitar Vault</title></head>
+<body>
+<section th:fragment="content" class="signup" aria-labelledby="signup-title">
+    <style>
+        .signup { max-width: 820px; margin: 0 auto; }
+        .signup * { box-sizing: border-box; }
+        .signup .eyebrow { color: #92400e; font-size: .8rem; font-weight: 700; letter-spacing: .12em; }
+        .signup h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); margin: 12px 0; }
+        .signup .intro { color: #4b5563; line-height: 1.6; margin-bottom: 28px; }
+        .signup form, .signup .notice { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px; }
+        .signup fieldset { border: 0; margin: 0 0 24px; padding: 0; min-width: 0; }
+        .signup legend { font-size: 1.15rem; font-weight: 700; padding: 0; margin-bottom: 18px; }
+        .signup label { display: block; font-weight: 600; margin-bottom: 6px; }
+        .signup input, .signup select, .signup textarea { width: 100%; padding: 12px; border: 1px solid #9ca3af; border-radius: 6px; font: inherit; background: white; color: #111827; }
+        .signup input:focus, .signup select:focus, .signup textarea:focus, .signup button:focus-visible { outline: 3px solid #d97706; outline-offset: 3px; }
+        .signup textarea { resize: vertical; }
+        .signup .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .signup .wide { grid-column: 1 / -1; }
+        .signup small { display: block; color: #4b5563; line-height: 1.5; margin-top: 6px; }
+        .signup .optional { font-weight: 400; color: #6b7280; font-size: .85rem; }
+        .signup button { background: #111827; color: white; border: 0; border-radius: 6px; padding: 14px 24px; font: inherit; font-weight: 700; cursor: pointer; }
+        .signup button:hover { background: #374151; }
+        .signup .error { margin-bottom: 20px; background: #fef2f2; border-color: #b91c1c; color: #991b1b; }
+        .signup .success { color: #065f46; border-color: #059669; background: #ecfdf5; line-height: 1.6; }
+        .signup .success a { color: inherit; }
+        @media (max-width: 600px) { .signup .fields { grid-template-columns: 1fr; } .signup form, .signup .notice { padding: 20px; } .container { padding: 20px 12px; } .signup button { width: 100%; } }
+    </style>
+    <p class="eyebrow">GUITAR VAULT</p>
+    <h1 id="signup-title" th:text="#{signup.heading}">Votre passion mérite son espace.</h1>
+    <p class="intro" th:text="#{signup.intro}">Créez votre compte pour préparer le passeport numérique de vos instruments.</p>
+
+    <div th:if="${success}" class="notice success" role="status">
+        <strong th:text="${#messages.msg(success)}"></strong>
+        <p><a th:href="@{/login}" th:text="#{nav.login}">Se connecter</a></p>
+    </div>
+    <div th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></div>
+
+    <form th:unless="${success}" method="post" th:action="@{/signup}">
+        <fieldset>
+            <legend th:text="#{signup.submit}">Créer mon compte</legend>
+            <div class="fields">
+                <div>
+                    <label for="fullName" th:text="#{field.fullName}">Nom complet</label>
+                    <input id="fullName" name="fullName" autocomplete="name" maxlength="100" required th:value="${form['fullName']}" />
+                </div>
+                <div>
+                    <label for="username" th:text="#{field.username}">Pseudo</label>
+                    <input id="username" name="username" autocomplete="username" minlength="3" maxlength="30" pattern="[a-zA-Z0-9_-]{3,30}" aria-describedby="username-help" required th:value="${form['username']}" />
+                    <small id="username-help" th:text="#{signup.usernameHelp}">3 à 30 lettres, chiffres, tirets ou tirets bas.</small>
+                </div>
+                <div class="wide">
+                    <label for="email" th:text="#{field.email}">Adresse email</label>
+                    <input id="email" name="email" type="email" autocomplete="email" maxlength="254" required th:value="${form['email']}" />
+                </div>
+                <div>
+                    <label for="password" th:text="#{field.password}">Mot de passe</label>
+                    <div class="password-field"><input id="password" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="72" pattern=".*[\p{P}\p{S}].*" th:title="#{password.help}" aria-describedby="password-help" required /><button th:replace="~{password-toggle :: toggle('password')}"></button></div>
+                    <small id="password-help" th:text="#{password.help}">Au moins 8 caractères, dont un caractère spécial.</small>
+                </div>
+                <div>
+                    <label for="confirmPassword" th:text="#{field.confirmPassword}">Confirmer le mot de passe</label>
+                    <div class="password-field"><input id="confirmPassword" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" maxlength="72" required /><button th:replace="~{password-toggle :: toggle('confirmPassword')}"></button></div>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset>
+            <legend><span th:text="#{signup.profile}">Votre profil musical</span> <span class="optional" th:text="#{signup.optional}">· Facultatif</span></legend>
+            <div class="fields">
+                <div>
+                    <label for="instrument" th:text="#{field.instrument}">Instrument principal</label>
+                    <select id="instrument" name="instrument">
+                        <option value="" th:text="#{signup.chooseInstrument}">Choisir un instrument</option>
+                        <option th:each="option : ${ {'Guitare', 'Basse', 'Ukulélé', 'Autre'} }" th:value="${option}" th:text="${#messages.msg(optionKeys.get(option))}" th:selected="${form['instrument'] == option}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="level" th:text="#{field.level}">Niveau</label>
+                    <select id="level" name="level">
+                        <option value="" th:text="#{signup.chooseLevel}">Choisir un niveau</option>
+                        <option th:each="option : ${ {'Débutant', 'Intermédiaire', 'Avancé'} }" th:value="${option}" th:text="${#messages.msg(optionKeys.get(option))}" th:selected="${form['level'] == option}"></option>
+                    </select>
+                </div>
+                <div>
+                    <label for="city" th:text="#{field.city}">Ville</label>
+                    <input id="city" name="city" autocomplete="address-level2" maxlength="100" th:value="${form['city']}" />
+                </div>
+                <div>
+                    <label for="country" th:text="#{field.country}">Pays</label>
+                    <input id="country" name="country" autocomplete="country-name" maxlength="100" th:value="${form['country']}" />
+                </div>
+                <div class="wide">
+                    <label for="bio" th:text="#{field.bio}">Quelques mots sur vous</label>
+                    <textarea id="bio" name="bio" rows="4" maxlength="1000" aria-describedby="bio-help" th:text="${form['bio']}"></textarea>
+                    <small id="bio-help" th:text="#{signup.bioHelp}">Vos instruments, votre parcours, vos envies… 1 000 caractères maximum.</small>
+                </div>
+            </div>
+        </fieldset>
+        <button type="submit" th:text="#{signup.submit}">Créer mon compte</button>
+        <p><span th:text="#{signup.existing}">Déjà un compte ?</span> <a th:href="@{/login}" th:text="#{nav.login}">Se connecter</a></p>
+    </form>
+</section>
+</body>
+</html>

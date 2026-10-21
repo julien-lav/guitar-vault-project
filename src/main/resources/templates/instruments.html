@@ -1,97 +1,38 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title th:text="${title}">Instruments</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background: #f3f4f6;
-            color: #111827;
-        }
-        nav {
-            background: #111827;
-            color: white;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-right: 16px;
-            font-weight: bold;
-        }
-        .container {
-            padding: 32px;
-        }
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-            padding: 12px;
-        }
-        .badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 999px;
-            background: #dbeafe;
-            color: #1d4ed8;
-            font-weight: bold;
-            font-size: 0.8rem;
-        }
-    </style>
-</head>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title th:text="#{nav.instruments}">Mes instruments</title></head>
 <body>
-    <nav>
+<section th:fragment="content" class="vault" aria-labelledby="instruments-title">
+    <header class="page-header">
         <div>
-            <a href="/">Guitar Vault</a>
-            <a href="/dashboard">Dashboard</a>
-            <a href="/instruments">Instruments</a>
-            <a href="/profile">Profil</a>
+            <p class="eyebrow" th:text="#{collection.label}">Ma collection</p>
+            <h1 id="instruments-title" th:text="#{nav.instruments}">Mes instruments</h1>
+            <p class="muted" th:text="#{collection.count(${#lists.size(instruments)})}"></p>
         </div>
-        <div>
-            <a href="/login">Login</a>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="card">
-            <h1 th:text="${title}">Mes instruments</h1>
-
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nom</th>
-                        <th>Marque</th>
-                        <th>Année</th>
-                        <th>Propriétaire</th>
-                        <th>Statut</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr th:each="instrument : ${instruments}">
-                        <td th:text="${instrument.name}">Nom</td>
-                        <td th:text="${instrument.brand}">Marque</td>
-                        <td th:text="${instrument.year}">Année</td>
-                        <td th:text="${instrument.owner}">Propriétaire</td>
-                        <td><span class="badge" th:text="${instrument.status}">Statut</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <a class="button" th:href="@{/instruments/new}" th:text="#{instrument.add}">+ Ajouter un instrument</a>
+    </header>
+    <div class="panel"><div th:replace="~{instruments :: collection}"></div></div>
+</section>
+<div th:fragment="collection">
+    <div class="empty" th:if="${#lists.isEmpty(instruments)}">
+        <div class="empty-icon" aria-hidden="true">♫</div>
+        <h2 th:text="#{collection.emptyTitle}">Votre collection commence ici</h2>
+        <p class="muted"><span th:text="#{collection.emptyText}">Vous n’avez pas encore d’instrument enregistré.</span><br><span th:text="#{collection.emptyHint}">Ajoutez le premier pour le retrouver dans votre espace.</span></p>
+        <a class="button" th:href="@{/instruments/new}" th:text="#{collection.first}">Ajouter mon premier instrument</a>
     </div>
+    <div class="table-scroll" th:unless="${#lists.isEmpty(instruments)}">
+        <table th:aria-label="#{nav.instruments}">
+            <thead><tr><th scope="col" th:text="#{field.instrumentName}">Instrument</th><th scope="col" th:text="#{field.brand}">Marque</th><th scope="col" th:text="#{field.year}">Année</th><th scope="col" th:text="#{field.status}">Statut</th></tr></thead>
+            <tbody>
+                <tr th:each="instrument : ${instruments}">
+                    <td><strong th:text="${instrument.name}"></strong></td>
+                    <td th:text="${instrument.brand}"></td>
+                    <td th:text="${instrument.year != null ? instrument.year : #messages.msg('instrument.unknownYear')}"></td>
+                    <td><span class="badge" th:classappend="${instrument.status == 'À réparer' ? 'repair' : (instrument.status == 'En vente' ? 'sale' : '')}" th:text="${#messages.msg(optionKeys.get(instrument.status))}"></span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </body>
 </html>

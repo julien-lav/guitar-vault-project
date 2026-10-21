@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title th:text="#{page.login}">Connexion — Guitar Vault</title></head>
+<body>
+<section th:fragment="content" class="login" aria-labelledby="login-title">
+    <style>
+        .login { max-width: 480px; margin: 0 auto; }
+        .login * { box-sizing: border-box; }
+        .login .eyebrow { color: #92400e; font-size: .8rem; font-weight: 700; letter-spacing: .12em; }
+        .login h1 { font-size: 2rem; margin: 12px 0; }
+        .login .intro { color: #4b5563; line-height: 1.6; margin-bottom: 28px; }
+        .login form, .login .notice { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px; }
+        .login label { display: block; font-weight: 600; margin-bottom: 6px; }
+        .login input { width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #9ca3af; border-radius: 6px; font: inherit; }
+        .login input:focus, .login button:focus-visible { outline: 3px solid #d97706; outline-offset: 3px; }
+        .login button { width: 100%; padding: 14px; background: #111827; color: white; border: 0; border-radius: 6px; font: inherit; font-weight: 700; cursor: pointer; }
+        .login button:hover { background: #374151; }
+        .login .notice { margin-bottom: 20px; line-height: 1.6; }
+        .login .error { color: #991b1b; background: #fef2f2; border-color: #b91c1c; }
+        .login .success { color: #065f46; background: #ecfdf5; border-color: #059669; }
+        .login .register { text-align: center; line-height: 1.6; }
+        .login a { color: #92400e; }
+        @media (max-width: 600px) { .login form, .login .notice { padding: 20px; } .container { padding: 20px 12px; } }
+    </style>
+    <p class="eyebrow">GUITAR VAULT</p>
+    <h1 id="login-title" th:text="#{login.heading}">Heureux de vous retrouver.</h1>
+    <p class="intro" th:text="#{login.intro}">Connectez-vous avec l’adresse email utilisée lors de votre inscription.</p>
+    <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
+    <div th:if="${verificationError}" class="notice error" role="alert" th:text="${#messages.msg(verificationError)}"></div>
+    <div th:if="${param.error != null}" class="notice error" role="alert" th:text="#{login.invalid}">Adresse email ou mot de passe incorrect.</div>
+    <div th:if="${param.logout != null}" class="notice success" role="status" th:text="#{login.loggedOut}">Vous êtes bien déconnecté.</div>
+    <div th:if="${param.expired != null}" class="notice error" role="alert" th:text="#{login.expired}"></div>
+    <form method="post" th:action="@{/login}">
+        <label for="email" th:text="#{field.email}">Adresse email</label>
+        <input id="email" name="email" type="email" autocomplete="username" maxlength="254" required autofocus />
+        <label for="password" th:text="#{field.password}">Mot de passe</label>
+        <div class="password-field"><input id="password" name="password" type="password" autocomplete="current-password" required /><button th:replace="~{password-toggle :: toggle('password')}"></button></div>
+        <p class="forgot-link"><a th:href="@{/forgot-password}" th:text="#{forgot.link}"></a></p>
+        <button type="submit" th:text="#{nav.login}">Se connecter</button>
+    </form>
+    <p class="register"><a th:href="@{/resend-verification}" th:text="#{resend.link}"></a></p>
+    <p class="register"><span th:text="#{login.new}">Pas encore de compte ?</span> <a th:href="@{/signup}" th:text="#{signup.submit}">Créer mon compte</a></p>
+</section>
+</body>
+</html>

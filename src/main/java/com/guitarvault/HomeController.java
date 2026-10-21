@@ -9,8 +9,8 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("title", "Guitar Vault");
-        model.addAttribute("message", "Bienvenue dans Guitar Vault");
+        model.addAttribute("title", "page.home");
+        model.addAttribute("message", "home.welcome");
         model.addAttribute("contentTemplate", "homepage");
         return "layout";
     }

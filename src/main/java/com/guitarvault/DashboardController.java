@@ -1,5 +1,6 @@
 package com.guitarvault;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -9,32 +10,30 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class DashboardController {
+    private final InstrumentService instruments;
+
+    public DashboardController(InstrumentService instruments) {
+        this.instruments = instruments;
+    }
 
     @GetMapping("/dashboard")
-    public String dashboard(Model model) {
-        model.addAttribute("title", "Dashboard Guitar Vault");
-
+    public String dashboard(Principal principal, Model model) {
+        User owner = instruments.currentUser(principal);
+        List<Instrument> collection = instruments.instrumentsFor(owner);
+        model.addAttribute("title", "page.dashboard");
+        model.addAttribute("contentTemplate", "dashboard");
+        model.addAttribute("displayName", owner.getFullName() == null || owner.getFullName().isBlank()
+                ? owner.getUsername() : owner.getFullName());
         model.addAttribute("stats", List.of(
-                Map.of("label", "Instruments", "value", "128"),
-                Map.of("label", "Propriétaires", "value", "42"),
-                Map.of("label", "Transferts", "value", "17"),
-                Map.of("label", "Entretien", "value", "9")
-        ));
+                Map.of("label", "stats.total", "value", collection.size()),
+                Map.of("label", "stats.active", "value", count(collection, "Actif")),
+                Map.of("label", "status.repair", "value", count(collection, "À réparer")),
+                Map.of("label", "status.sale", "value", count(collection, "En vente"))));
+        model.addAttribute("instruments", collection.stream().limit(5).toList());
+        return "layout";
+    }
 
-        model.addAttribute("recentInstruments", List.of(
-                Map.of("name", "Fender Stratocaster", "owner", "Julien", "status", "Actif"),
-                Map.of("name", "Gibson Les Paul", "owner", "Thomas", "status", "À réparer"),
-                Map.of("name", "PRS Custom 24", "owner", "Emma", "status", "En vente"),
-                Map.of("name", "Yamaha Pacifica", "owner", "Léo", "status", "Actif")
-        ));
-
-        model.addAttribute("recentEvents", List.of(
-                "18/10 — Réglage chez le luthier",
-                "15/10 — Vente de la Gibson Les Paul",
-                "11/10 — Nouveau transfert de propriété",
-                "06/10 — Contrôle d'entretien" 
-        ));
-
-        return "dashboard";
+    private long count(List<Instrument> collection, String status) {
+        return collection.stream().filter(instrument -> status.equals(instrument.getStatus())).count();
     }
 }

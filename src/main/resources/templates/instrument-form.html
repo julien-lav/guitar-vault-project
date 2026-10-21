@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title th:text="#{instrument.addTitle}">Ajouter un instrument</title></head>
+<body>
+<section th:fragment="content" class="vault" aria-labelledby="new-instrument-title">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow" th:text="#{collection.label}">Ma collection</p>
+            <h1 id="new-instrument-title" th:text="#{instrument.addTitle}">Ajouter un instrument</h1>
+            <p class="muted" th:text="#{instrument.formIntro}">Renseignez les premières informations de votre instrument.</p>
+        </div>
+    </header>
+    <div th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></div>
+    <form class="panel form-panel" method="post" th:action="@{/instruments}">
+        <div class="fields">
+            <div>
+                <label for="name" th:text="#{field.model}">Nom / modèle</label>
+                <input id="name" name="name" maxlength="100" required th:placeholder="#{instrument.modelPlaceholder}" th:value="${form['name']}" />
+            </div>
+            <div>
+                <label for="brand" th:text="#{field.brand}">Marque</label>
+                <input id="brand" name="brand" maxlength="100" required th:placeholder="#{instrument.brandPlaceholder}" th:value="${form['brand']}" />
+            </div>
+            <div>
+                <label for="year"><span th:text="#{field.year}">Année</span> <span class="muted" th:text="#{common.optional}">(facultatif)</span></label>
+                <input id="year" name="year" type="number" min="1" th:max="${currentYear}" th:value="${form['year']}" />
+            </div>
+            <div>
+                <label for="status" th:text="#{field.status}">Statut</label>
+                <select id="status" name="status" required>
+                    <option th:each="option : ${ {'Actif', 'À réparer', 'En vente'} }" th:value="${option}" th:text="${#messages.msg(optionKeys.get(option))}" th:selected="${form['status'] == option}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="actions"><button class="button" type="submit" th:text="#{instrument.save}">Ajouter à ma collection</button><a th:href="@{/dashboard}" th:text="#{common.cancel}">Annuler</a></div>
+    </form>
+</section>
+</body>
+</html>

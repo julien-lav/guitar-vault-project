@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><head><title>Guitar Vault</title></head><body>
+<section th:fragment="content" class="vault recovery" aria-labelledby="resend-title">
+    <p class="eyebrow">GUITAR VAULT</p>
+    <h1 id="resend-title" th:text="#{resend.heading}"></h1>
+    <p class="muted" th:text="#{resend.intro}"></p>
+    <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
+    <form method="post" th:action="@{/resend-verification}" class="panel">
+        <label for="email" th:text="#{field.email}"></label>
+        <input id="email" name="email" type="email" autocomplete="email" maxlength="254" th:value="${email}" required />
+        <button class="button" type="submit" th:text="#{resend.submit}"></button>
+    </form>
+    <p th:if="${success}" class="muted" th:text="#{mail.resendWait}"></p>
+    <p><a th:href="@{/login}" th:text="#{forgot.back}"></a></p>
+</section>
+</body></html>
