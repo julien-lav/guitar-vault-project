@@ -30,6 +30,16 @@ public class InstrumentService {
         return instruments.findByOwnerIdOrderByIdDesc(owner.getId());
     }
 
+    public Instrument ownedInstrument(User owner, Long id) {
+        return instruments.findById(id)
+                .filter(instrument -> instrument.getOwner().getId().equals(owner.getId()))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    public void save(Instrument instrument) {
+        instruments.save(instrument);
+    }
+
     public void add(User owner, String name, String brand, Integer year, String status) {
         instruments.save(new Instrument(name, brand, year, owner, status));
     }

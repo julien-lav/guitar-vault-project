@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault article-editor" aria-labelledby="article-editor-title">
+    <a href="/admin/articles" th:text="#{article.back}"></a>
+    <div class="page-header"><div><p class="eyebrow" th:text="#{nav.admin}"></p><h1 id="article-editor-title" th:text="${#messages.msg(articleId == null ? 'article.new' : 'article.editHeading')}"></h1><p class="muted" th:text="#{article.editorIntro}"></p></div>
+        <a th:if="${articleId != null}" th:href="@{/admin/articles/{id}/preview(id=${articleId})}" th:text="#{article.savedPreview}"></a></div>
+    <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
+    <div th:if="${error}" class="notice error" role="alert"><p th:text="${#messages.msg(error)}"></p><p th:text="#{article.retryCover}"></p><a th:if="${error == 'article.error.conflict' &amp;&amp; articleId != null}" th:href="@{/admin/articles/{id}/edit(id=${articleId})}" th:text="#{article.reload}"></a></div>
+    <p th:if="${article != null}" class="muted"><span class="badge" th:classappend="${article.published ? '' : 'repair'}" th:text="${#messages.msg(article.published ? 'article.published' : 'article.draft')}"></span> <a th:if="${article.published}" th:href="@{/articles/{id}(id=${articleId})}" th:text="#{article.viewPublic}"></a></p>
+    <form class="panel" method="post" enctype="multipart/form-data" th:action="${articleId == null ? '/admin/articles' : '/admin/articles/' + articleId}" data-article-editor>
+        <input type="hidden" name="version" th:value="${form['version']}">
+        <div class="article-editor-fields">
+            <div><label for="article-title" th:text="#{article.title}"></label><input id="article-title" name="title" maxlength="160" required th:value="${form['title']}"></div>
+            <div><label for="article-category" th:text="#{article.category}"></label><select id="article-category" name="category"><option th:each="item : ${categories}" th:value="${item}" th:selected="${form['category'] == item}" th:text="${#messages.msg('article.category.' + item)}"></option></select></div>
+            <div><label for="article-summary" th:text="#{article.summary}"></label><textarea id="article-summary" name="summary" rows="3" maxlength="500" aria-describedby="article-summary-help" th:text="${form['summary']}"></textarea><small id="article-summary-help" class="muted" th:text="#{article.summaryHelp}"></small></div>
+            <div><label for="article-body" th:text="#{article.body}"></label><textarea id="article-body" name="body" rows="20" maxlength="50000" aria-describedby="article-body-help" th:text="${form['body']}"></textarea><small id="article-body-help" class="muted" th:text="#{article.bodyHelp}"></small></div>
+            <fieldset class="article-cover-fields"><legend th:text="#{article.cover}"></legend>
+                <img th:if="${article != null &amp;&amp; article.coverPresent}" class="editor-cover" th:src="@{/admin/articles/{id}/cover(id=${articleId})}" th:alt="${article.coverAlt}">
+                <label for="article-cover" th:text="#{article.chooseCover}"></label><input id="article-cover" type="file" name="cover" accept="image/jpeg,image/png" aria-describedby="article-cover-help"><small id="article-cover-help" class="muted" th:text="#{article.coverHelp}"></small>
+                <label for="article-cover-alt" th:text="#{article.coverAlt}"></label><input id="article-cover-alt" name="coverAlt" maxlength="200" th:value="${form['coverAlt']}" aria-describedby="article-alt-help"><small id="article-alt-help" class="muted" th:text="#{article.altHelp}"></small>
+                <label th:if="${article != null &amp;&amp; article.coverPresent}" class="article-checkbox"><input type="checkbox" name="removeCover" value="true" th:checked="${form['removeCover'] == 'true'}"><span th:text="#{article.removeCover}"></span></label>
+            </fieldset>
+        </div>
+        <p class="muted" th:text="${#messages.msg(isAdmin ? 'article.publicationHelp' : 'article.editorScope')}"></p>
+        <div class="actions article-editor-actions"><button th:if="${isAdmin}" class="button" type="submit" name="action" value="publish" th:text="#{article.savePublish}"></button><button class="button secondary-button" type="submit" name="action" value="draft" th:text="#{article.saveDraft}"></button><a href="/admin/articles" th:text="#{common.cancel}"></a></div>
+    </form>
+</section>
+</body></html>

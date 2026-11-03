@@ -25,7 +25,7 @@
             <thead><tr><th scope="col" th:text="#{field.instrumentName}">Instrument</th><th scope="col" th:text="#{field.brand}">Marque</th><th scope="col" th:text="#{field.year}">Année</th><th scope="col" th:text="#{field.status}">Statut</th></tr></thead>
             <tbody>
                 <tr th:each="instrument : ${instruments}">
-                    <td><strong th:text="${instrument.name}"></strong></td>
+                    <td><a th:href="@{/instruments/{id}(id=${instrument.id})}"><strong th:text="${instrument.name}"></strong></a></td>
                     <td th:text="${instrument.brand}"></td>
                     <td th:text="${instrument.year != null ? instrument.year : #messages.msg('instrument.unknownYear')}"></td>
                     <td><span class="badge" th:classappend="${instrument.status == 'À réparer' ? 'repair' : (instrument.status == 'En vente' ? 'sale' : '')}" th:text="${#messages.msg(optionKeys.get(instrument.status))}"></span></td>

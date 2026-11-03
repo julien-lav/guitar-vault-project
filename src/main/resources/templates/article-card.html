@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<article th:fragment="card(article)" class="article-card">
+    <a class="article-image-link" th:if="${article.coverPresent}" th:href="@{/articles/{id}(id=${article.id})}" tabindex="-1" aria-hidden="true">
+        <img class="article-thumbnail" th:src="@{/articles/{id}/cover(id=${article.id})}" alt="" loading="lazy" width="640" height="400">
+    </a>
+    <div class="article-card-content">
+        <span class="eyebrow" th:text="${#messages.msg('article.category.' + article.category)}"></span>
+        <h3><a th:href="@{/articles/{id}(id=${article.id})}" th:text="${article.title}"></a></h3>
+        <p class="muted" th:text="${article.summary}"></p>
+        <p class="article-meta"><time th:datetime="${article.publishedAt}" th:text="${article.displayDate}"></time> · <span th:text="#{article.reading(${article.readingMinutes})}"></span></p>
+        <a class="article-read" th:href="@{/articles/{id}(id=${article.id})}"><span th:text="#{article.read}"></span><span class="sr-only" th:text="${' : ' + article.title}"></span> →</a>
+    </div>
+</article>
+</body></html>

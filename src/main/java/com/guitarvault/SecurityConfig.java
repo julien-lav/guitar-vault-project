@@ -27,14 +27,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    UserDetailsService userDetailsService(UserRepository users) {
+    UserDetailsService userDetailsService(UserRepository users, AdminAccess admins) {
         return email -> {
             User user = users.findByEmailIgnoreCase(email.strip())
                     .orElseThrow(() -> new UsernameNotFoundException("Identifiants incorrects"));
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getEmail())
                     .password(user.getPasswordHash())
-                    .roles("USER")
+                    .authorities(admins.roles(user).stream().map(Role::name).toArray(String[]::new))
                     .disabled(!user.isEnabled())
                     .build();
         };
@@ -45,8 +45,13 @@ public class SecurityConfig {
         http.sessionManagement(session -> session.maximumSessions(-1).sessionRegistry(sessionRegistry())
                         .expiredUrl("/login?expired"))
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/", "/signup", "/verify-email", "/resend-verification", "/login", "/error", "/favicon.ico", "/api/hello", "/css/**", "/js/**", "/forgot-password", "/reset-password").permitAll()
+                        .requestMatchers("/admin/articles/*/publish", "/admin/articles/*/unpublish", "/admin/articles/*/delete").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers("/admin", "/admin/articles", "/admin/articles/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "EDITOR")
+                        .requestMatchers("/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/articles", "/articles/**").permitAll()
+                        .requestMatchers("/", "/signup", "/verify-email", "/resend-verification", "/login", "/error", "/access-denied", "/favicon.ico", "/api/hello", "/css/**", "/js/**", "/forgot-password", "/reset-password").permitAll()
                         .anyRequest().authenticated())
+                .exceptionHandling(exceptions -> exceptions.accessDeniedPage("/access-denied"))
                 .formLogin(form -> form.loginPage("/login")
                         .usernameParameter("email")
                         .defaultSuccessUrl("/dashboard", true)

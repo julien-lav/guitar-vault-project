@@ -5,11 +5,28 @@
     <title th:text="${#messages.msg(title)}">Guitar Vault</title>
 </head>
 <body>
-    <div th:fragment="content">
+    <div th:fragment="content" class="vault journal">
+        <div class="welcome-block">
         <h1 th:text="${#messages.msg(title)}">Guitar Vault</h1>
         <p th:text="${#messages.msg(message)}">Bienvenue</p>
         <p th:text="#{home.intro}">Bienvenue dans votre passeport numérique pour les instruments.</p>
         <p><a href="/signup" th:text="#{home.signup}">Créer mon compte Guitar Vault</a></p>
+        </div>
+        <section class="home-articles" aria-labelledby="articles-heading">
+            <div class="page-header">
+                <div><p class="eyebrow" th:text="#{articles.eyebrow}">Le journal Guitar Vault</p>
+                    <h2 id="articles-heading" th:text="#{articles.heading}">Autour de la guitare</h2>
+                    <p class="muted" th:text="#{articles.intro}"></p></div>
+                <a href="/articles" th:text="#{articles.all}">Tous les articles →</a>
+            </div>
+            <div th:if="${#lists.isEmpty(articles)}" class="panel empty">
+                <h3 th:text="#{articles.emptyTitle}"></h3><p class="muted" th:text="#{articles.emptyHome}"></p>
+                <a th:if="${canWriteArticles}" class="button" href="/admin/articles/new" th:text="#{article.new}"></a>
+            </div>
+            <div th:unless="${#lists.isEmpty(articles)}" class="article-grid">
+                <th:block th:each="article : ${articles}"><article th:replace="~{article-card :: card(${article})}"></article></th:block>
+            </div>
+        </section>
     </div>
 </body>
 </html>

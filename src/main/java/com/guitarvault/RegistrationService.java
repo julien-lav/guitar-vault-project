@@ -25,6 +25,7 @@ public class RegistrationService {
 
     @Transactional
     public void register(User user) {
+        user.setRoles(java.util.Set.of(Role.ROLE_USER));
         user.setEnabled(false);
         issueVerification(user);
     }

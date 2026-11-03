@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${#messages.msg(title)}">Guitar Vault</title>
+    <title th:text="${pageTitle != null ? pageTitle : #messages.msg(title)}">Guitar Vault</title>
+    <meta th:if="${pageDescription != null}" name="description" th:content="${pageDescription}">
     <script th:src="@{/js/ui.js}" defer></script>
     <link rel="stylesheet" th:href="@{/css/vault.css}">
     <style>
@@ -45,26 +46,30 @@
     <nav>
         <div>
             <a href="/" th:text="#{page.home}">Guitar Vault</a>
+            <a href="/articles" th:text="#{nav.articles}">Articles</a>
             <a href="/dashboard" th:text="#{nav.dashboard}">Tableau de bord</a>
             <a href="/instruments" th:text="#{nav.instruments}">Mes instruments</a>
+            <a th:if="${canWriteArticles}" href="/admin/articles" th:text="#{nav.admin}">Administration</a>
         </div>
-        <div th:if="${currentUsername == null}">
-            <a href="/signup" th:text="#{nav.signup}">Créer un compte</a>
-            <a href="/login" th:text="#{nav.login}">Se connecter</a>
-        </div>
-        <div th:if="${currentUsername != null}">
-            <span th:text="${currentUsername}"></span>
-            <form method="post" th:action="@{/logout}">
-                <button type="submit" th:text="#{nav.logout}">Se déconnecter</button>
-            </form>
-        </div>
-        <details class="language-menu">
-            <summary><span class="sr-only" th:text="#{language.label}"></span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M5 6.5h14M5 17.5h14"/></svg> <span th:text="${#locale.language == 'en' ? 'English' : 'Français'}"></span></summary>
-            <div class="language-options" aria-label="Language / Langue">
-                <a th:href="${languageUrls['fr']}" lang="fr" hreflang="fr" th:aria-current="${#locale.language == 'fr' ? 'true' : null}">Français</a>
-                <a th:href="${languageUrls['en']}" lang="en" hreflang="en" th:aria-current="${#locale.language == 'en' ? 'true' : null}">English</a>
+        <div class="nav-actions">
+            <div class="nav-account" th:if="${currentUsername == null}">
+                <a href="/signup" th:text="#{nav.signup}">Créer un compte</a>
+                <a href="/login" th:text="#{nav.login}">Se connecter</a>
             </div>
-        </details>
+            <div class="nav-account" th:if="${currentUsername != null}">
+                <span th:text="${currentUsername}"></span>
+                <form method="post" th:action="@{/logout}">
+                    <button type="submit" th:text="#{nav.logout}">Se déconnecter</button>
+                </form>
+            </div>
+            <details class="language-menu">
+                <summary><span class="sr-only" th:text="#{language.label}"></span><span class="language-flag" aria-hidden="true" th:text="${#locale.language == 'en' ? '🇬🇧' : '🇫🇷'}">🇫🇷</span> <span th:text="${#locale.language == 'en' ? 'English' : 'Français'}"></span></summary>
+                <div class="language-options" aria-label="Language / Langue">
+                    <a th:href="${languageUrls['fr']}" lang="fr" hreflang="fr" th:aria-current="${#locale.language == 'fr' ? 'true' : null}">Français</a>
+                    <a th:href="${languageUrls['en']}" lang="en" hreflang="en" th:aria-current="${#locale.language == 'en' ? 'true' : null}">English</a>
+                </div>
+            </details>
+        </div>
     </nav>
 
     <div class="container">

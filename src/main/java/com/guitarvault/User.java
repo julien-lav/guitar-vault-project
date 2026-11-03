@@ -7,6 +7,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.EnumSet;
+import java.util.Set;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
 
 @Entity
 @Table(name = "users")
@@ -37,6 +45,26 @@ public class User {
     private String bio;
 
     private boolean enabled = true;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 30)
+    private Set<Role> roles = EnumSet.of(Role.ROLE_USER);
+
+    public Set<Role> getRoles() {
+        // Accounts created before roles were introduced keep ordinary member access.
+        EnumSet<Role> result = EnumSet.of(Role.ROLE_USER);
+        result.addAll(roles);
+        return Set.copyOf(result);
+    }
+
+    public void setRoles(Set<Role> values) {
+        java.util.Objects.requireNonNull(values);
+        roles.clear();
+        roles.add(Role.ROLE_USER);
+        roles.addAll(values);
+    }
 
     @Column(unique = true, length = 64)
     private String verificationTokenHash;

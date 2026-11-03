@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<article th:fragment="content" class="vault article-reader" aria-labelledby="article-title">
+    <div th:if="${preview}" class="notice preview-banner"><strong th:text="#{article.previewNotice}"></strong> <a th:href="@{/admin/articles/{id}/edit(id=${article.id})}" th:text="#{article.backEditor}"></a></div>
+    <a th:href="${preview ? '/admin/articles' : '/articles'}" th:text="#{article.back}"></a>
+    <header class="article-reader-header">
+        <p class="eyebrow" th:text="${#messages.msg('article.category.' + article.category)}"></p>
+        <h1 id="article-title" th:text="${article.title}"></h1>
+        <p class="article-lead" th:text="${article.summary}"></p>
+        <p class="article-meta"><span th:text="${article.authorName}"></span> · <time th:datetime="${article.publishedAt != null ? article.publishedAt : article.updatedAt}" th:text="${article.displayDate}"></time> · <span th:text="#{article.reading(${article.readingMinutes})}"></span></p>
+        <a th:if="${isAdmin &amp;&amp; !preview}" th:href="@{/admin/articles/{id}/edit(id=${article.id})}" th:text="#{article.edit}"></a>
+    </header>
+    <img th:if="${article.coverPresent}" class="article-cover" th:src="${preview ? '/admin/articles/' + article.id + '/cover' : '/articles/' + article.id + '/cover'}" th:alt="${article.coverAlt}">
+    <div class="article-body" th:text="${article.body}"></div>
+    <footer class="article-reader-footer"><a href="/articles" th:text="#{articles.all}"></a></footer>
+</article>
+</body></html>

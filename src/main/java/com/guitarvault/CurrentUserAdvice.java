@@ -10,6 +10,16 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 @ControllerAdvice
 public class CurrentUserAdvice {
+    @ModelAttribute("isAdmin")
+    public boolean isAdmin(org.springframework.security.core.Authentication authentication) {
+        return ArticlePermissions.canPublish(authentication);
+    }
+
+    @ModelAttribute("canWriteArticles")
+    public boolean canWriteArticles(org.springframework.security.core.Authentication authentication) {
+        return ArticlePermissions.canWrite(authentication);
+    }
+
     @ModelAttribute("optionKeys")
     public Map<String, String> optionKeys() {
         return Map.ofEntries(
@@ -27,6 +37,9 @@ public class CurrentUserAdvice {
 
     private String languageUrl(HttpServletRequest request, String language) {
         var builder = UriComponentsBuilder.fromPath(request.getRequestURI());
+        if (request.getRequestURI().endsWith("/access-denied")) {
+            return builder.queryParam("lang", language).build().encode().toUriString();
+        }
         if ("GET".equals(request.getMethod())) {
             request.getParameterMap().forEach((key, values) -> {
                 if (!java.util.Set.of("password", "confirmPassword", "_csrf").contains(key)) {

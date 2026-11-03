@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault article-delete" aria-labelledby="article-delete-title">
+    <a href="/admin/articles" th:text="#{article.back}"></a><h1 id="article-delete-title" th:text="#{article.deleteHeading}"></h1>
+    <div class="panel"><h2 th:text="${article.title}"></h2><p th:text="#{article.deleteWarning}"></p><p th:if="${article.published}" class="notice error" th:text="#{article.deletePublished}"></p>
+        <form method="post" th:action="@{/admin/articles/{id}/delete(id=${article.id})}"><input type="hidden" name="version" th:value="${article.version}"><div class="actions"><button class="button danger-button" type="submit" th:text="#{article.confirmDelete}"></button><a href="/admin/articles" th:text="#{common.cancel}"></a></div></form>
+    </div>
+</section>
+</body></html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault recovery" aria-labelledby="access-title">
+    <div class="panel">
+        <p class="eyebrow">GUITAR VAULT</p>
+        <h1 id="access-title" th:text="${#messages.msg(expiredForm ? 'access.expiredHeading' : 'access.heading')}"></h1>
+        <p class="muted" th:text="${#messages.msg(expiredForm ? 'access.expiredText' : 'access.text')}"></p>
+        <p th:if="${currentUsername != null}"><span th:text="#{access.account}"></span> <strong th:text="${currentUsername}"></strong></p>
+        <div th:if="${expiredForm}">
+            <p class="muted" th:text="#{access.notSubmitted}"></p>
+            <a class="button" th:href="@{${recoveryUrl}}" th:text="#{access.reload}"></a>
+        </div>
+        <div th:unless="${expiredForm}">
+            <p class="muted" th:text="#{access.adminHint}"></p>
+            <form th:if="${currentUsername != null}" method="post" th:action="@{/logout}">
+                <button class="button" type="submit" th:text="#{access.switchAccount}"></button>
+            </form>
+            <a th:if="${currentUsername == null}" class="button" th:href="@{/login}" th:text="#{nav.login}"></a>
+        </div>
+        <p><a th:href="@{/}" th:text="#{access.home}"></a></p>
+    </div>
+</section>
+</body></html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><head><title>Instrument</title></head><body>
+<section th:fragment="content" class="vault instrument-detail" aria-labelledby="instrument-title">
+    <header class="page-header">
+        <div><p class="eyebrow" th:text="#{collection.label}"></p><h1 id="instrument-title" th:text="${instrument.name}"></h1>
+        <p class="muted"><span th:text="${instrument.brand}"></span> · <span th:text="${instrument.year != null ? instrument.year : #messages.msg('instrument.unknownYear')}"></span> · <span th:text="${#messages.msg(optionKeys.get(instrument.status))}"></span></p></div>
+        <a th:href="@{/instruments}" th:text="#{instrument.back}"></a>
+    </header>
+    <div class="panel">
+        <section class="instrument-section" th:if="${!#strings.isEmpty(instrument.serialNumber)}"><h2 th:text="#{instrument.serialNumber}"></h2><p class="instrument-text" th:text="${instrument.serialNumber}"></p></section>
+        <section class="instrument-section" th:if="${!#strings.isEmpty(instrument.previousOwner)}"><h2 th:text="#{instrument.previousOwner}"></h2><p class="instrument-text" th:text="${instrument.previousOwner}"></p></section>
+        <section class="instrument-section" th:unless="${#lists.isEmpty(instrument.photos)}">
+            <h2 th:text="#{instrument.photos}"></h2>
+            <div class="photo-gallery"><img th:each="photo : ${instrument.photos}" th:src="@{/instruments/{id}/photos/{photoId}(id=${instrument.id},photoId=${photo.id})}" th:alt="${instrument.name}" loading="lazy" /></div>
+        </section>
+        <section class="instrument-section" th:if="${!#strings.isEmpty(instrument.history)}"><h2 th:text="#{instrument.history}"></h2><p class="instrument-text" th:text="${instrument.history}"></p></section>
+        <section class="instrument-section" th:if="${!#strings.isEmpty(instrument.notes)}"><h2 th:text="#{instrument.notes}"></h2><p class="instrument-text" th:text="${instrument.notes}"></p></section>
+        <section class="instrument-section" th:unless="${#lists.isEmpty(instrument.recordings)}"><h2 th:text="#{instrument.recordings}"></h2><ul><li th:each="entry : ${instrument.recordings}" th:text="${entry}"></li></ul></section>
+        <section class="instrument-section" th:unless="${#lists.isEmpty(instrument.concerts)}"><h2 th:text="#{instrument.concerts}"></h2><ul><li th:each="entry : ${instrument.concerts}" th:text="${entry}"></li></ul></section>
+    </div>
+</section>
+</body></html>
