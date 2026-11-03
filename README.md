@@ -2,11 +2,49 @@
 
 Application Java 21 / Spring Boot.
 
+## Fixtures de démonstration
+
+Depuis le dossier `guitar-vault`, lancer :
+
+```sh
+./mvnw spring-boot:run -Dspring-boot.run.profiles=fixtures
+```
+
+Ouvrir <http://localhost:8082>. Le profil `fixtures` utilise la base persistante distincte `data/guitarvault-demo.mv.db` et son propre cookie de session `GUITARVAULT_DEMO_SESSION`. L’instance habituelle peut rester ouverte sur 8081 avec ses données dans `data/guitarvault.mv.db`. Le profil de démonstration écoute uniquement sur la machine locale.
+
+| Compte fictif | Rôle |
+| --- | --- |
+| `superadmin@guitar-vault.test` | `ROLE_SUPER_ADMIN` |
+| `admin@guitar-vault.test` | `ROLE_ADMIN` |
+| `editor@guitar-vault.test` | `ROLE_EDITOR` |
+| `superuser@guitar-vault.test` | `ROLE_SUPER_USER` |
+| `user@guitar-vault.test` | `ROLE_USER` |
+
+Mot de passe de démonstration commun : **`DemoGuitar2026!`**. Il est haché avec BCrypt dans la base. Pour choisir un autre mot de passe lors du **premier** chargement :
+
+```sh
+FIXTURES_PASSWORD='AutreMotDePasse!' ./mvnw spring-boot:run -Dspring-boot.run.profiles=fixtures
+```
+
+Les comptes sont déjà vérifiés ; le chargement n’envoie aucun email et ne nécessite pas Mailpit. Pour tester les parcours d’inscription et de récupération sur cette instance, démarrer Mailpit comme indiqué plus bas ; les liens pointent vers 8082.
+
+`AppFixtures.java` prépare également cinq articles (trois publiés et deux brouillons) et sept instruments répartis entre les comptes. Le chargement entier est transactionnel. Le marqueur `guitar-vault-demo-v1` dans `fixture_loads` empêche de rejouer un chargement déjà terminé : les textes, mots de passe, rôles et suppressions modifiés pendant les essais sont conservés au redémarrage. Changer `FIXTURES_PASSWORD` après le premier chargement ne réinitialise donc pas les comptes. Aucune purge automatique n’est effectuée. Une collision avec un compte déjà présent lors du premier chargement annule l’opération, sans modifier ce compte.
+
+Les fixtures ne s’activent qu’avec le profil `fixtures`. Le chargeur refuse les profils `prod`/`production` et toute base persistante autre que `data/guitarvault-demo` ; les tests utilisent une base H2 en mémoire indépendante. Le démarrage normal n’exécute pas les fixtures.
+
+## Rôles
+
+Les cinq rôles sont cumulables et enregistrés dans `user_roles`. Tous les comptes conservent `ROLE_USER`, y compris les comptes créés avant cette table. L’inscription publique attribue uniquement `ROLE_USER` et exige toujours la vérification de l’email. Les champs de rôle envoyés par le navigateur sont ignorés.
+
+`ROLE_ADMIN` et `ROLE_SUPER_ADMIN` peuvent gérer tous les articles, les publier, les remettre en brouillon et les supprimer. `ROLE_EDITOR` peut créer, modifier et prévisualiser uniquement ses propres brouillons ; la publication passe par un administrateur. Il ne peut pas modifier un article déjà publié ni lire les brouillons d’un autre auteur. `ROLE_SUPER_USER` conserve actuellement les permissions d’un membre, en attendant la définition des fonctions avancées. Les rôles administratifs n’ouvrent pas les collections privées des autres membres.
+
+L’attribution d’`ADMIN` par `APP_ADMIN_EMAILS` reste compatible avec les comptes existants. Elle s’ajoute aux rôles enregistrés pour les comptes vérifiés. Aucun écran d’attribution des rôles n’est ajouté par les fixtures ; les rôles de démonstration sont définis dans le chargeur. Aucun rôle `SUPER_ADMIN` n’est attribué au compte personnel : seul le compte fictif de la base de démonstration le reçoit.
+
 ## Journal et administration des articles
 
-L’accueil affiche les trois derniers articles publiés sous le bloc de bienvenue et son lien d’inscription. `/articles` propose le journal public avec recherche par titre/chapeau, filtre par rubrique et pagination. Chaque article dispose de sa page de lecture, de son auteur, de sa date et d’une estimation du temps de lecture. Aucun article de démonstration n’est ajouté à la base.
+L’accueil affiche les trois derniers articles publiés sous le bloc de bienvenue et son lien d’inscription. `/articles` propose le journal public avec recherche par titre/chapeau, filtre par rubrique et pagination. Chaque article dispose de sa page de lecture, de son auteur, de sa date et d’une estimation du temps de lecture. Le démarrage normal n’ajoute aucun article de démonstration.
 
-L’espace `/admin/articles` permet de créer, modifier, prévisualiser, publier, remettre en brouillon et supprimer les articles. Il affiche les compteurs, une recherche, les filtres de statut/rubrique et une liste paginée. La suppression demande une confirmation sur une page dédiée. Les brouillons, leurs couvertures et leurs aperçus restent réservés aux administrateurs. Les articles et couvertures sont persistés en base.
+L’espace `/admin/articles` permet de créer, modifier, prévisualiser, publier, remettre en brouillon et supprimer les articles selon les permissions du compte. Il affiche les compteurs, une recherche, les filtres de statut/rubrique et une liste paginée. La suppression demande une confirmation sur une page dédiée. Les brouillons, leurs couvertures et leurs aperçus restent privés : les administrateurs y accèdent tous, les éditeurs uniquement à leurs propres brouillons. Les articles et couvertures sont persistés en base.
 
 Pour attribuer le premier accès administrateur, configurer **l’adresse exacte d’un compte que vous contrôlez**, puis démarrer l’application :
 

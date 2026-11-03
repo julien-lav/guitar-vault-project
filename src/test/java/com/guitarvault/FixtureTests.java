@@ -153,7 +153,7 @@ class FixtureTests {
         Article published = articles.findAll().stream().filter(Article::isPublished).findFirst().orElseThrow();
         assertThatThrownBy(() -> articleService.save(published.getId(),
                 Map.of("version", "" + published.getVersion(), "action", "draft"), null,
-                account("editor").getEmail(), false)).isInstanceOf(org.springframework.web.server.ResponseStatusException.class);
+                account("editor").getEmail(), false)).isInstanceOf(org.springframework.security.access.AccessDeniedException.class);
     }
 
     @Test

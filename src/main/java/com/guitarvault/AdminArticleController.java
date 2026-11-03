@@ -73,7 +73,7 @@ public class AdminArticleController {
                         Model model, RedirectAttributes redirect) {
         if (id != null) ArticlePermissions.requireEditable(articles.find(id, true), authentication);
         if (!ArticlePermissions.canPublish(authentication) && !"draft".equals(params.get("action"))) {
-            throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN);
+            throw new org.springframework.security.access.AccessDeniedException("Only administrators can publish articles.");
         }
         try {
             Article article = articles.save(id, params, cover, authentication.getName(), ArticlePermissions.canPublish(authentication));

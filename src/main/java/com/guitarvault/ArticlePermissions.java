@@ -1,8 +1,7 @@
 package com.guitarvault;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.server.ResponseStatusException;
 
 public final class ArticlePermissions {
     private ArticlePermissions() { }
@@ -18,7 +17,7 @@ public final class ArticlePermissions {
     public static void requireEditable(Article article, Authentication authentication) {
         if (!canPublish(authentication) && (!canWrite(authentication) || article.isPublished()
                 || !article.getAuthor().getEmail().equalsIgnoreCase(authentication.getName()))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new AccessDeniedException("Article editing is not permitted for this account.");
         }
     }
 

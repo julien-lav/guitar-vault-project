@@ -64,7 +64,7 @@ public class ArticleService {
         Article article = id == null ? new Article() : checked(id, form.get("version"));
         if (!publisher && (!"draft".equals(form.get("action")) || article.isPublished()
                 || (id != null && !article.getAuthor().getEmail().equalsIgnoreCase(email)))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new org.springframework.security.access.AccessDeniedException("Article editing is not permitted for this account.");
         }
         String title = value(form, "title"), summary = value(form, "summary"), body = value(form, "body");
         String category = value(form, "category"), alt = value(form, "coverAlt"), action = value(form, "action");
