@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="content" class="vault wishlist-editor" aria-labelledby="wishlist-delete-title">
+    <header class="page-header"><h1 id="wishlist-delete-title" th:text="#{wishlist.remove}"></h1></header>
+    <div class="panel">
+        <p th:text="#{wishlist.deletePrompt(${item.name})}"></p>
+        <form method="post" th:action="@{/wishlist/{id}/delete(id=${item.id})}" class="actions">
+            <button class="button danger-button" type="submit" th:text="#{wishlist.remove}"></button>
+            <a th:href="@{/wishlist}" th:text="#{common.cancel}"></a>
+        </form>
+    </div>
+</section>
+</body>
+</html>

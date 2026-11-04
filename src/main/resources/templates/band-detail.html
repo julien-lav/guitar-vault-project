@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault band-profile" aria-labelledby="band-title">
+    <a th:href="@{/bands}" th:text="#{band.back}"></a>
+    <header class="page-header">
+        <div><p class="eyebrow" th:text="#{band.profile}"></p><h1 id="band-title" th:text="${band.name}"></h1><p class="muted" th:if="${!#strings.isEmpty(band.genre)}" th:text="${band.genre}"></p><p class="muted" th:if="${!#strings.isEmpty(band.city)}" th:text="${band.city}"></p></div>
+        <a class="button" th:if="${canEditBand}" th:href="@{/bands/{id}/edit(id=${band.id})}" th:text="#{band.edit}"></a>
+    </header>
+    <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
+    <div class="band-profile-grid">
+        <div>
+            <section class="panel band-section" aria-labelledby="band-about"><h2 id="band-about" th:text="#{band.about}"></h2><p class="instrument-text" th:if="${!#strings.isEmpty(band.description)}" th:text="${band.description}"></p><p class="muted" th:if="${#strings.isEmpty(band.description)}" th:text="#{band.noDescription}"></p></section>
+            <section class="panel band-section" aria-labelledby="band-members"><h2 id="band-members" th:text="#{band.members}"></h2><ul class="band-member-list"><li th:each="member : ${band.members}"><a th:href="@{/musicians/{id}(id=${member.id})}" th:text="${member.username}"></a><span class="muted" th:if="${member.id == band.creator.id}" th:text="#{band.creator}"></span></li></ul></section>
+        </div>
+        <aside class="panel band-links" aria-labelledby="band-listen">
+            <h2 id="band-listen" th:text="#{band.links}"></h2>
+            <p class="muted" th:if="${#strings.isEmpty(band.spotifyUrl) and #strings.isEmpty(band.deezerUrl) and #strings.isEmpty(band.websiteUrl)}" th:text="#{band.noLinks}"></p>
+            <a th:if="${!#strings.isEmpty(band.spotifyUrl)}" th:href="${band.spotifyUrl}" target="_blank" rel="noopener noreferrer" th:text="#{band.spotify}"></a>
+            <a th:if="${!#strings.isEmpty(band.deezerUrl)}" th:href="${band.deezerUrl}" target="_blank" rel="noopener noreferrer" th:text="#{band.deezer}"></a>
+            <a th:if="${!#strings.isEmpty(band.websiteUrl)}" th:href="${band.websiteUrl}" target="_blank" rel="noopener noreferrer" th:text="#{band.website}"></a>
+        </aside>
+    </div>
+</section>
+</body></html>

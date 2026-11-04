@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault band-editor" aria-labelledby="band-form-title">
+    <a th:href="@{/bands}" th:text="#{band.back}"></a>
+    <header class="page-header"><div><p class="eyebrow" th:text="#{band.profile}"></p><h1 id="band-form-title" th:text="${#messages.msg(title)}"></h1><p class="muted" th:text="#{band.formIntro}"></p></div></header>
+    <div th:if="${error}" class="notice error" role="alert" tabindex="-1" data-form-error th:text="${#messages.msg(error)}"></div>
+    <form class="panel" method="post" th:action="${bandId == null ? '/bands' : '/bands/' + bandId}">
+        <div class="fields">
+            <div class="field-wide"><label for="name" th:text="#{band.name}"></label><input id="name" name="name" required maxlength="100" th:value="${form['name']}"></div>
+            <div><label for="genre" th:text="#{band.genre}"></label><input id="genre" name="genre" maxlength="100" th:value="${form['genre']}"></div>
+            <div><label for="city" th:text="#{band.city}"></label><input id="city" name="city" maxlength="100" th:value="${form['city']}"></div>
+            <div class="field-wide"><label for="description" th:text="#{band.about}"></label><textarea id="description" name="description" rows="6" maxlength="5000" th:text="${form['description']}"></textarea></div>
+        </div>
+        <fieldset class="band-fieldset"><legend th:text="#{band.links}"></legend><p class="muted" th:text="#{band.linksHint}"></p><div class="fields">
+            <div class="field-wide"><label for="spotifyUrl">Spotify</label><input id="spotifyUrl" name="spotifyUrl" type="url" maxlength="2000" placeholder="https://open.spotify.com/artist/…" th:value="${form['spotifyUrl']}"></div>
+            <div class="field-wide"><label for="deezerUrl">Deezer</label><input id="deezerUrl" name="deezerUrl" type="url" maxlength="2000" placeholder="https://www.deezer.com/artist/…" th:value="${form['deezerUrl']}"></div>
+            <div class="field-wide"><label for="websiteUrl" th:text="#{band.website}"></label><input id="websiteUrl" name="websiteUrl" type="url" maxlength="2000" placeholder="https://…" th:value="${form['websiteUrl']}"></div>
+        </div></fieldset>
+        <div class="band-section"><label for="members" th:text="#{band.members}"></label><p id="members-help" class="muted" th:text="#{band.membersHint}"></p><textarea id="members" name="members" rows="5" maxlength="10000" aria-describedby="members-help" th:text="${form['members']}"></textarea></div>
+        <div class="actions"><button class="button" type="submit" th:text="#{band.save}"></button><a th:href="${bandId == null ? '/bands' : '/bands/' + bandId}" th:text="#{common.cancel}"></a></div>
+    </form>
+</section>
+</body></html>

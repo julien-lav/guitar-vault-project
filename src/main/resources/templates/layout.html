@@ -49,6 +49,9 @@
             <a href="/articles" th:text="#{nav.articles}">Articles</a>
             <a href="/dashboard" th:text="#{nav.dashboard}">Tableau de bord</a>
             <a href="/instruments" th:text="#{nav.instruments}">Mes instruments</a>
+            <a href="/studios" th:text="#{nav.studios}">Studios</a>
+            <a href="/bands" th:text="#{nav.bands}">Groupes</a>
+            <a href="/wishlist" th:text="#{nav.wishlist}">Ma liste de souhaits</a>
             <a th:if="${canWriteArticles}" href="/admin/articles" th:text="#{nav.admin}">Administration</a>
         </div>
         <div class="nav-actions">
@@ -57,6 +60,8 @@
                 <a href="/login" th:text="#{nav.login}">Se connecter</a>
             </div>
             <div class="nav-account" th:if="${currentUsername != null}">
+                <a th:href="@{/quotes}" th:text="#{nav.quotes}">Mes demandes</a>
+                <a th:href="@{/profile}" th:text="#{nav.profile}">Mon profil</a>
                 <span th:text="${currentUsername}"></span>
                 <form method="post" th:action="@{/logout}">
                     <button type="submit" th:text="#{nav.logout}">Se déconnecter</button>

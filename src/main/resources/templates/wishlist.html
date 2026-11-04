@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="content" class="vault wishlist" aria-labelledby="wishlist-title">
+    <header class="page-header">
+        <div>
+            <p class="eyebrow" th:text="#{wishlist.label}"></p>
+            <h1 id="wishlist-title" th:text="#{nav.wishlist}"></h1>
+            <p class="muted" th:text="#{wishlist.intro}"></p>
+            <p class="muted" th:text="#{wishlist.count(${#lists.size(items)})}"></p>
+        </div>
+        <a class="button" th:href="@{/wishlist/new}" th:text="#{wishlist.add}"></a>
+    </header>
+    <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
+    <div class="panel empty" th:if="${#lists.isEmpty(items)}">
+        <div class="empty-icon" aria-hidden="true">♡</div>
+        <h2 th:text="#{wishlist.emptyTitle}"></h2>
+        <p class="muted" th:text="#{wishlist.emptyText}"></p>
+        <a class="button" th:href="@{/wishlist/new}" th:text="#{wishlist.add}"></a>
+    </div>
+    <div class="wishlist-grid" th:unless="${#lists.isEmpty(items)}">
+        <article class="panel wishlist-card" th:each="item : ${items}">
+            <p class="eyebrow" th:text="${item.brand}"></p>
+            <h2 th:text="${item.name}"></h2>
+            <p class="muted" th:if="${item.year != null}"><span th:text="#{field.year}"></span>: <span th:text="${item.year}"></span></p>
+            <p class="instrument-text" th:if="${!#strings.isEmpty(item.notes)}" th:text="${item.notes}"></p>
+            <div class="actions">
+                <a th:href="@{/wishlist/{id}/edit(id=${item.id})}" th:text="#{wishlist.edit}" th:aria-label="#{wishlist.editItem(${item.name})}"></a>
+                <a class="danger-link" th:href="@{/wishlist/{id}/delete(id=${item.id})}" th:text="#{wishlist.remove}" th:aria-label="#{wishlist.removeItem(${item.name})}"></a>
+            </div>
+        </article>
+    </div>
+</section>
+</body>
+</html>

@@ -44,6 +44,33 @@ public class User {
     @Column(length = 1000)
     private String bio;
 
+    @Column(length = 100)
+    private String displayName;
+    @Column(length = 2000)
+    private String spotifyUrl;
+    @Column(length = 2000)
+    private String deezerUrl;
+    @Column(length = 2000)
+    private String websiteUrl;
+    @ElementCollection
+    @CollectionTable(name = "user_activities", joinColumns = @JoinColumn(name = "user_id"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "activity", nullable = false, length = 30)
+    private Set<ProfileActivity> activities = EnumSet.noneOf(ProfileActivity.class);
+
+    public String getDisplayName() { return displayName; }
+    public void setDisplayName(String value) { displayName = value; }
+    public String getSpotifyUrl() { return spotifyUrl; }
+    public void setSpotifyUrl(String value) { spotifyUrl = value; }
+    public String getDeezerUrl() { return deezerUrl; }
+    public void setDeezerUrl(String value) { deezerUrl = value; }
+    public String getWebsiteUrl() { return websiteUrl; }
+    public void setWebsiteUrl(String value) { websiteUrl = value; }
+    public Set<ProfileActivity> getActivities() { return Set.copyOf(activities); }
+    public void setActivities(Set<ProfileActivity> values) {
+        activities = new java.util.HashSet<>(values);
+    }
+
     private boolean enabled = true;
 
     @ElementCollection(fetch = FetchType.EAGER)

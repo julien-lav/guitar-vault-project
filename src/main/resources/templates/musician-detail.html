@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault member-profile" aria-labelledby="musician-title">
+    <header class="panel profile-header">
+        <div class="profile-identity">
+            <img class="profile-avatar" th:if="${profile.hasPhoto}" th:src="@{/musicians/{id}/photo(id=${profile.id})}" th:alt="#{profile.photoAlt(${profile.displayName})}" width="128" height="128">
+            <span class="profile-avatar profile-avatar-placeholder" th:unless="${profile.hasPhoto}" aria-hidden="true" th:text="${#strings.substring(profile.username, 0, 1)}"></span>
+            <div>
+                <p class="eyebrow" th:text="#{profile.member}"></p>
+                <h1 id="musician-title" th:text="${profile.displayName}"></h1>
+                <p class="muted profile-handle" th:text="${'@' + profile.username}"></p>
+                <div class="profile-activities"><span class="badge" th:each="activity : ${profile.activities}" th:text="${#messages.msg('profile.activity.' + activity)}"></span></div>
+            </div>
+        </div>
+        <a class="button" th:if="${canEditProfile}" th:href="@{/profile/edit}" th:text="#{profile.edit}"></a>
+    </header>
+    <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
+    <div class="profile-content-grid">
+        <section class="panel" aria-labelledby="profile-about">
+            <h2 id="profile-about" th:text="#{profile.about}"></h2>
+            <p class="instrument-text" th:if="${!#strings.isEmpty(profile.bio)}" th:text="${profile.bio}"></p>
+            <p class="muted" th:if="${#strings.isEmpty(profile.bio)}" th:text="#{profile.noBio}"></p>
+            <dl class="profile-facts">
+                <th:block th:if="${!#strings.isEmpty(profile.instrument)}"><dt th:text="#{profile.instruments}"></dt><dd th:text="${optionKeys.containsKey(profile.instrument) ? #messages.msg(optionKeys.get(profile.instrument)) : profile.instrument}"></dd></th:block>
+                <th:block th:if="${!#strings.isEmpty(profile.level)}"><dt th:text="#{field.level}"></dt><dd th:text="${optionKeys.containsKey(profile.level) ? #messages.msg(optionKeys.get(profile.level)) : profile.level}"></dd></th:block>
+                <th:block th:if="${!#strings.isEmpty(profile.city)}"><dt th:text="#{field.city}"></dt><dd th:text="${profile.city}"></dd></th:block>
+                <th:block th:if="${!#strings.isEmpty(profile.country)}"><dt th:text="#{field.country}"></dt><dd th:text="${profile.country}"></dd></th:block>
+            </dl>
+        </section>
+        <aside class="panel profile-links" aria-labelledby="profile-links-title">
+            <h2 id="profile-links-title" th:text="#{profile.links}"></h2>
+            <p class="muted" th:if="${#strings.isEmpty(profile.spotifyUrl) and #strings.isEmpty(profile.deezerUrl) and #strings.isEmpty(profile.websiteUrl)}" th:text="#{profile.noLinks}"></p>
+            <a th:if="${!#strings.isEmpty(profile.spotifyUrl)}" th:href="${profile.spotifyUrl}" target="_blank" rel="noopener noreferrer">Spotify ↗</a>
+            <a th:if="${!#strings.isEmpty(profile.deezerUrl)}" th:href="${profile.deezerUrl}" target="_blank" rel="noopener noreferrer">Deezer ↗</a>
+            <a th:if="${!#strings.isEmpty(profile.websiteUrl)}" th:href="${profile.websiteUrl}" target="_blank" rel="noopener noreferrer" th:text="#{profile.websiteVisit}"></a>
+        </aside>
+    </div>
+    <h2 class="band-section-title" th:text="#{band.musicianBands}"></h2>
+    <p class="panel muted" th:if="${#lists.isEmpty(bands)}" th:text="#{band.noMembership}"></p>
+    <div th:replace="~{bands :: cards}"></div>
+    <h2 class="studio-section-title" th:text="#{studio.memberStudios}"></h2>
+    <p class="panel muted" th:if="${#lists.isEmpty(studios)}" th:text="#{studio.none}"></p>
+    <div th:replace="~{studios :: cards}"></div>
+</section>
+</body></html>

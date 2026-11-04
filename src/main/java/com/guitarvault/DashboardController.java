@@ -22,8 +22,9 @@ public class DashboardController {
         List<Instrument> collection = instruments.instrumentsFor(owner);
         model.addAttribute("title", "page.dashboard");
         model.addAttribute("contentTemplate", "dashboard");
-        model.addAttribute("displayName", owner.getFullName() == null || owner.getFullName().isBlank()
-                ? owner.getUsername() : owner.getFullName());
+        model.addAttribute("displayName", owner.getDisplayName() != null && !owner.getDisplayName().isBlank()
+                ? owner.getDisplayName() : (owner.getFullName() == null || owner.getFullName().isBlank()
+                ? owner.getUsername() : owner.getFullName()));
         model.addAttribute("stats", List.of(
                 Map.of("label", "stats.total", "value", collection.size()),
                 Map.of("label", "stats.active", "value", count(collection, "Actif")),

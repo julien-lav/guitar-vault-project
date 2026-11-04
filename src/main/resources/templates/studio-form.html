@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault studio-editor" aria-labelledby="studio-form-title">
+    <a th:href="@{/studios}" th:text="#{studio.back}"></a>
+    <header class="page-header"><div><p class="eyebrow" th:text="#{studio.profile}"></p><h1 id="studio-form-title" th:text="${#messages.msg(title)}"></h1><p class="muted" th:text="#{studio.formIntro}"></p></div></header>
+    <div th:if="${error}" class="notice error" role="alert" tabindex="-1" data-form-error th:text="${#messages.msg(error)}"></div>
+    <form class="panel" method="post" enctype="multipart/form-data" th:action="${studioId == null ? '/studios' : '/studios/' + studioId}">
+        <div class="fields">
+            <div class="field-wide"><label for="name" th:text="#{studio.name}"></label><input id="name" name="name" required maxlength="100" th:value="${form['name']}"></div>
+            <div><label for="city" th:text="#{studio.city}"></label><input id="city" name="city" maxlength="100" th:value="${form['city']}"></div>
+            <div><label for="country" th:text="#{studio.country}"></label><input id="country" name="country" maxlength="100" th:value="${form['country']}"></div>
+            <div class="field-wide"><label for="capacity" th:text="#{studio.capacity}"></label><input id="capacity" name="capacity" type="number" min="1" max="1000" step="1" th:value="${form['capacity']}" aria-describedby="capacity-help"><p id="capacity-help" class="field-hint" th:text="#{studio.capacityHint}"></p></div>
+            <div class="field-wide"><label for="description" th:text="#{studio.about}"></label><textarea id="description" name="description" rows="5" maxlength="5000" th:text="${form['description']}"></textarea></div>
+            <div class="field-wide"><label for="services" th:text="#{studio.services}"></label><textarea id="services" name="services" rows="4" maxlength="5000" th:text="${form['services']}" th:placeholder="#{studio.servicesPlaceholder}"></textarea></div>
+            <div class="field-wide"><label for="equipment" th:text="#{studio.equipment}"></label><textarea id="equipment" name="equipment" rows="4" maxlength="5000" th:text="${form['equipment']}" th:placeholder="#{studio.equipmentPlaceholder}"></textarea></div>
+            <div class="field-wide"><label for="websiteUrl" th:text="#{studio.website}"></label><input id="websiteUrl" name="websiteUrl" type="url" maxlength="2000" placeholder="https://…" th:value="${form['websiteUrl']}" aria-describedby="website-help"><p id="website-help" class="field-hint" th:text="#{studio.websiteHint}"></p></div>
+            <div class="field-wide"><label for="contactEmail" th:text="#{studio.contactEmail}"></label><input id="contactEmail" name="contactEmail" type="email" maxlength="254" th:value="${form['contactEmail']}" aria-describedby="contact-help"><p id="contact-help" class="field-hint" th:text="#{studio.contactHint}"></p></div>
+        </div>
+        <fieldset class="studio-fieldset">
+            <legend th:text="#{studio.pricing}"></legend><p class="muted" th:text="#{studio.pricingHint}"></p>
+            <div class="fields">
+                <div><label for="hourlyRate" th:text="#{studio.hourlyRate}"></label><input id="hourlyRate" name="hourlyRate" type="text" inputmode="decimal" maxlength="9" pattern="[0-9]{1,6}([.,][0-9]{1,2})?" th:value="${form['hourlyRate']}" aria-describedby="rate-help"><p id="rate-help" class="field-hint" th:text="#{studio.rateHint}"></p></div>
+                <div><label for="mixingRate" th:text="#{studio.mixingRate}"></label><input id="mixingRate" name="mixingRate" type="text" inputmode="decimal" maxlength="9" pattern="[0-9]{1,6}([.,][0-9]{1,2})?" th:value="${form['mixingRate']}"></div>
+                <div><label for="masteringRate" th:text="#{studio.masteringRate}"></label><input id="masteringRate" name="masteringRate" type="text" inputmode="decimal" maxlength="9" pattern="[0-9]{1,6}([.,][0-9]{1,2})?" th:value="${form['masteringRate']}"></div>
+                <div><label for="dayRate" th:text="#{studio.dayRate}"></label><input id="dayRate" name="dayRate" type="text" inputmode="decimal" maxlength="9" pattern="[0-9]{1,6}([.,][0-9]{1,2})?" th:value="${form['dayRate']}"></div>
+                <div class="field-wide"><label for="pricingNotes" th:text="#{studio.pricingNotes}"></label><textarea id="pricingNotes" name="pricingNotes" rows="3" maxlength="1000" th:text="${form['pricingNotes']}" th:placeholder="#{studio.pricingNotesPlaceholder}"></textarea></div>
+            </div>
+        </fieldset>
+        <fieldset class="studio-fieldset">
+            <legend th:text="#{studio.photos}"></legend>
+            <p class="muted" th:text="#{studio.photosHint}"></p>
+            <div class="studio-photo-grid" th:unless="${#lists.isEmpty(photos)}">
+                <label class="studio-photo-choice" th:each="photo, row : ${photos}">
+                    <img th:src="@{/studios/{id}/photos/{photoId}(id=${studioId},photoId=${photo.id})}" th:alt="#{studio.savedPhoto(${row.count})}" width="240" height="160" loading="lazy">
+                    <span><input type="checkbox" name="removePhotos" th:value="${photo.id}" th:checked="${#lists.contains(selectedPhotos, photo.id)}"><span th:text="#{studio.removePhoto(${row.count})}"></span></span>
+                </label>
+            </div>
+            <label for="studio-photos" th:text="#{studio.addPhotos}"></label><input id="studio-photos" name="photos" type="file" accept="image/jpeg,image/png" multiple aria-describedby="studio-photos-help"><p id="studio-photos-help" class="field-hint" th:text="#{studio.photoSaveHint}"></p>
+        </fieldset>
+        <div class="actions"><button class="button" type="submit" th:text="#{studio.save}"></button><a th:href="${studioId == null ? '/studios' : '/studios/' + studioId}" th:text="#{common.cancel}"></a></div>
+    </form>
+</section>
+</body></html>

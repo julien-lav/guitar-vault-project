@@ -12,6 +12,13 @@
         <a class="button" th:href="@{/instruments/new}" th:text="#{instrument.add}">+ Ajouter un instrument</a>
     </header>
     <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
+    <section class="panel profile-dashboard" aria-labelledby="dashboard-profile">
+        <div class="panel-heading"><h2 id="dashboard-profile" th:text="#{nav.profile}"></h2><a th:href="@{/profile/edit}" th:text="#{profile.edit}"></a></div>
+        <p class="muted" th:text="#{profile.dashboardIntro}"></p>
+    </section>
+    <section class="panel quote-dashboard" aria-labelledby="dashboard-quotes">
+        <div class="panel-heading"><h2 id="dashboard-quotes" th:text="#{nav.quotes}"></h2><a th:href="@{/quotes}" th:text="#{quote.view}"></a></div><p class="muted" th:text="#{quote.inboxIntro}"></p>
+    </section>
     <div class="stats" th:aria-label="#{dashboard.summary}">
         <div class="stat" th:each="stat : ${stats}">
             <span class="muted" th:text="${#messages.msg(stat.label)}"></span>
@@ -24,6 +31,21 @@
             <a th:if="${!#lists.isEmpty(instruments)}" th:href="@{/instruments}" th:text="#{dashboard.viewAll}">Voir toute ma collection →</a>
         </div>
         <div th:replace="~{instruments :: collection}"></div>
+    </section>
+    <section class="panel studio-dashboard" aria-labelledby="dashboard-studios">
+        <div class="panel-heading"><h2 id="dashboard-studios" th:text="#{studio.mine}"></h2><a th:href="@{/studios}" th:text="#{studio.view}"></a></div>
+        <p class="muted" th:text="#{studio.intro}"></p>
+    </section>
+    <section class="panel band-dashboard" aria-labelledby="dashboard-bands">
+        <div class="panel-heading"><h2 id="dashboard-bands" th:text="#{band.mine}"></h2><a th:href="@{/bands}" th:text="#{band.view}"></a></div>
+        <p class="muted" th:text="#{band.intro}"></p>
+    </section>
+    <section class="panel wishlist-dashboard" aria-labelledby="wishlist-heading">
+        <div class="panel-heading">
+            <h2 id="wishlist-heading" th:text="#{nav.wishlist}"></h2>
+            <a th:href="@{/wishlist}" th:text="#{wishlist.view}"></a>
+        </div>
+        <p class="muted" th:text="#{wishlist.intro}"></p>
     </section>
 </section>
 </body>

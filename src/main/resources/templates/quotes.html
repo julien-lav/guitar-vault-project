@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault quote-inbox" aria-labelledby="quotes-title">
+    <header class="page-header"><div><p class="eyebrow" th:text="#{quote.label}"></p><h1 id="quotes-title" th:text="#{nav.quotes}"></h1><p class="muted" th:text="#{quote.inboxIntro}"></p></div><a class="button" th:href="@{/studios}" th:text="#{quote.findStudio}"></a></header>
+    <section class="panel quote-section" aria-labelledby="quotes-sent"><div class="panel-heading"><h2 id="quotes-sent" th:text="#{quote.sentTitle}"></h2></div><p class="muted" th:if="${#lists.isEmpty(sentQuotes)}" th:text="#{quote.emptySent}"></p><div th:replace="~{quotes :: table(${sentQuotes}, false)}"></div></section>
+    <section class="panel quote-section" aria-labelledby="quotes-received"><div class="panel-heading"><h2 id="quotes-received" th:text="#{quote.receivedTitle}"></h2></div><p class="muted" th:if="${#lists.isEmpty(receivedQuotes)}" th:text="#{quote.emptyReceived}"></p><div th:replace="~{quotes :: table(${receivedQuotes}, true)}"></div></section>
+</section>
+<div th:fragment="table(items, received)" class="table-scroll" th:unless="${#lists.isEmpty(items)}">
+    <table th:aria-label="${#messages.msg(received ? 'quote.receivedTitle' : 'quote.sentTitle')}">
+        <thead><tr><th scope="col" th:text="#{quote.project}"></th><th scope="col" th:text="#{quote.studio}"></th><th scope="col" th:if="${received}" th:text="#{quote.requester}"></th><th scope="col" th:text="#{quote.created}"></th><th scope="col" th:text="#{quote.status}"></th></tr></thead>
+        <tbody><tr th:each="q : ${items}"><td><a th:href="@{/quotes/{id}(id=${q.id})}" th:text="${q.title}"></a></td><td th:text="${q.studio.name}"></td><td th:if="${received}" th:text="${q.requester.username}"></td><td th:text="${#temporals.format(q.createdDate, 'dd/MM/yyyy')}"></td><td><span class="badge quote-status" th:classappend="${q.status.name() == 'PENDING' ? 'pending' : ''}" th:text="${#messages.msg('quote.status.' + q.status)}"></span></td></tr></tbody>
+    </table>
+</div>
+</body></html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault quote-detail" aria-labelledby="quote-title">
+    <a th:href="@{/quotes}" th:text="#{quote.back}"></a>
+    <header class="page-header"><div><p class="eyebrow" th:text="#{quote.label}"></p><h1 id="quote-title" th:text="${quote.title}"></h1></div><span class="badge quote-status" th:classappend="${quote.status.name() == 'PENDING' ? 'pending' : ''}" th:text="${#messages.msg('quote.status.' + quote.status)}"></span></header>
+    <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
+    <div th:if="${error}" class="notice error" role="alert" tabindex="-1" data-form-error th:text="${#messages.msg(error)}"></div>
+    <section class="panel quote-section" aria-labelledby="quote-project-heading">
+        <h2 id="quote-project-heading" th:text="#{quote.description}"></h2>
+        <dl class="profile-facts">
+            <dt th:text="#{quote.studio}"></dt><dd><a th:href="@{/studios/{id}(id=${quote.studio.id})}" th:text="${quote.studio.name}"></a></dd>
+            <dt th:text="#{quote.requester}"></dt><dd><a th:href="@{/musicians/{id}(id=${quote.requester.id})}" th:text="${quote.requester.username}"></a></dd>
+            <dt th:text="#{quote.created}"></dt><dd th:text="${#temporals.format(quote.createdDate, 'dd/MM/yyyy')}"></dd>
+            <dt th:text="#{quote.dates}"></dt><dd><span th:if="${quote.startDate == null}" th:text="#{quote.flexibleDates}"></span><span th:if="${quote.startDate != null}" th:text="${#temporals.format(quote.startDate, 'dd/MM/yyyy')}"></span><span th:if="${quote.endDate != null}" th:text="${' — ' + #temporals.format(quote.endDate, 'dd/MM/yyyy')}"></span></dd>
+            <dt th:text="#{quote.budget}"></dt><dd><span th:if="${quote.budget == null}" th:text="#{quote.unspecifiedBudget}"></span><span th:if="${quote.budget != null}" th:text="#{quote.euros(${#numbers.formatDecimal(quote.budget, 1, 2)})}"></span></dd>
+        </dl>
+        <p class="instrument-text" th:text="${quote.description}"></p>
+    </section>
+    <section class="panel quote-section" th:if="${quote.status.name() == 'ANSWERED'}" aria-labelledby="quote-response-title">
+        <h2 id="quote-response-title" th:text="#{quote.response}"></h2><p class="instrument-text" th:text="${quote.reply}"></p>
+        <p th:if="${quote.proposedAmount != null}"><strong th:text="#{quote.proposedAmount}"></strong> <span th:text="#{quote.euros(${#numbers.formatDecimal(quote.proposedAmount, 1, 2)})}"></span></p>
+    </section>
+    <section class="panel quote-section" th:if="${isStudioManager and quote.status.name() == 'PENDING'}" aria-labelledby="quote-reply-title">
+        <h2 id="quote-reply-title" th:text="#{quote.replyTitle}"></h2>
+        <form method="post" th:action="@{/quotes/{id}/reply(id=${quote.id})}" class="quote-reply-form">
+            <div class="fields"><div class="field-wide"><label for="message" th:text="#{quote.message}"></label><textarea id="message" name="message" required rows="6" maxlength="5000" th:text="${replyForm['message']}"></textarea></div><div class="field-wide"><label for="amount" th:text="#{quote.proposedAmount}"></label><input id="amount" name="amount" type="text" inputmode="decimal" maxlength="9" pattern="[0-9]{1,6}([.,][0-9]{1,2})?" th:value="${replyForm['amount']}" aria-describedby="amount-help"><p id="amount-help" class="field-hint" th:text="#{quote.amountHint}"></p></div></div>
+            <p class="muted" th:text="#{quote.replyHint}"></p><button class="button" type="submit" th:text="#{quote.sendReply}"></button>
+        </form>
+    </section>
+    <p class="panel muted" th:if="${!isStudioManager and quote.status.name() == 'PENDING'}" th:text="#{quote.waiting}"></p>
+    <p class="muted" th:text="#{quote.noBooking}"></p>
+</section>
+</body></html>

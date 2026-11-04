@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault profile-editor" aria-labelledby="profile-form-title">
+    <a th:href="@{/profile}" th:text="#{profile.back}"></a>
+    <header class="page-header"><div><p class="eyebrow" th:text="#{profile.member}"></p><h1 id="profile-form-title" th:text="#{profile.edit}"></h1><p class="muted" th:text="#{profile.formIntro}"></p></div></header>
+    <div th:if="${error}" class="notice error" role="alert" tabindex="-1" data-form-error th:text="${#messages.msg(error)}"></div>
+    <form class="panel" method="post" enctype="multipart/form-data" th:action="@{/profile}">
+        <fieldset class="profile-fieldset">
+            <legend th:text="#{profile.identity}"></legend>
+            <div class="fields">
+                <div class="field-wide"><label for="displayName" th:text="#{profile.displayName}"></label><input id="displayName" name="displayName" maxlength="100" th:value="${form['displayName']}" th:placeholder="${profile.username}" aria-describedby="display-name-help"><p id="display-name-help" class="field-hint" th:text="#{profile.nameHint(${profile.username})}"></p></div>
+                <div><label for="city" th:text="#{field.city}"></label><input id="city" name="city" maxlength="100" autocomplete="address-level2" th:value="${form['city']}"></div>
+                <div><label for="country" th:text="#{field.country}"></label><input id="country" name="country" maxlength="100" autocomplete="country-name" th:value="${form['country']}"></div>
+                <div class="field-wide"><label for="bio" th:text="#{field.bio}"></label><textarea id="bio" name="bio" rows="5" maxlength="1000" th:text="${form['bio']}" aria-describedby="bio-help"></textarea><p class="field-hint" id="bio-help" th:text="#{signup.bioHelp}"></p></div>
+            </div>
+        </fieldset>
+        <fieldset class="profile-fieldset">
+            <legend th:text="#{profile.activities}"></legend>
+            <p class="muted" th:text="#{profile.activitiesHint}"></p>
+            <div class="profile-checkboxes">
+                <label class="profile-checkbox"><input type="checkbox" name="activities" value="MUSICIAN" th:checked="${#lists.contains(selectedActivities, 'MUSICIAN')}"><span th:text="#{profile.activity.MUSICIAN}"></span></label>
+                <label class="profile-checkbox"><input type="checkbox" name="activities" value="SOUND_ENGINEER" th:checked="${#lists.contains(selectedActivities, 'SOUND_ENGINEER')}"><span th:text="#{profile.activity.SOUND_ENGINEER}"></span></label>
+            </div>
+            <div class="fields">
+                <div><label for="instrument" th:text="#{profile.instruments}"></label><input id="instrument" name="instrument" maxlength="255" th:value="${form['instrument']}" th:placeholder="#{profile.instrumentsPlaceholder}"></div>
+                <div><label for="level" th:text="#{field.level}"></label><select id="level" name="level"><option value="" th:text="#{signup.chooseLevel}"></option><option th:each="option : ${ {'Débutant', 'Intermédiaire', 'Avancé'} }" th:value="${option}" th:text="${#messages.msg(optionKeys.get(option))}" th:selected="${form['level'] == option}"></option></select></div>
+            </div>
+        </fieldset>
+        <fieldset class="profile-fieldset">
+            <legend th:text="#{profile.photo}"></legend>
+            <img class="profile-avatar" th:if="${profile.hasPhoto}" th:src="@{/musicians/{id}/photo(id=${profile.id})}" th:alt="#{profile.photoAlt(${profile.displayName})}" width="128" height="128">
+            <label for="photo" th:text="#{profile.choosePhoto}"></label><input id="photo" name="photo" type="file" accept="image/jpeg,image/png" aria-describedby="photo-help">
+            <p id="photo-help" class="field-hint" th:text="#{profile.photoHint}"></p>
+            <label class="profile-checkbox" th:if="${profile.hasPhoto}"><input type="checkbox" name="removePhoto" value="true"><span th:text="#{profile.removePhoto}"></span></label>
+        </fieldset>
+        <fieldset class="profile-fieldset">
+            <legend th:text="#{profile.links}"></legend><p class="muted" th:text="#{profile.linksHint}"></p>
+            <div class="fields">
+                <div class="field-wide"><label for="spotifyUrl">Spotify</label><input id="spotifyUrl" name="spotifyUrl" type="url" maxlength="2000" placeholder="https://open.spotify.com/artist/…" th:value="${form['spotifyUrl']}"></div>
+                <div class="field-wide"><label for="deezerUrl">Deezer</label><input id="deezerUrl" name="deezerUrl" type="url" maxlength="2000" placeholder="https://www.deezer.com/artist/…" th:value="${form['deezerUrl']}"></div>
+                <div class="field-wide"><label for="websiteUrl" th:text="#{profile.website}"></label><input id="websiteUrl" name="websiteUrl" type="url" maxlength="2000" placeholder="https://…" th:value="${form['websiteUrl']}"></div>
+            </div>
+        </fieldset>
+        <div class="actions"><button class="button" type="submit" th:text="#{profile.save}"></button><a th:href="@{/profile}" th:text="#{common.cancel}"></a></div>
+    </form>
+</section>
+</body></html>

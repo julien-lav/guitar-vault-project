@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault" aria-labelledby="studios-title">
+    <header class="page-header">
+        <div><p class="eyebrow" th:text="#{studio.community}"></p><h1 id="studios-title" th:text="#{nav.studios}"></h1><p class="muted" th:text="#{studio.intro}"></p></div>
+        <a class="button" th:href="@{/studios/new}" th:text="#{studio.create}"></a>
+    </header>
+    <section class="panel studio-section" aria-labelledby="my-studios-title">
+        <div class="panel-heading"><h2 id="my-studios-title" th:text="#{studio.mine}"></h2></div>
+        <p class="muted" th:if="${#lists.isEmpty(myStudios)}" th:text="#{studio.none}"></p>
+        <ul class="studio-list" th:unless="${#lists.isEmpty(myStudios)}"><li th:each="studio : ${myStudios}"><a th:href="@{/studios/{id}(id=${studio.id})}" th:text="${studio.name}"></a></li></ul>
+    </section>
+    <h2 class="studio-section-title" th:text="#{studio.discover}"></h2>
+    <form class="panel studio-search" method="get" th:action="@{/studios}" aria-labelledby="studio-search-title">
+        <h3 id="studio-search-title" th:text="#{studio.searchTitle}"></h3>
+        <div class="fields">
+            <div><label for="search-city" th:text="#{studio.city}"></label><input id="search-city" name="city" maxlength="100" th:value="${filters['city']}" th:placeholder="#{studio.cityPlaceholder}"></div>
+            <div><label for="search-country" th:text="#{studio.country}"></label><input id="search-country" name="country" maxlength="100" th:value="${filters['country']}"></div>
+            <div><label for="min-price" th:text="#{studio.minPrice}"></label><input id="min-price" name="minPrice" type="number" min="0" max="999999.99" step="0.01" th:value="${filters['minPrice']}"></div>
+            <div><label for="max-price" th:text="#{studio.maxPrice}"></label><input id="max-price" name="maxPrice" type="number" min="0" max="999999.99" step="0.01" th:value="${filters['maxPrice']}"></div>
+        </div>
+        <p class="field-hint" th:text="#{studio.searchHint}"></p>
+        <div class="actions"><button class="button" type="submit" th:text="#{studio.search}"></button><a th:href="@{/studios}" th:text="#{studio.reset}"></a></div>
+    </form>
+    <div th:if="${searchError}" class="notice error" role="alert" th:text="${#messages.msg(searchError)}"></div>
+    <p th:unless="${searchError}" class="muted" role="status" th:text="#{studio.resultCount(${#lists.size(studios)})}"></p>
+    <div class="panel empty" th:if="${#lists.isEmpty(studios) and !hasFilters}"><h2 th:text="#{studio.emptyTitle}"></h2><p class="muted" th:text="#{studio.emptyText}"></p><a class="button" th:href="@{/studios/new}" th:text="#{studio.create}"></a></div>
+    <div class="panel empty" th:if="${#lists.isEmpty(studios) and hasFilters and searchError == null}"><h2 th:text="#{studio.noResults}"></h2><p class="muted" th:text="#{studio.noResultsHint}"></p><a th:href="@{/studios}" th:text="#{studio.reset}"></a></div>
+    <div th:replace="~{studios :: cards}"></div>
+</section>
+<div th:fragment="cards" class="studio-grid">
+    <article class="panel studio-card" th:each="studio : ${studios}">
+        <p class="eyebrow" th:text="#{studio.profile}"></p>
+        <h2><a th:href="@{/studios/{id}(id=${studio.id})}" th:text="${studio.name}"></a></h2>
+        <p class="muted" th:if="${!#strings.isEmpty(studio.city)}" th:text="${studio.city}"></p>
+        <p class="muted" th:if="${!#strings.isEmpty(studio.country)}" th:text="${studio.country}"></p>
+        <p class="muted" th:if="${studio.capacity != null}" th:text="#{studio.capacityValue(${studio.capacity})}"></p>
+        <p class="studio-price" th:if="${studio.hourlyRate != null}" th:text="#{studio.rateValue(${#numbers.formatDecimal(studio.hourlyRate, 1, 2)})}"></p>
+        <p class="muted" th:if="${studio.hourlyRate == null}" th:text="#{studio.rateUnknown}"></p>
+    </article>
+</div>
+</body></html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault" aria-labelledby="bands-title">
+    <header class="page-header">
+        <div><p class="eyebrow" th:text="#{band.community}"></p><h1 id="bands-title" th:text="#{nav.bands}"></h1><p class="muted" th:text="#{band.intro}"></p></div>
+        <a class="button" th:href="@{/bands/new}" th:text="#{band.create}"></a>
+    </header>
+    <section class="panel band-my" aria-labelledby="my-bands-title">
+        <div class="panel-heading"><h2 id="my-bands-title" th:text="#{band.mine}"></h2></div>
+        <p class="muted" th:if="${#lists.isEmpty(myBands)}" th:text="#{band.noMembership}"></p>
+        <ul class="band-member-list" th:unless="${#lists.isEmpty(myBands)}"><li th:each="band : ${myBands}"><a th:href="@{/bands/{id}(id=${band.id})}" th:text="${band.name}"></a></li></ul>
+    </section>
+    <h2 class="band-section-title" th:text="#{band.discover}"></h2>
+    <div class="panel empty" th:if="${#lists.isEmpty(bands)}"><h2 th:text="#{band.emptyTitle}"></h2><p class="muted" th:text="#{band.emptyText}"></p><a class="button" th:href="@{/bands/new}" th:text="#{band.create}"></a></div>
+    <div th:replace="~{bands :: cards}"></div>
+</section>
+<div th:fragment="cards" class="band-grid">
+    <article class="panel band-card" th:each="band : ${bands}">
+        <p class="eyebrow" th:if="${!#strings.isEmpty(band.genre)}" th:text="${band.genre}"></p>
+        <h2><a th:href="@{/bands/{id}(id=${band.id})}" th:text="${band.name}"></a></h2>
+        <p class="muted" th:if="${!#strings.isEmpty(band.city)}" th:text="${band.city}"></p>
+        <p class="muted" th:text="#{band.memberCount(${#sets.size(band.members)})}"></p>
+    </article>
+</div>
+</body></html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault studio-profile" aria-labelledby="studio-title">
+    <a th:href="@{/studios}" th:text="#{studio.back}"></a>
+    <header class="page-header">
+        <div><p class="eyebrow" th:text="#{studio.profile}"></p><h1 id="studio-title" th:text="${studio.name}"></h1><p class="muted" th:if="${!#strings.isEmpty(studio.city)}" th:text="${studio.city}"></p><p class="muted" th:if="${!#strings.isEmpty(studio.country)}" th:text="${studio.country}"></p></div>
+        <a class="button" th:if="${canEditStudio}" th:href="@{/studios/{id}/edit(id=${studio.id})}" th:text="#{studio.edit}"></a>
+    </header>
+    <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
+    <section class="panel studio-section" th:unless="${#lists.isEmpty(photos)}" aria-labelledby="studio-photos-heading">
+        <h2 id="studio-photos-heading" th:text="#{studio.photos}"></h2>
+        <div class="studio-photo-grid"><a th:each="photo, row : ${photos}" th:href="@{/studios/{id}/photos/{photoId}(id=${studio.id},photoId=${photo.id})}" target="_blank" rel="noopener noreferrer"><img th:src="@{/studios/{id}/photos/{photoId}(id=${studio.id},photoId=${photo.id})}" th:alt="#{studio.photoAlt(${studio.name},${row.count})}" width="360" height="240" loading="lazy"></a></div>
+    </section>
+    <div class="studio-profile-grid">
+        <div>
+            <section class="panel studio-section" th:if="${studio.capacity != null}" aria-labelledby="studio-capacity-heading"><h2 id="studio-capacity-heading" th:text="#{studio.capacity}"></h2><p th:text="#{studio.capacityValue(${studio.capacity})}"></p></section>
+            <section class="panel studio-section" th:if="${studio.hourlyRate != null or studio.mixingRate != null or studio.masteringRate != null or studio.dayRate != null or !#strings.isEmpty(studio.pricingNotes)}" aria-labelledby="studio-pricing-heading">
+                <h2 id="studio-pricing-heading" th:text="#{studio.pricing}"></h2>
+                <dl class="studio-rate-list">
+                    <th:block th:if="${studio.hourlyRate != null}"><dt th:text="#{studio.recordingRate}"></dt><dd th:text="#{studio.rateValue(${#numbers.formatDecimal(studio.hourlyRate,1,2)})}"></dd></th:block>
+                    <th:block th:if="${studio.mixingRate != null}"><dt th:text="#{studio.mixing}"></dt><dd th:text="#{studio.trackRateValue(${#numbers.formatDecimal(studio.mixingRate,1,2)})}"></dd></th:block>
+                    <th:block th:if="${studio.masteringRate != null}"><dt th:text="#{studio.mastering}"></dt><dd th:text="#{studio.trackRateValue(${#numbers.formatDecimal(studio.masteringRate,1,2)})}"></dd></th:block>
+                    <th:block th:if="${studio.dayRate != null}"><dt th:text="#{studio.day}"></dt><dd th:text="#{studio.dayRateValue(${#numbers.formatDecimal(studio.dayRate,1,2)})}"></dd></th:block>
+                </dl>
+                <p class="instrument-text" th:if="${!#strings.isEmpty(studio.pricingNotes)}" th:text="${studio.pricingNotes}"></p>
+            </section>
+            <section class="panel studio-section" aria-labelledby="studio-about"><h2 id="studio-about" th:text="#{studio.about}"></h2><p class="instrument-text" th:if="${!#strings.isEmpty(studio.description)}" th:text="${studio.description}"></p><p class="muted" th:if="${#strings.isEmpty(studio.description)}" th:text="#{studio.noDescription}"></p></section>
+            <section class="panel studio-section" th:if="${!#strings.isEmpty(studio.services)}" aria-labelledby="studio-services"><h2 id="studio-services" th:text="#{studio.services}"></h2><p class="instrument-text" th:text="${studio.services}"></p></section>
+            <section class="panel studio-section" th:if="${!#strings.isEmpty(studio.equipment)}" aria-labelledby="studio-equipment"><h2 id="studio-equipment" th:text="#{studio.equipment}"></h2><p class="instrument-text" th:text="${studio.equipment}"></p></section>
+        </div>
+        <aside class="panel studio-contact" aria-labelledby="studio-contact">
+            <h2 id="studio-contact" th:text="#{studio.contact}"></h2>
+            <p th:unless="${canEditStudio}"><a class="button" th:href="@{/studios/{id}/quotes/new(id=${studio.id})}" th:text="#{quote.request}"></a></p>
+            <p th:if="${canEditStudio}"><a th:href="@{/quotes}" th:text="#{quote.manage}"></a></p>
+            <p class="studio-price" th:if="${studio.hourlyRate != null}" th:text="#{studio.rateValue(${#numbers.formatDecimal(studio.hourlyRate, 1, 2)})}"></p>
+            <p class="muted" th:if="${studio.hourlyRate == null}" th:text="#{studio.rateUnknown}"></p>
+            <p class="muted" th:text="#{studio.manager}"></p><a th:href="@{/musicians/{id}(id=${studio.creator.id})}" th:text="${studio.creator.username}"></a>
+            <p th:if="${!#strings.isEmpty(studio.contactEmail)}" th:text="${studio.contactEmail}"></p>
+            <p th:if="${!#strings.isEmpty(studio.websiteUrl)}"><a th:href="${studio.websiteUrl}" target="_blank" rel="noopener noreferrer" th:text="#{studio.websiteVisit}"></a></p>
+        </aside>
+    </div>
+</section>
+</body></html>

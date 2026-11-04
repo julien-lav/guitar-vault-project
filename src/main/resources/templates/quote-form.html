@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault quote-editor" aria-labelledby="quote-form-title">
+    <a th:href="@{/studios/{id}(id=${studio.id})}" th:text="#{quote.backStudio}"></a>
+    <header class="page-header"><div><p class="eyebrow" th:text="${studio.name}"></p><h1 id="quote-form-title" th:text="#{quote.request}"></h1><p class="muted" th:text="#{quote.formIntro}"></p></div></header>
+    <div th:if="${error}" class="notice error" role="alert" tabindex="-1" data-form-error th:text="${#messages.msg(error)}"></div>
+    <form class="panel" method="post" th:action="@{/studios/{id}/quotes(id=${studio.id})}">
+        <div class="fields">
+            <div class="field-wide"><label for="title" th:text="#{quote.project}"></label><input id="title" name="title" required maxlength="150" th:value="${form['title']}" th:placeholder="#{quote.titlePlaceholder}"></div>
+            <div class="field-wide"><label for="description" th:text="#{quote.description}"></label><textarea id="description" name="description" required rows="7" maxlength="5000" th:text="${form['description']}" th:placeholder="#{quote.descriptionPlaceholder}"></textarea></div>
+            <div><label for="startDate" th:text="#{quote.startDate}"></label><input id="startDate" name="startDate" type="date" th:min="${today}" max="9999-12-31" th:value="${form['startDate']}" aria-describedby="dates-help"></div>
+            <div><label for="endDate" th:text="#{quote.endDate}"></label><input id="endDate" name="endDate" type="date" th:min="${today}" max="9999-12-31" th:value="${form['endDate']}" aria-describedby="dates-help"></div>
+            <p id="dates-help" class="field-hint field-wide" th:text="#{quote.datesHint}"></p>
+            <div class="field-wide"><label for="budget" th:text="#{quote.budget}"></label><input id="budget" name="budget" type="text" inputmode="decimal" maxlength="9" pattern="[0-9]{1,6}([.,][0-9]{1,2})?" th:value="${form['budget']}" aria-describedby="budget-help"><p id="budget-help" class="field-hint" th:text="#{quote.budgetHint}"></p></div>
+        </div>
+        <div class="actions"><button class="button" type="submit" th:text="#{quote.send}"></button><a th:href="@{/studios/{id}(id=${studio.id})}" th:text="#{common.cancel}"></a></div>
+    </form>
+</section>
+</body></html>
