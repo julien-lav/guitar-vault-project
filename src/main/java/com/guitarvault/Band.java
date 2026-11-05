@@ -8,6 +8,10 @@ import java.util.Set;
 @Entity
 @Table(name = "bands")
 public class Band {
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean moderationHidden;
+    public boolean isModerationHidden() { return moderationHidden; }
+    void setModerationHidden(boolean value) { moderationHidden = value; }
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -17,6 +21,14 @@ public class Band {
     private String name;
     @Column(length = 100)
     private String genre;
+    @ElementCollection
+    @CollectionTable(name = "band_genres", joinColumns = @JoinColumn(name = "band_id"),
+            uniqueConstraints = @UniqueConstraint(columnNames = {"band_id", "genre"}))
+    @Column(name = "genre", nullable = false, length = 100)
+    @OrderBy
+    private Set<String> genres = new LinkedHashSet<>();
+    @Column(length = 100)
+    private String region;
     @Column(length = 100)
     private String city;
     @Column(length = 5000)
@@ -44,6 +56,13 @@ public class Band {
     public void setName(String value) { name = value; }
     public String getGenre() { return genre; }
     public void setGenre(String value) { genre = value; }
+    public Set<String> getGenres() { return genres; }
+    public Set<String> getDisplayGenres() {
+        if (!genres.isEmpty()) return genres;
+        return genre == null || genre.isBlank() ? Set.of() : Set.of(genre);
+    }
+    public String getRegion() { return region; }
+    public void setRegion(String value) { region = value; }
     public String getCity() { return city; }
     public void setCity(String value) { city = value; }
     public String getDescription() { return description; }

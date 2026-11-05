@@ -28,6 +28,7 @@ class BandTests {
     @Autowired UserRepository users;
     @Autowired BandRepository bands;
     @Autowired BandService service;
+    @Autowired BandInvitationRepository invitations;
     @Autowired EntityManager entityManager;
     @MockitoBean JavaMailSender mail;
     private MockMvc mvc;
@@ -70,7 +71,11 @@ class BandTests {
         assertThat(band.getGenre()).isEqualTo("Rock");
         assertThat(band.getCity()).isEqualTo("Paris");
         assertThat(band.getCreator().getId()).isEqualTo(alice.getId());
-        assertThat(band.getMembers()).extracting(User::getId).containsExactlyInAnyOrder(alice.getId(), bob.getId());
+        assertThat(band.getMembers()).extracting(User::getId).containsExactly(alice.getId());
+        mvc.perform(get("/musicians/" + bob.getId()).with(user(alice.getEmail())))
+                .andExpect(content().string(not(containsString("The Vaults"))));
+        service.respond(bob, invitations.findByBandIdAndInviteeId(band.getId(), bob.getId()).orElseThrow().getId(), true);
+        bands.flush();
         mvc.perform(get("/bands/" + band.getId()).with(user(alice.getEmail())))
                 .andExpect(status().isOk()).andExpect(model().attribute("canEditBand", true))
                 .andExpect(content().string(containsString("&lt;script&gt;alert(1)&lt;/script&gt;")))
@@ -87,12 +92,12 @@ class BandTests {
     }
 
     @Test
-    void musicianCanBelongToSeveralBandsAndEditingUpdatesMembership() throws Exception {
+    void editingProfilePreservesMembersAndCreatorCanExplicitlyRemoveAMember() throws Exception {
         Band first = create("First band", "band-bob");
         create("Second band", "band-bob");
         assertThat(bands.findByMembersIdOrderByNameAsc(bob.getId())).hasSize(2);
         mvc.perform(get("/bands/" + first.getId() + "/edit").with(user(alice.getEmail())))
-                .andExpect(status().isOk()).andExpect(content().string(containsString("band-bob")));
+                .andExpect(status().isOk()).andExpect(content().string(containsString("name=\"members\"")));
         mvc.perform(post("/bands/" + first.getId()).with(user(alice.getEmail())).with(csrf())
                         .param("name", "Renamed band").param("members", ""))
                 .andExpect(redirectedUrl("/bands/" + first.getId()));
@@ -100,7 +105,11 @@ class BandTests {
         entityManager.clear();
         Band updated = bands.findById(first.getId()).orElseThrow();
         assertThat(updated.getName()).isEqualTo("Renamed band");
-        assertThat(updated.getMembers()).extracting(User::getId).containsExactly(alice.getId());
+        assertThat(updated.getMembers()).extracting(User::getId).containsExactlyInAnyOrder(alice.getId(), bob.getId());
+        service.removeMember(alice, first.getId(), bob.getId());
+        bands.flush();
+        entityManager.clear();
+        assertThat(service.find(first.getId()).getMembers()).extracting(User::getId).containsExactly(alice.getId());
         assertThat(bands.findByMembersIdOrderByNameAsc(bob.getId())).hasSize(1);
         assertThat(bands.findByMembersIdOrderByNameAsc(alice.getId())).hasSize(2);
     }
@@ -193,8 +202,12 @@ class BandTests {
     }
 
     private Band create(String name, String members) {
-        return service.save(alice, null, Map.of("name", name, "genre", "", "city", "", "description", "",
+        Band band = service.save(alice, null, Map.of("name", name, "genre", "", "city", "", "description", "",
                 "spotifyUrl", "", "deezerUrl", "", "websiteUrl", "", "members", members));
+        for (var invitation : invitations.findByBandIdAndStatusOrderByIdDesc(band.getId(), BandInvitation.Status.PENDING)) {
+            service.respond(invitation.getInvitee(), invitation.getId(), true);
+        }
+        return band;
     }
 
     private User account(String name, boolean enabled) {

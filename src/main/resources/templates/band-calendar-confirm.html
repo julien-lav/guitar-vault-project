@@ -1,0 +1,4 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault membership-confirm"><header class="page-header"><h1 th:text="#{calendar.delete}"></h1></header><div class="panel"><p th:text="#{calendar.deletePrompt(${event.title})}"></p><p th:if="${event.recurrence.name() == 'WEEKLY'}" class="notice" th:text="#{calendar.deleteSeriesHint}"></p><form method="post" th:action="@{/bands/{bandId}/calendar/events/{id}/delete(bandId=${band.id},id=${event.id})}" class="actions"><button class="button danger-button" type="submit" th:text="#{calendar.delete}"></button><a th:href="@{/bands/{id}/calendar(id=${band.id})}" th:text="#{common.cancel}"></a></form></div></section>
+</body></html>

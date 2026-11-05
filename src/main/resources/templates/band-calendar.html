@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault band-calendar" aria-labelledby="calendar-title">
+    <a th:href="@{/bands/{id}(id=${band.id})}" th:text="${band.name}"></a>
+    <header class="page-header"><div><p class="eyebrow" th:text="${band.name}"></p><h1 id="calendar-title" th:text="#{calendar.title}"></h1><p class="muted" th:text="#{calendar.privateHint}"></p></div><a th:if="${canManageCalendar}" class="button" th:href="@{/bands/{id}/calendar/events/new(id=${band.id})}" th:text="#{calendar.create}"></a></header>
+    <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
+    <nav class="panel calendar-toolbar" th:aria-label="#{calendar.navigation}">
+        <div class="actions"><a th:if="${previousMonth != null}" th:href="@{/bands/{id}/calendar(id=${band.id},month=${previousMonth},view=${calendarView})}" th:text="#{calendar.previous}"></a><h2 th:text="${monthLabel}"></h2><a th:if="${nextMonth != null}" th:href="@{/bands/{id}/calendar(id=${band.id},month=${nextMonth},view=${calendarView})}" th:text="#{calendar.next}"></a><a th:href="@{/bands/{id}/calendar(id=${band.id},view=${calendarView})}" th:text="#{calendar.today}"></a></div>
+        <form method="get" th:action="@{/bands/{id}/calendar(id=${band.id})}" class="calendar-month-form"><label for="calendar-month" th:text="#{calendar.month}"></label><input id="calendar-month" type="month" name="month" min="0001-01" max="9999-12" required th:value="${selectedMonth}"><input type="hidden" name="view" th:value="${calendarView}"><button class="button secondary-button" th:text="#{calendar.go}"></button></form>
+        <div class="actions"><a th:href="@{/bands/{id}/calendar(id=${band.id},month=${selectedMonth},view='month')}" th:aria-current="${calendarView == 'month' ? 'page' : null}" th:text="#{calendar.monthView}"></a><a th:href="@{/bands/{id}/calendar(id=${band.id},month=${selectedMonth},view='list')}" th:aria-current="${calendarView == 'list' ? 'page' : null}" th:text="#{calendar.listView}"></a></div>
+    </nav>
+    <ul class="calendar-legend" th:aria-label="#{calendar.categories}"><li th:each="type : ${calendarTypes}"><span class="calendar-dot" th:classappend="${'calendar-type-' + type}" aria-hidden="true"></span><span th:text="${#messages.msg('calendar.type.' + type)}"></span></li></ul>
+    <div th:if="${calendarView == 'month'}" class="calendar-grid-scroll" tabindex="0" role="region" th:aria-label="#{calendar.monthView}">
+        <div class="calendar-grid"><div class="calendar-weekday" th:each="weekday : ${weekdays}" th:text="${weekday}"></div>
+            <section th:each="day : ${days}" class="calendar-day" th:classappend="${(!day.currentMonth() ? 'outside-month ' : '') + (day.today() ? 'is-today' : '')}">
+                <time class="calendar-day-number" th:datetime="${day.date()}" th:text="${day.date().dayOfMonth}" th:aria-label="${#temporals.format(day.date(), 'dd/MM/yyyy')}"></time>
+                <ul class="calendar-day-events"><li th:each="entry : ${day.entries()}"><a class="calendar-event-chip" th:classappend="${'calendar-type-' + entry.type()}" th:href="${entry.concert() ? entry.link() : '/bands/' + band.id + '/calendar?month=' + #temporals.format(entry.date(), 'yyyy-MM') + '&amp;view=list#' + entry.anchor()}"><span class="calendar-event-category" th:text="${#messages.msg('calendar.type.' + entry.type())}"></span><span th:if="${entry.startTime() != null}" th:text="${#temporals.format(entry.startTime(), 'HH:mm')}"></span> <span th:text="${entry.title()}"></span><span th:if="${entry.cancelled()}" th:text="#{concert.cancelled}"></span></a></li></ul>
+            </section>
+        </div>
+    </div>
+    <div th:if="${calendarView == 'list'}"><p class="panel muted" th:if="${#lists.isEmpty(entries)}" th:text="#{calendar.empty}"></p>
+        <ol class="calendar-list"><li class="panel calendar-list-entry" th:each="entry : ${entries}" th:id="${entry.anchor()}">
+            <div class="calendar-list-heading"><div><span class="calendar-category" th:classappend="${'calendar-type-' + entry.type()}" th:text="${#messages.msg('calendar.type.' + entry.type())}"></span><h2><a th:if="${entry.concert()}" th:href="${entry.link()}" th:text="${entry.title()}"></a><span th:unless="${entry.concert()}" th:text="${entry.title()}"></span></h2></div><span class="badge" th:if="${entry.cancelled()}" th:text="#{concert.cancelled}"></span></div>
+            <p><time th:datetime="${entry.date()}" th:text="${#temporals.format(entry.date(), 'dd/MM/yyyy')}"></time><span th:if="${entry.startTime() == null}" class="muted" th:text="${' · ' + #messages.msg('calendar.allDay')}"></span><span th:if="${entry.startTime() != null}" th:text="${' · ' + #temporals.format(entry.startTime(), 'HH:mm')}"></span><span th:if="${entry.endTime() != null}" th:text="${' – ' + #temporals.format(entry.endTime(), 'HH:mm')}"></span></p>
+            <p th:if="${!#strings.isEmpty(entry.location())}" th:text="${entry.location()}"></p><p class="instrument-text" th:if="${!#strings.isEmpty(entry.notes())}" th:text="${entry.notes()}"></p>
+            <p class="muted" th:if="${entry.recurring()}" th:text="#{calendar.weeklyOccurrence}"></p>
+            <div class="actions" th:if="${canManageCalendar and !entry.concert()}"><a th:href="@{/bands/{bandId}/calendar/events/{id}/edit(bandId=${band.id},id=${entry.id()})}" th:text="#{calendar.edit}"></a><a class="danger-link" th:href="@{/bands/{bandId}/calendar/events/{id}/delete(bandId=${band.id},id=${entry.id()})}" th:text="#{calendar.delete}"></a></div>
+        </li></ol>
+    </div>
+</section>
+</body></html>

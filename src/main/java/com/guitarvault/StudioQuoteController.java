@@ -16,11 +16,14 @@ public class StudioQuoteController {
     private final StudioQuoteService service;
     private final StudioQuoteRepository quotes;
     private final InstrumentService instruments;
+    private final StudioQuoteMessageRepository messages;
 
-    public StudioQuoteController(StudioQuoteService service, StudioQuoteRepository quotes, InstrumentService instruments) {
+    public StudioQuoteController(StudioQuoteService service, StudioQuoteRepository quotes, InstrumentService instruments,
+                                 StudioQuoteMessageRepository messages) {
         this.service = service;
         this.quotes = quotes;
         this.instruments = instruments;
+        this.messages = messages;
     }
 
     @GetMapping("/quotes")
@@ -63,6 +66,11 @@ public class StudioQuoteController {
         User actor = instruments.currentUser(principal);
         StudioQuote quote = service.visible(actor, id);
         model.addAttribute("quote", quote);
+        List<StudioQuoteMessage> conversation = messages.findByQuoteIdOrderByIdAsc(quote.getId());
+        if (conversation.isEmpty() && quote.getReply() != null) {
+            conversation = List.of(StudioQuoteMessage.legacyReply(quote));
+        }
+        model.addAttribute("conversation", conversation);
         model.addAttribute("isStudioManager", quote.getStudio().getCreator().getId().equals(actor.getId()));
         model.addAttribute("title", "quote.detail");
         model.addAttribute("contentTemplate", "quote-detail");

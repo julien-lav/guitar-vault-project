@@ -30,6 +30,7 @@ class StudioQuoteTests {
     @Autowired UserRepository users;
     @Autowired StudioRepository studios;
     @Autowired StudioQuoteRepository quotes;
+    @Autowired StudioQuoteMessageRepository messages;
     @Autowired EntityManager entityManager;
     @MockitoBean JavaMailSender mail;
     private MockMvc mvc;
@@ -94,14 +95,15 @@ class StudioQuoteTests {
     }
 
     @Test
-    void managerCanReplyOnceAndRequesterCanReadThePersistedReply() throws Exception {
+    void managerCanSendSuccessiveRepliesAndRequesterCanReadTheirHistory() throws Exception {
         StudioQuote quote = request(alice, studio, "My EP");
         String path = "/quotes/" + quote.getId();
         mvc.perform(get(path).with(user(bob.getEmail())))
                 .andExpect(status().isOk()).andExpect(content().string(containsString(path + "/reply")))
                 .andExpect(content().string(containsString("name=\"_csrf\"")));
         mvc.perform(get(path).with(user(alice.getEmail())))
-                .andExpect(content().string(not(containsString("action=\"" + path + "/reply\""))));
+                .andExpect(content().string(containsString("action=\"" + path + "/reply\"")))
+                .andExpect(content().string(not(containsString("name=\"amount\""))));
         mvc.perform(post(path + "/reply").with(user(bob.getEmail())).with(csrf())
                         .param("message", "  Available <script>reply</script> ").param("amount", "650,25"))
                 .andExpect(redirectedUrl(path)).andExpect(flash().attribute("success", "quote.replySent"));
@@ -115,9 +117,17 @@ class StudioQuoteTests {
         mvc.perform(get(path).with(user(alice.getEmail())))
                 .andExpect(content().string(containsString("&lt;script&gt;reply&lt;/script&gt;")))
                 .andExpect(content().string(containsString("650,25 €")));
-        mvc.perform(post(path + "/reply").with(user(bob.getEmail())).with(csrf()).param("message", "Overwrite"))
-                .andExpect(status().isConflict());
-        assertThat(saved.getReply()).isEqualTo("Available <script>reply</script>");
+        mvc.perform(post(path + "/reply").with(user(bob.getEmail())).with(csrf()).param("message", "A second proposal").param("amount", "600"))
+                .andExpect(redirectedUrl(path));
+        messages.flush();
+        entityManager.clear();
+        var history = messages.findByQuoteIdOrderByIdAsc(quote.getId());
+        assertThat(history).extracting(StudioQuoteMessage::getBody).containsExactly("Available <script>reply</script>", "A second proposal");
+        assertThat(history.getFirst().getProposedAmount()).isEqualByComparingTo("650.25");
+        assertThat(history.getLast().getProposedAmount()).isEqualByComparingTo("600");
+        mvc.perform(get(path).with(user(alice.getEmail())))
+                .andExpect(content().string(containsString("650,25 €")))
+                .andExpect(content().string(containsString("600,00 €")));
     }
 
     @Test
@@ -211,10 +221,14 @@ class StudioQuoteTests {
         StudioQuote quote = request(alice, studio, "Private project");
         String path = "/quotes/" + quote.getId();
         mvc.perform(get(path).with(user(mallory.getEmail()))).andExpect(status().isNotFound());
-        for (User actor : List.of(alice, mallory)) {
+        for (User actor : List.of(mallory)) {
             mvc.perform(post(path + "/reply").with(user(actor.getEmail())).with(csrf()).param("message", "Forged reply"))
                     .andExpect(status().isNotFound());
         }
+        mvc.perform(post(path + "/reply").with(user(alice.getEmail())).with(csrf())
+                        .param("message", "Forged offer").param("amount", "500"))
+                .andExpect(model().attribute("error", "quote.studioAmountOnly"));
+        assertThat(messages.findByQuoteIdOrderByIdAsc(quote.getId())).isEmpty();
         for (String suffix : List.of("", "/reply")) {
             if (suffix.isEmpty()) mvc.perform(get("/quotes/9223372036854775807").with(user(alice.getEmail()))).andExpect(status().isNotFound());
             else mvc.perform(post("/quotes/9223372036854775807/reply").with(user(bob.getEmail())).with(csrf())).andExpect(status().isNotFound());
@@ -238,6 +252,107 @@ class StudioQuoteTests {
         mvc.perform(get(createPath + "/new").with(user(alice.getEmail()))).andExpect(status().isNotFound());
         mvc.perform(post(createPath).with(user(alice.getEmail())).with(csrf())).andExpect(status().isNotFound());
         mvc.perform(post("/quotes/" + quote.getId() + "/reply").with(user(bob.getEmail())).with(csrf())).andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    void requesterCanClarifyProjectWithTrustedAuthorshipAndReopenStudioAction() throws Exception {
+        StudioQuote quote = request(alice, studio, "Project");
+        String path = "/quotes/" + quote.getId();
+        mvc.perform(post(path + "/reply").with(user(bob.getEmail())).with(csrf())
+                        .param("message", "An initial offer").param("amount", "800"))
+                .andExpect(redirectedUrl(path));
+        mvc.perform(post(path + "/reply").with(user(alice.getEmail())).with(csrf())
+                        .param("message", "  Could we add <script>vocals</script>?  ")
+                        .param("authorId", bob.getId().toString()).param("quoteId", "999")
+                        .param("status", "ANSWERED").param("proposedAmount", "1"))
+                .andExpect(redirectedUrl(path));
+        messages.flush();
+        entityManager.clear();
+        var history = messages.findByQuoteIdOrderByIdAsc(quote.getId());
+        assertThat(history).hasSize(2);
+        assertThat(history.getLast().getAuthor().getId()).isEqualTo(alice.getId());
+        assertThat(history.getLast().getBody()).isEqualTo("Could we add <script>vocals</script>?");
+        assertThat(history.getLast().getProposedAmount()).isNull();
+        assertThat(history.getLast().isFromStudio()).isFalse();
+        assertThat(history.getFirst().isFromStudio()).isTrue();
+        assertThat(quotes.findById(quote.getId()).orElseThrow().getStatus()).isEqualTo(StudioQuote.Status.PENDING);
+        mvc.perform(get("/dashboard").with(user(bob.getEmail())))
+                .andExpect(model().attribute("toAnswerCount", 1L));
+        mvc.perform(get("/dashboard").with(user(alice.getEmail())))
+                .andExpect(model().attribute("answersCount", 0L));
+        mvc.perform(get(path).with(user(bob.getEmail())))
+                .andExpect(content().string(containsString("&lt;script&gt;vocals&lt;/script&gt;")))
+                .andExpect(content().string(not(containsString("<script>vocals</script>"))));
+        mvc.perform(post(path + "/reply").with(user(bob.getEmail())).with(csrf())
+                        .param("message", "Yes, with vocals").param("amount", "950"))
+                .andExpect(redirectedUrl(path));
+        assertThat(messages.findByQuoteIdOrderByIdAsc(quote.getId())).hasSize(3);
+        mvc.perform(get("/dashboard").with(user(bob.getEmail())))
+                .andExpect(model().attribute("toAnswerCount", 0L));
+        mvc.perform(get("/dashboard").with(user(alice.getEmail())))
+                .andExpect(model().attribute("answersCount", 1L));
+    }
+
+    @Test
+    void legacyReplyIsVisibleWithoutWritingAndArchivedExactlyOnceWhenDiscussionContinues() throws Exception {
+        StudioQuote quote = request(alice, studio, "Legacy project");
+        quote.answer("Original studio offer", new java.math.BigDecimal("725.50"));
+        quotes.flush();
+        var originalTime = quote.getAnsweredAt();
+        String path = "/quotes/" + quote.getId();
+        mvc.perform(get(path).with(user(alice.getEmail())))
+                .andExpect(content().string(containsString("Original studio offer")))
+                .andExpect(content().string(containsString("725,50 €")));
+        assertThat(messages.findByQuoteIdOrderByIdAsc(quote.getId())).isEmpty();
+        mvc.perform(post(path + "/reply").with(user(alice.getEmail())).with(csrf())
+                        .param("message", "Can we record on Sunday?"))
+                .andExpect(redirectedUrl(path));
+        mvc.perform(post(path + "/reply").with(user(bob.getEmail())).with(csrf())
+                        .param("message", "Yes, revised offer").param("amount", "700"))
+                .andExpect(redirectedUrl(path));
+        messages.flush();
+        entityManager.clear();
+        var history = messages.findByQuoteIdOrderByIdAsc(quote.getId());
+        assertThat(history).extracting(StudioQuoteMessage::getBody)
+                .containsExactly("Original studio offer", "Can we record on Sunday?", "Yes, revised offer");
+        assertThat(history.getFirst().getCreatedAt()).isCloseTo(originalTime, org.assertj.core.api.Assertions.within(1, java.time.temporal.ChronoUnit.MICROS));
+        assertThat(history.getFirst().getProposedAmount()).isEqualByComparingTo("725.50");
+        assertThat(history.getLast().getProposedAmount()).isEqualByComparingTo("700");
+    }
+
+    @Test
+    void managerCanContinueLegacyReplyWithoutReplacingItsHistory() throws Exception {
+        StudioQuote quote = request(alice, studio, "Legacy project");
+        quote.answer("Old reply", null);
+        quotes.flush();
+        mvc.perform(post("/quotes/" + quote.getId() + "/reply").with(user(bob.getEmail())).with(csrf())
+                        .param("message", "New reply"))
+                .andExpect(status().is3xxRedirection());
+        assertThat(messages.findByQuoteIdOrderByIdAsc(quote.getId())).extracting(StudioQuoteMessage::getBody)
+                .containsExactly("Old reply", "New reply");
+    }
+
+    @Test
+    void requesterMaySendFirstMessageButInvalidMessagesDoNotChangeAnsweredStatusOrHistory() throws Exception {
+        StudioQuote quote = request(alice, studio, "Project");
+        String path = "/quotes/" + quote.getId();
+        mvc.perform(post(path + "/reply").with(user(alice.getEmail())).with(csrf())
+                        .param("message", "One more detail"))
+                .andExpect(redirectedUrl(path));
+        mvc.perform(post(path + "/reply").with(user(bob.getEmail())).with(csrf())
+                        .param("message", "Noted"))
+                .andExpect(redirectedUrl(path));
+        for (String message : List.of(" ", "x".repeat(5001))) {
+            mvc.perform(post(path + "/reply").with(user(alice.getEmail())).with(csrf()).param("message", message))
+                    .andExpect(model().attribute("error", "quote.replyError"));
+        }
+        assertThat(quote.getStatus()).isEqualTo(StudioQuote.Status.ANSWERED);
+        assertThat(messages.findByQuoteIdOrderByIdAsc(quote.getId())).hasSize(2);
+        mvc.perform(get(path).with(user(alice.getEmail())).param("lang", "en"))
+                .andExpect(content().string(containsString("Conversation and proposals")))
+                .andExpect(content().string(containsString("Continue the conversation")))
+                .andExpect(content().string(not(containsString("??"))));
     }
 
     private void invalid(String field, String value, String error) throws Exception {

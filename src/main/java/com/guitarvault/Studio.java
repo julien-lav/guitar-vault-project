@@ -7,6 +7,10 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "studios", indexes = @Index(name = "idx_studio_creator", columnList = "creator_id"))
 public class Studio {
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean moderationHidden;
+    public boolean isModerationHidden() { return moderationHidden; }
+    void setModerationHidden(boolean value) { moderationHidden = value; }
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

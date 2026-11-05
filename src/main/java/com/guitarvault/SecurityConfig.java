@@ -41,10 +41,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, UserRepository users) throws Exception {
+        http.addFilterBefore(new SuspendedAccountFilter(users), org.springframework.security.web.access.intercept.AuthorizationFilter.class);
         http.sessionManagement(session -> session.maximumSessions(-1).sessionRegistry(sessionRegistry())
                         .expiredUrl("/login?expired"))
                 .authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/admin/moderation/reports/*/account/**").hasRole("SUPER_ADMIN")
                         .requestMatchers("/admin/articles/*/publish", "/admin/articles/*/unpublish", "/admin/articles/*/delete").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers("/admin", "/admin/articles", "/admin/articles/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "EDITOR")
                         .requestMatchers("/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN")

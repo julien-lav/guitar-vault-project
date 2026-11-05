@@ -39,5 +39,6 @@
             <p th:if="${!#strings.isEmpty(studio.websiteUrl)}"><a th:href="${studio.websiteUrl}" target="_blank" rel="noopener noreferrer" th:text="#{studio.websiteVisit}"></a></p>
         </aside>
     </div>
+<p class="report-entry" th:if="${!canEditStudio}"><a th:replace="~{report-link :: link('STUDIO',${studio.id})}"></a></p>
 </section>
 </body></html>

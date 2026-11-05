@@ -55,6 +55,7 @@ public class StudioController {
     @GetMapping("/studios/{id}")
     public String detail(Principal principal, @PathVariable Long id, Model model) {
         Studio studio = service.find(id);
+        ContentVisibility.require(!studio.isModerationHidden());
         model.addAttribute("studio", studio);
         model.addAttribute("photos", photos.findByStudioIdOrderByIdAsc(id));
         model.addAttribute("canEditStudio", studio.getCreator().getId().equals(instruments.currentUser(principal).getId()));
@@ -96,7 +97,7 @@ public class StudioController {
     @GetMapping("/studios/{id}/photos/{photoId}")
     public ResponseEntity<byte[]> photo(Principal principal, @PathVariable Long id, @PathVariable Long photoId) {
         instruments.currentUser(principal);
-        service.find(id);
+        ContentVisibility.require(!service.find(id).isModerationHidden());
         var photo = photos.findByIdAndStudioId(photoId, id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(photo.getContentType()))

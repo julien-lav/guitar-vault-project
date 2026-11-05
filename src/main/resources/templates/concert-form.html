@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault concert-editor" aria-labelledby="concert-form-title">
+    <a th:href="@{/bands/{id}(id=${band.id})}" th:text="${band.name}"></a>
+    <header class="page-header"><div><h1 id="concert-form-title" th:text="${#messages.msg(title)}"></h1><p class="muted" th:text="#{concert.formIntro}"></p></div></header>
+    <div th:if="${error}" class="notice error" role="alert" tabindex="-1" data-form-error th:text="${#messages.msg(error)}"></div>
+    <form class="panel" method="post" enctype="multipart/form-data" th:action="${concertId == null ? '/bands/' + band.id + '/concerts' : '/concerts/' + concertId}">
+        <div class="fields">
+            <div class="field-wide"><label for="concert-title" th:text="#{concert.name}"></label><input id="concert-title" name="title" required maxlength="150" th:value="${form['title']}"></div>
+            <div><label for="concert-date" th:text="#{concert.date}"></label><input id="concert-date" name="date" type="date" required th:value="${form['date']}"></div>
+            <div><label for="concert-city" th:text="#{concert.city}"></label><input id="concert-city" name="city" maxlength="100" th:value="${form['city']}"></div>
+            <div class="field-wide"><label for="concert-venue" th:text="#{concert.venue}"></label><input id="concert-venue" name="venue" required maxlength="200" th:value="${form['venue']}"></div>
+            <div class="field-wide"><label for="concert-description" th:text="#{concert.description}"></label><textarea id="concert-description" name="description" maxlength="5000" rows="6" th:text="${form['description']}"></textarea></div>
+            <div class="field-wide"><label for="poster" th:text="#{concert.poster}"></label><input id="poster" name="poster" type="file" accept="image/jpeg,image/png" aria-describedby="concert-poster-help"><p id="concert-poster-help" class="field-hint" th:text="#{concert.posterHint}"></p></div>
+            <div th:if="${hasPoster}" class="field-wide"><img class="concert-poster-preview" th:src="@{/concerts/{id}/poster(id=${concertId})}" th:alt="#{concert.currentPoster}"><label class="concert-checkbox"><input type="checkbox" name="removePoster" value="true" th:checked="${removePoster}"><span th:text="#{concert.removePoster}"></span></label></div>
+        </div>
+        <p class="field-hint" th:if="${concertId == null}" th:text="#{concert.inviteAfterSave}"></p>
+        <div class="actions"><button type="submit" class="button" th:text="#{concert.save}"></button><a th:href="${concertId == null ? '/bands/' + band.id : '/concerts/' + concertId}" th:text="#{common.cancel}"></a></div>
+    </form>
+</section>
+</body></html>

@@ -59,6 +59,7 @@ public class StudioQuote {
         this.status = Status.ANSWERED;
         this.answeredAt = Instant.now();
     }
+    public void awaitStudioReply() { this.status = Status.PENDING; }
     public Long getId() { return id; }
     public Studio getStudio() { return studio; }
     public User getRequester() { return requester; }

@@ -11,15 +11,35 @@
         <ul class="band-member-list" th:unless="${#lists.isEmpty(myBands)}"><li th:each="band : ${myBands}"><a th:href="@{/bands/{id}(id=${band.id})}" th:text="${band.name}"></a></li></ul>
     </section>
     <h2 class="band-section-title" th:text="#{band.discover}"></h2>
-    <div class="panel empty" th:if="${#lists.isEmpty(bands)}"><h2 th:text="#{band.emptyTitle}"></h2><p class="muted" th:text="#{band.emptyText}"></p><a class="button" th:href="@{/bands/new}" th:text="#{band.create}"></a></div>
+    <form method="get" th:action="@{/bands}" class="panel band-search" aria-labelledby="band-search-title">
+        <h3 id="band-search-title" th:text="#{band.searchTitle}"></h3>
+        <div class="fields">
+            <div><label for="search-genre" th:text="#{band.genre}"></label><select id="search-genre" name="genre">
+                <option value="" th:text="#{band.allGenres}"></option>
+                <option th:if="${!#strings.isEmpty(filters['genre']) and !#lists.contains(genreOptions, filters['genre'])}" th:value="${filters['genre']}" selected th:text="${filters['genre']}"></option>
+                <option th:each="genre : ${genreOptions}" th:value="${genre}" th:selected="${genre == filters['genre']}" th:text="${genre}"></option>
+            </select></div>
+            <div><label for="search-region" th:text="#{band.region}"></label><input id="search-region" name="region" maxlength="100" list="search-regions" th:value="${filters['region']}"></div>
+            <div><label for="search-city" th:text="#{band.city}"></label><input id="search-city" name="city" maxlength="100" th:value="${filters['city']}"></div>
+        </div>
+        <datalist id="search-regions"><option th:each="region : ${regionOptions}" th:value="${region}"></option></datalist>
+        <p class="field-hint" th:text="#{band.searchHint}"></p>
+        <div class="actions"><button class="button" type="submit" th:text="#{band.search}"></button><a th:if="${hasFilters}" th:href="@{/bands}" th:text="#{band.resetSearch}"></a></div>
+    </form>
+    <div th:if="${error}" class="notice error" role="alert" tabindex="-1" data-form-error th:text="${#messages.msg(error)}"></div>
+    <p class="muted" th:unless="${error}" th:text="#{band.resultCount(${#lists.size(bands)})}"></p>
+    <div class="panel empty" th:if="${error == null and hasFilters and #lists.isEmpty(bands)}"><h2 th:text="#{band.noResults}"></h2><p class="muted" th:text="#{band.noResultsHint}"></p><a th:href="@{/bands}" th:text="#{band.resetSearch}"></a></div>
+    <div class="panel empty" th:if="${error == null and !hasFilters and #lists.isEmpty(bands)}"><h2 th:text="#{band.emptyTitle}"></h2><p class="muted" th:text="#{band.emptyText}"></p><a class="button" th:href="@{/bands/new}" th:text="#{band.create}"></a></div>
     <div th:replace="~{bands :: cards}"></div>
 </section>
 <div th:fragment="cards" class="band-grid">
     <article class="panel band-card" th:each="band : ${bands}">
-        <p class="eyebrow" th:if="${!#strings.isEmpty(band.genre)}" th:text="${band.genre}"></p>
+        <div th:replace="~{bands :: genres(${band})}"></div>
         <h2><a th:href="@{/bands/{id}(id=${band.id})}" th:text="${band.name}"></a></h2>
-        <p class="muted" th:if="${!#strings.isEmpty(band.city)}" th:text="${band.city}"></p>
+        <p th:replace="~{bands :: location(${band})}"></p>
         <p class="muted" th:text="#{band.memberCount(${#sets.size(band.members)})}"></p>
     </article>
 </div>
+<ul th:fragment="genres(band)" class="genre-tags" th:if="${!#sets.isEmpty(band.displayGenres)}" th:aria-label="#{band.genres}"><li class="genre-tag" th:each="genre : ${band.displayGenres}" th:text="${genre}"></li></ul>
+<p th:fragment="location(band)" class="muted band-location" th:if="${!#strings.isEmpty(band.city) or !#strings.isEmpty(band.region)}"><span th:if="${!#strings.isEmpty(band.city)}" th:text="${band.city}"></span><span th:if="${!#strings.isEmpty(band.city) and !#strings.isEmpty(band.region)}" aria-hidden="true"> · </span><span th:if="${!#strings.isEmpty(band.region)}" th:text="${band.region}"></span></p>
 </body></html>

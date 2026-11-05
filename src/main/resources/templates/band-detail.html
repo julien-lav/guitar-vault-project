@@ -3,14 +3,29 @@
 <section th:fragment="content" class="vault band-profile" aria-labelledby="band-title">
     <a th:href="@{/bands}" th:text="#{band.back}"></a>
     <header class="page-header">
-        <div><p class="eyebrow" th:text="#{band.profile}"></p><h1 id="band-title" th:text="${band.name}"></h1><p class="muted" th:if="${!#strings.isEmpty(band.genre)}" th:text="${band.genre}"></p><p class="muted" th:if="${!#strings.isEmpty(band.city)}" th:text="${band.city}"></p></div>
-        <a class="button" th:if="${canEditBand}" th:href="@{/bands/{id}/edit(id=${band.id})}" th:text="#{band.edit}"></a>
+        <div><p class="eyebrow" th:text="#{band.profile}"></p><h1 id="band-title" th:text="${band.name}"></h1><div th:replace="~{bands :: genres(${band})}"></div><p th:replace="~{bands :: location(${band})}"></p></div>
+        <div class="actions band-profile-actions"><a class="button secondary-button" th:if="${isBandMember or canEditBand}" th:href="@{/bands/{id}/calendar(id=${band.id})}" th:text="#{calendar.title}"></a><a class="button" th:if="${canEditBand}" th:href="@{/bands/{id}/edit(id=${band.id})}" th:text="#{band.edit}"></a></div>
     </header>
     <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
+    <div th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></div>
+    <section class="panel band-section" th:if="${myInvitation != null}" aria-labelledby="my-invitation-title"><h2 id="my-invitation-title" th:text="#{invitation.youAreInvited}"></h2><p class="muted" th:text="#{invitation.consentHint}"></p><div th:replace="~{band-invitations :: decision(${myInvitation})}"></div></section>
     <div class="band-profile-grid">
         <div>
             <section class="panel band-section" aria-labelledby="band-about"><h2 id="band-about" th:text="#{band.about}"></h2><p class="instrument-text" th:if="${!#strings.isEmpty(band.description)}" th:text="${band.description}"></p><p class="muted" th:if="${#strings.isEmpty(band.description)}" th:text="#{band.noDescription}"></p></section>
-            <section class="panel band-section" aria-labelledby="band-members"><h2 id="band-members" th:text="#{band.members}"></h2><ul class="band-member-list"><li th:each="member : ${band.members}"><a th:href="@{/musicians/{id}(id=${member.id})}" th:text="${member.username}"></a><span class="muted" th:if="${member.id == band.creator.id}" th:text="#{band.creator}"></span></li></ul></section>
+            <section th:replace="~{concerts :: bandConcerts}"></section>
+            <section th:replace="~{band-connections :: network}"></section>
+            <section class="panel band-section" aria-labelledby="band-members">
+                <h2 id="band-members" th:text="#{band.members}"></h2>
+                <ul class="band-member-list"><li th:each="member : ${band.members}" class="band-member-row"><div><a th:href="@{/musicians/{id}(id=${member.id})}" th:text="${member.username}"></a><span class="muted" th:if="${member.id == band.creator.id}" th:text="#{band.creator}"></span></div><a class="danger-link" th:if="${canEditBand and member.id != band.creator.id}" th:href="@{/bands/{id}/members/{memberId}/remove(id=${band.id},memberId=${member.id})}" th:text="#{invitation.remove}"></a></li></ul>
+                <p th:if="${isBandMember and !canEditBand}"><a class="danger-link" th:href="@{/bands/{id}/leave(id=${band.id})}" th:text="#{invitation.leave}"></a></p>
+                <p class="field-hint" th:if="${canEditBand}" th:text="#{invitation.creatorStays}"></p>
+            </section>
+            <section class="panel band-section" th:if="${canEditBand}" aria-labelledby="invite-heading">
+                <h2 id="invite-heading" th:text="#{invitation.inviteTitle}"></h2><p class="muted" th:text="#{invitation.consentHint}"></p>
+                <form method="post" th:action="@{/bands/{id}/invitations(id=${band.id})}" class="band-invite-form"><label for="invite-username" th:text="#{field.username}"></label><input id="invite-username" name="username" required minlength="3" maxlength="30" pattern="[a-zA-Z0-9_-]{3,30}" th:value="${inviteUsername}"><button class="button" type="submit" th:text="#{invitation.send}"></button></form>
+                <h3 th:text="#{invitation.pendingSent}"></h3><p class="muted" th:if="${#lists.isEmpty(pendingInvitations)}" th:text="#{invitation.emptySent}"></p>
+                <ul class="band-member-list"><li th:each="invitation : ${pendingInvitations}" class="band-member-row"><span th:text="${invitation.invitee.username}"></span><form method="post" th:action="@{/invitations/{id}/cancel(id=${invitation.id})}"><button type="submit" class="entry-remove" th:text="#{invitation.cancel}"></button></form></li></ul>
+            </section>
         </div>
         <aside class="panel band-links" aria-labelledby="band-listen">
             <h2 id="band-listen" th:text="#{band.links}"></h2>
@@ -20,5 +35,6 @@
             <a th:if="${!#strings.isEmpty(band.websiteUrl)}" th:href="${band.websiteUrl}" target="_blank" rel="noopener noreferrer" th:text="#{band.website}"></a>
         </aside>
     </div>
+<p class="report-entry" th:if="${!canEditBand}"><a th:replace="~{report-link :: link('BAND',${band.id})}"></a></p>
 </section>
 </body></html>

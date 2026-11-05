@@ -12,6 +12,7 @@
     </header>
     <img th:if="${article.coverPresent}" class="article-cover" th:src="${preview ? '/admin/articles/' + article.id + '/cover' : '/articles/' + article.id + '/cover'}" th:alt="${article.coverAlt}">
     <div class="article-body" th:text="${article.body}"></div>
+    <p class="report-entry" th:if="${!preview and currentUsername != null and !#strings.equalsIgnoreCase(currentUsername, article.author.email)}"><a th:replace="~{report-link :: link('ARTICLE',${article.id})}"></a></p>
     <footer class="article-reader-footer"><a href="/articles" th:text="#{articles.all}"></a></footer>
 </article>
 </body></html>

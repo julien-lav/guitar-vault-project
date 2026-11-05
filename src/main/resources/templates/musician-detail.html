@@ -41,5 +41,6 @@
     <h2 class="studio-section-title" th:text="#{studio.memberStudios}"></h2>
     <p class="panel muted" th:if="${#lists.isEmpty(studios)}" th:text="#{studio.none}"></p>
     <div th:replace="~{studios :: cards}"></div>
+<p class="report-entry" th:if="${!canEditProfile}"><a th:replace="~{report-link :: link('PROFILE',${profile.id})}"></a></p>
 </section>
 </body></html>

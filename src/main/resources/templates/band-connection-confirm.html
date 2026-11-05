@@ -1,0 +1,4 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault membership-confirm"><header class="page-header"><h1 th:text="#{connection.remove}"></h1></header><div class="panel"><div th:replace="~{band-connections :: summary(${connection})}"></div><p th:text="#{connection.removePrompt}"></p><form method="post" th:action="@{/band-connections/{id}/remove(id=${connection.id})}" class="actions"><button class="button danger-button" th:text="#{connection.remove}"></button><a th:href="@{/band-connections}" th:text="#{common.cancel}"></a></form></div></section>
+</body></html>

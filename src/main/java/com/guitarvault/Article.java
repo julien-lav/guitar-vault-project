@@ -8,6 +8,10 @@ import java.time.format.DateTimeFormatter;
 @Entity
 @Table(name = "articles", indexes = @Index(name = "article_publication_idx", columnList = "published,publishedAt"))
 public class Article {
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean moderationHidden;
+    public boolean isModerationHidden() { return moderationHidden; }
+    void setModerationHidden(boolean value) { moderationHidden = value; }
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Version private long version;

@@ -25,6 +25,8 @@ public class ProfileService {
         this.photos = photos;
     }
 
+    public void requireVisible(Long id) { ContentVisibility.require(!enabledUser(id).isModerationHidden()); }
+
     // Only these fields are exposed to the member profile template.
     public record View(Long id, String username, String displayName, String instrument, String level,
                        String city, String country, String bio, String spotifyUrl, String deezerUrl,

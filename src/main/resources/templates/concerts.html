@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="bandConcerts" id="band-concerts" class="panel band-section" aria-labelledby="band-concerts-title">
+    <div class="panel-heading"><h2 id="band-concerts-title" th:text="#{concert.title}"></h2><a class="button" th:if="${canEditBand}" th:href="@{/bands/{id}/concerts/new(id=${band.id})}" th:text="#{concert.create}"></a></div>
+    <h3 th:text="#{concert.upcoming}"></h3><p class="muted" th:if="${#lists.isEmpty(upcomingConcerts)}" th:text="#{concert.noUpcoming}"></p>
+    <div th:replace="~{concerts :: cards(${upcomingConcerts})}"></div>
+    <h3 th:if="${!#lists.isEmpty(pastConcerts)}" th:text="#{concert.past}"></h3><div th:replace="~{concerts :: cards(${pastConcerts})}"></div>
+    <h3 th:if="${!#lists.isEmpty(cancelledConcerts)}" th:text="#{concert.cancelled}"></h3><div th:replace="~{concerts :: cards(${cancelledConcerts})}"></div>
+</section>
+<ul th:fragment="cards(items)" class="concert-list"><li th:each="concert : ${items}" class="concert-card"><a th:if="${#sets.contains(concertPosterIds, concert.id)}" th:href="@{/concerts/{id}(id=${concert.id})}" tabindex="-1" aria-hidden="true"><img class="concert-card-poster" th:src="@{/concerts/{id}/poster(id=${concert.id})}" alt="" loading="lazy"></a><div><time th:datetime="${concert.date}" th:text="${#temporals.format(concert.date, 'dd/MM/yyyy')}"></time><span class="badge" th:if="${concert.cancelled}" th:text="#{concert.cancelled}"></span><h4><a th:href="@{/concerts/{id}(id=${concert.id})}" th:text="${concert.title}"></a></h4><p class="muted"><span th:text="${concert.venue}"></span><span th:if="${!#strings.isEmpty(concert.city)}" th:text="${' · ' + concert.city}"></span></p></div></li></ul>
+</body></html>

@@ -40,12 +40,12 @@ public class ArticleService {
         String term = query.strip().toLowerCase(Locale.ROOT);
         if (term.length() > 160) term = term.substring(0, 160);
         term = term.isEmpty() ? "" : "%" + term.replace("!", "!!").replace("%", "!%").replace("_", "!_") + "%";
-        return articles.search(published, category, term, authorEmail, PageRequest.of(Math.max(0, Math.min(page, 100000)), size,
+        return articles.search(admin, published, category, term, authorEmail, PageRequest.of(Math.max(0, Math.min(page, 100000)), size,
                 Sort.by(Sort.Direction.DESC, admin ? "updatedAt" : "publishedAt").and(Sort.by(Sort.Direction.DESC, "id"))));
     }
 
     public Article find(Long id, boolean admin) {
-        return (admin ? articles.findById(id) : articles.findByIdAndPublishedTrue(id))
+        return (admin ? articles.findById(id) : articles.findByIdAndPublishedTrueAndModerationHiddenFalse(id))
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 

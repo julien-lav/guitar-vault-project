@@ -53,6 +53,7 @@ public class StudioService {
         }
         return studios.findAll((root, query, builder) -> {
             var predicates = new ArrayList<Predicate>();
+            predicates.add(builder.isFalse(root.get("moderationHidden")));
             if (!city.isEmpty()) predicates.add(builder.like(builder.lower(root.get("city")), contains(city), '!'));
             if (!country.isEmpty()) predicates.add(builder.like(builder.lower(root.get("country")), contains(country), '!'));
             // SQL comparisons exclude unknown prices whenever a price bound is set.

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault calendar-editor" aria-labelledby="calendar-form-title">
+    <a th:href="@{/bands/{id}/calendar(id=${band.id})}" th:text="#{calendar.back}"></a><header class="page-header"><div><p class="eyebrow" th:text="${band.name}"></p><h1 id="calendar-form-title" th:text="${#messages.msg(title)}"></h1><p class="muted" th:text="#{calendar.privateHint}"></p></div></header>
+    <div th:if="${error}" class="notice error" role="alert" tabindex="-1" data-form-error th:text="${#messages.msg(error)}"></div>
+    <p class="notice" th:text="#{calendar.seriesHint}"></p>
+    <form class="panel" method="post" th:action="${'/bands/' + band.id + '/calendar/events' + (eventId == null ? '' : '/' + eventId)}"><div class="fields">
+        <div class="field-wide"><label for="event-title" th:text="#{calendar.name}"></label><input id="event-title" name="title" maxlength="150" required th:value="${form['title']}"></div>
+        <div><label for="event-type" th:text="#{calendar.category}"></label><select id="event-type" name="type" required><option th:each="type : ${eventTypes}" th:value="${type}" th:selected="${type.name() == form['type']}" th:text="${#messages.msg('calendar.type.' + type)}"></option></select></div>
+        <div><label for="event-date" th:text="#{calendar.date}"></label><input id="event-date" name="date" type="date" required th:value="${form['date']}"></div>
+        <div><label for="event-start" th:text="#{calendar.startTime}"></label><input id="event-start" name="startTime" type="time" th:value="${form['startTime']}"></div>
+        <div><label for="event-end" th:text="#{calendar.endTime}"></label><input id="event-end" name="endTime" type="time" th:value="${form['endTime']}"></div>
+        <div><label for="event-recurrence" th:text="#{calendar.recurrence}"></label><select id="event-recurrence" name="recurrence"><option th:each="recurrence : ${recurrences}" th:value="${recurrence}" th:selected="${recurrence.name() == form['recurrence']}" th:text="${#messages.msg('calendar.recurrence.' + recurrence)}"></option></select></div>
+        <div><label for="event-until" th:text="#{calendar.repeatUntil}"></label><input id="event-until" name="repeatUntil" type="date" th:value="${form['repeatUntil']}" aria-describedby="event-repeat-help"><p id="event-repeat-help" class="field-hint" th:text="#{calendar.repeatHint}"></p></div>
+        <div class="field-wide"><label for="event-location" th:text="#{calendar.location}"></label><input id="event-location" name="location" maxlength="200" th:value="${form['location']}"></div>
+        <div class="field-wide"><label for="event-notes" th:text="#{calendar.notes}"></label><textarea id="event-notes" name="notes" rows="6" maxlength="5000" th:text="${form['notes']}"></textarea></div>
+    </div><p class="field-hint" th:text="#{calendar.concertHint}"></p><div class="actions"><button class="button" type="submit" th:text="#{calendar.save}"></button><a th:href="@{/bands/{id}/calendar(id=${band.id})}" th:text="#{common.cancel}"></a></div></form>
+</section>
+</body></html>

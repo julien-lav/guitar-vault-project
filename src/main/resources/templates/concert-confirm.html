@@ -1,0 +1,4 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault membership-confirm"><header class="page-header"><h1 th:text="${#messages.msg(title)}"></h1></header><div class="panel"><p th:text="${#messages.msg(prompt, target)}"></p><form method="post" th:action="${action}" class="actions"><button class="button danger-button" th:text="${#messages.msg(title)}"></button><a th:href="@{/concerts/{id}(id=${concert.id})}" th:text="#{common.cancel}"></a></form></div></section>
+</body></html>

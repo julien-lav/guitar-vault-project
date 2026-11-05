@@ -149,3 +149,102 @@ if (editorSections.length && 'IntersectionObserver' in window) {
 }
 
 document.querySelector('[data-form-error]')?.focus();
+
+// Native disclosure menus remain usable when JavaScript is unavailable.
+const vaultNavMenus = Array.from(document.querySelectorAll('.site-nav .nav-menu'));
+vaultNavMenus.forEach(menu => {
+    menu.addEventListener('toggle', () => {
+        if (menu.open) vaultNavMenus.filter(other => other !== menu).forEach(other => { other.open = false; });
+    });
+    menu.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && menu.open) {
+            menu.open = false;
+            menu.querySelector('summary').focus();
+        }
+    });
+    menu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => { menu.open = false; }));
+});
+document.addEventListener('click', event => {
+    vaultNavMenus.filter(menu => !menu.contains(event.target)).forEach(menu => { menu.open = false; });
+});
+
+const bandGenresInput = document.querySelector('[data-band-genres]');
+const bandGenresPreview = document.querySelector('[data-band-genre-preview]');
+if (bandGenresInput && bandGenresPreview) {
+    const renderGenres = () => {
+        bandGenresPreview.replaceChildren();
+        const seen = new Set();
+        bandGenresInput.value.split(',').forEach(value => {
+            const genre = value.trim().replace(/\s+/g, ' ');
+            const key = genre.toLowerCase();
+            if (!genre || seen.has(key)) return;
+            seen.add(key);
+            const tag = document.createElement('span');
+            tag.className = 'genre-tag';
+            tag.setAttribute('role', 'listitem');
+            tag.textContent = genre;
+            bandGenresPreview.append(tag);
+        });
+    };
+    bandGenresInput.addEventListener('input', renderGenres);
+    renderGenres();
+}
+
+const connectionTypeInput = document.getElementById('connection-type');
+if (connectionTypeInput) {
+    const updateConcertFields = () => {
+        const sharedShow = connectionTypeInput.value === 'PLAYED_TOGETHER';
+        ['connection-date', 'connection-venue'].forEach(id => {
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.disabled = !sharedShow;
+            input.parentElement.hidden = !sharedShow;
+        });
+    };
+    connectionTypeInput.addEventListener('change', updateConcertFields);
+    updateConcertFields();
+}
+
+const calendarRecurrence = document.getElementById('event-recurrence');
+const calendarRepeatUntil = document.getElementById('event-until');
+if (calendarRecurrence && calendarRepeatUntil) {
+    const updateCalendarRecurrence = () => {
+        const weekly = calendarRecurrence.value === 'WEEKLY';
+        calendarRepeatUntil.disabled = !weekly;
+        calendarRepeatUntil.required = weekly;
+        calendarRepeatUntil.parentElement.hidden = !weekly;
+    };
+    calendarRecurrence.addEventListener('change', updateCalendarRecurrence);
+    updateCalendarRecurrence();
+}
+
+const notificationBell = document.querySelector('[data-notification-bell]');
+if (notificationBell) {
+    const badge = notificationBell.querySelector('[data-notification-count]');
+    const announcement = notificationBell.querySelector('[data-notification-announcement]');
+    const numberFormat = new Intl.NumberFormat(document.documentElement.lang || 'fr');
+    let stopped = false;
+    let loading = false;
+    const refreshNotifications = async () => {
+        if (stopped || loading || document.visibilityState !== 'visible') return;
+        loading = true;
+        try {
+            const response = await fetch('/notifications/unread-count', { headers: { Accept: 'application/json' }, cache: 'no-store' });
+            if (response.redirected || response.status === 401 || response.status === 403) { stopped = true; return; }
+            if (!response.ok) return;
+            const data = await response.json();
+            if (!Number.isSafeInteger(data.unread) || data.unread < 0) return;
+            if (notificationBell.dataset.unread === String(data.unread)) return;
+            notificationBell.dataset.unread = String(data.unread);
+            badge.hidden = data.unread === 0;
+            badge.textContent = data.unread > 99 ? '99+' : numberFormat.format(data.unread);
+            const label = notificationBell.dataset.notificationLabel.replace('{count}', numberFormat.format(data.unread));
+            notificationBell.setAttribute('aria-label', label);
+            announcement.textContent = label;
+        } catch { /* The server-rendered bell remains usable if polling fails. */ }
+        finally { loading = false; }
+    };
+    setInterval(refreshNotifications, 30000);
+    document.addEventListener('visibilitychange', refreshNotifications);
+    window.addEventListener('pageshow', event => { if (event.persisted) refreshNotifications(); });
+}

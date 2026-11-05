@@ -29,6 +29,7 @@
     <div th:if="${verificationError}" class="notice error" role="alert" th:text="${#messages.msg(verificationError)}"></div>
     <div th:if="${param.error != null}" class="notice error" role="alert" th:text="#{login.invalid}">Adresse email ou mot de passe incorrect.</div>
     <div th:if="${param.logout != null}" class="notice success" role="status" th:text="#{login.loggedOut}">Vous êtes bien déconnecté.</div>
+    <div th:if="${param.suspended != null}" class="notice error" role="alert" th:text="#{report.loginSuspended}"></div>
     <div th:if="${param.expired != null}" class="notice error" role="alert" th:text="#{login.expired}"></div>
     <form method="post" th:action="@{/login}">
         <label for="email" th:text="#{field.email}">Adresse email</label>

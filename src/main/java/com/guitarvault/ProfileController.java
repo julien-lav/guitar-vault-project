@@ -34,6 +34,7 @@ public class ProfileController {
 
     @GetMapping("/musicians/{id}")
     public String show(Principal principal, @PathVariable Long id, Model model) {
+        profiles.requireVisible(id);
         var profile = profiles.view(id);
         model.addAttribute("profile", profile);
         model.addAttribute("canEditProfile", id.equals(instruments.currentUser(principal).getId()));
@@ -47,6 +48,7 @@ public class ProfileController {
     @GetMapping("/musicians/{id}/photo")
     public ResponseEntity<byte[]> photo(Principal principal, @PathVariable Long id) {
         instruments.currentUser(principal);
+        profiles.requireVisible(id);
         var photo = profiles.photo(id);
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(photo.getContentType()))
                 .header("Cache-Control", "private, no-store").header("X-Content-Type-Options", "nosniff")

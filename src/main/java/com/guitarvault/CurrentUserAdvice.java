@@ -10,6 +10,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 @ControllerAdvice
 public class CurrentUserAdvice {
+    private final NotificationService notifications;
+    public CurrentUserAdvice(NotificationService notifications) { this.notifications = notifications; }
+    @ModelAttribute("unreadNotificationCount")
+    public long unreadNotificationCount(Principal principal) { return notifications.unreadFor(principal); }
+
+    @ModelAttribute("currentPath")
+    public String currentPath(HttpServletRequest request) { return request.getRequestURI(); }
+
     @ModelAttribute("isAdmin")
     public boolean isAdmin(org.springframework.security.core.Authentication authentication) {
         return ArticlePermissions.canPublish(authentication);

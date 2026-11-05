@@ -20,6 +20,14 @@ import jakarta.persistence.JoinColumn;
 @Table(name = "users")
 public class User {
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean moderationHidden;
+    public boolean isModerationHidden() { return moderationHidden; }
+    void setModerationHidden(boolean value) { moderationHidden = value; }
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean suspended;
+    public boolean isSuspended() { return suspended; }
+    void setSuspended(boolean value) { suspended = value; }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -121,6 +129,7 @@ public class User {
 
     // Getters and setters
 
+
     public String getVerificationTokenHash() {
         return verificationTokenHash;
     }
@@ -218,7 +227,7 @@ public class User {
     }
 
     public boolean isEnabled() {
-        return enabled;
+        return enabled && !suspended;
     }
 
     public void setEnabled(boolean enabled) {

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault notifications" aria-labelledby="notifications-title">
+    <header class="page-header"><div><h1 id="notifications-title" th:text="#{notification.title}"></h1><p class="muted" th:text="#{notification.intro}"></p><p th:text="#{notification.unreadCount(${unreadNotificationCount})}"></p></div><form method="post" th:action="@{/notifications/read-all}"><button class="button secondary-button" type="submit" th:disabled="${unreadNotificationCount == 0}" th:text="#{notification.readAll}"></button></form></header>
+    <div class="actions notification-filters"><a th:href="@{/notifications}" th:aria-current="${!onlyUnread ? 'page' : null}" th:text="#{notification.all}"></a><a th:href="@{/notifications(unread=true)}" th:aria-current="${onlyUnread ? 'page' : null}" th:text="#{notification.onlyUnread}"></a></div>
+    <p class="panel muted" th:if="${notificationPage.empty}" th:text="${onlyUnread ? #messages.msg('notification.emptyUnread') : #messages.msg('notification.empty')}"></p>
+    <ol class="notification-list"><li class="panel notification-item" th:each="notice : ${notificationPage.content}" th:classappend="${notice.unread ? 'is-unread' : ''}">
+        <div class="notification-heading"><form method="post" th:action="@{/notifications/{id}/open(id=${notice.id})}"><button class="notification-open" type="submit" th:text="${#messages.msg('notification.kind.' + notice.kind, notice.subject)}"></button></form><span class="badge" th:if="${notice.unread}" th:text="#{notification.unread}"></span></div>
+        <div class="notification-meta"><time th:datetime="${notice.createdAt}" th:text="${#temporals.format(notice.createdDateTime, 'dd/MM/yyyy HH:mm') + ' UTC'}"></time><form th:if="${notice.unread}" method="post" th:action="@{/notifications/{id}/read(id=${notice.id})}"><button class="notification-read" type="submit" th:text="#{notification.read}"></button></form></div>
+    </li></ol>
+    <nav th:if="${notificationPage.totalPages > 1}" class="article-pagination" th:aria-label="#{notification.pagination}"><a th:if="${notificationPage.hasPrevious()}" th:href="@{/notifications(page=${notificationPage.number - 1},unread=${onlyUnread})}" th:text="#{notification.previous}"></a><span th:text="#{notification.page(${notificationPage.number + 1},${notificationPage.totalPages})}"></span><a th:if="${notificationPage.hasNext()}" th:href="@{/notifications(page=${notificationPage.number + 1},unread=${onlyUnread})}" th:text="#{notification.next}"></a></nav>
+</section>
+</body></html>

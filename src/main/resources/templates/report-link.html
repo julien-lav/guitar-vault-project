@@ -1,0 +1,2 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body><a th:fragment="link(type,id)" class="report-link" th:if="${currentUsername != null}" th:href="@{/reports/new(type=${type},targetId=${id})}" th:text="#{report.create}"></a></body></html>

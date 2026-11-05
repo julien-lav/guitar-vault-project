@@ -14,15 +14,19 @@ import org.springframework.web.server.ResponseStatusException;
 public class StudioQuoteService {
     private final StudioQuoteRepository quotes;
     private final StudioService studios;
+    private final StudioQuoteMessageRepository messages;
+    private final NotificationService notifications;
 
-    public StudioQuoteService(StudioQuoteRepository quotes, StudioService studios) {
+    public StudioQuoteService(StudioQuoteRepository quotes, StudioService studios, StudioQuoteMessageRepository messages, NotificationService notifications) {
         this.quotes = quotes;
         this.studios = studios;
+        this.messages = messages;
+        this.notifications = notifications;
     }
 
     public Studio requestableStudio(User actor, Long studioId) {
         Studio studio = studios.find(studioId);
-        if (!studio.getCreator().isEnabled() || studio.getCreator().getId().equals(actor.getId())) throw notFound();
+        if (studio.isModerationHidden() || !studio.getCreator().isEnabled() || studio.getCreator().getId().equals(actor.getId())) throw notFound();
         return studio;
     }
 
@@ -48,21 +52,31 @@ public class StudioQuoteService {
             throw new IllegalArgumentException("quote.datesError");
         }
         BigDecimal budget = amount(form.get("budget"));
-        return quotes.save(new StudioQuote(studio, actor, title, description, start, end, budget));
+        StudioQuote quote = quotes.save(new StudioQuote(studio, actor, title, description, start, end, budget));
+        notifications.send(actor, studio.getCreator(), Notification.Kind.QUOTE_REQUEST, quote.getTitle(), "/quotes/" + quote.getId());
+        return quote;
     }
 
     @Transactional
     public void reply(User actor, Long id, Map<String, String> form) {
         StudioQuote quote = quotes.findForUpdate(id).orElseThrow(StudioQuoteService::notFound);
-        if (!quote.getStudio().getCreator().getId().equals(actor.getId())) throw notFound();
-        if (quote.getStatus() != StudioQuote.Status.PENDING) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT);
-        }
+        boolean manager = quote.getStudio().getCreator().getId().equals(actor.getId());
+        if (!manager && !quote.getRequester().getId().equals(actor.getId())) throw notFound();
         String message = form.get("message");
         if (message.isBlank() || message.length() > 5000) throw new IllegalArgumentException("quote.replyError");
         BigDecimal proposedAmount = amount(form.get("amount"));
-        quote.answer(message, proposedAmount);
+        if (!manager && proposedAmount != null) throw new IllegalArgumentException("quote.studioAmountOnly");
+        // Archive the original single reply before appending to a pre-existing quote.
+        // The quote row lock also serializes concurrent first messages during this migration.
+        if (quote.getReply() != null && !messages.existsByQuoteId(id)) {
+            messages.save(StudioQuoteMessage.legacyReply(quote));
+        }
+        messages.save(new StudioQuoteMessage(quote, actor, message, proposedAmount));
+        if (manager) quote.answer(message, proposedAmount);
+        else quote.awaitStudioReply();
         quotes.save(quote);
+        notifications.send(actor, manager ? quote.getRequester() : quote.getStudio().getCreator(),
+                Notification.Kind.QUOTE_MESSAGE, quote.getTitle(), "/quotes/" + quote.getId());
     }
 
     private static LocalDate date(String value) {
