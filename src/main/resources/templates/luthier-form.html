@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page" aria-labelledby="workshop-title">
+<header class="page-header"><div><h1 id="workshop-title" th:text="#{luthier.workshop}"></h1><p class="muted" th:text="#{luthier.workshopIntro}"></p></div><a th:href="@{/interventions}" th:text="#{luthier.interventions}"></a></header>
+<div th:if="${error}" class="notice error" role="alert" data-form-error th:text="${#messages.msg(error)}"></div>
+<p class="notice" th:text="#{luthier.verificationHint}"></p>
+<form class="panel" method="post" th:action="@{/workshop}"><input type="hidden" name="version" th:value="${form['version']}">
+<div class="fields">
+<div class="field-wide"><label for="name" th:text="#{luthier.name}"></label><input id="name" name="name" required maxlength="150" th:value="${form['name']}"></div>
+<div><label for="location" th:text="#{luthier.location}"></label><input id="location" name="location" required maxlength="200" th:value="${form['location']}"></div>
+<div><label for="contact" th:text="#{luthier.contact}"></label><input id="contact" name="contact" required maxlength="300" th:value="${form['contact']}" aria-describedby="contact-hint"><p id="contact-hint" class="field-hint" th:text="#{luthier.contactHint}"></p></div>
+<div class="field-wide"><label for="specialties" th:text="#{luthier.specialties}"></label><textarea id="specialties" name="specialties" required maxlength="500" rows="3" th:text="${form['specialties']}"></textarea></div>
+<div class="field-wide"><label for="description" th:text="#{luthier.description}"></label><textarea id="description" name="description" required maxlength="3000" rows="6" th:text="${form['description']}"></textarea></div>
+<div class="field-wide"><label class="workshop-publish"><input type="checkbox" name="published" value="true" th:checked="${form['published'] == 'true'}"> <span th:text="#{luthier.publish}"></span></label></div>
+</div><div class="actions"><button class="button" type="submit" th:text="#{luthier.save}"></button><a th:if="${luthier != null and luthier.published}" th:href="@{/luthiers/{id}(id=${luthier.id})}" th:text="#{luthier.viewProfile}"></a></div>
+</form>
+</section>
+</body></html>

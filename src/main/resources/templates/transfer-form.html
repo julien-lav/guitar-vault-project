@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page">
+<a th:href="@{/instruments/{id}(id=${instrument.id})}" th:text="${instrument.name}"></a>
+<header class="page-header"><h1 th:text="#{transfer.new}"></h1></header>
+<p class="notice" th:text="#{transfer.sharing}"></p><p class="notice" th:text="#{transfer.workHint}"></p>
+<div class="notice error" role="alert" th:if="${error}" th:text="${#messages.msg(error)}"></div>
+<form class="panel" method="post" th:action="@{/instruments/{id}/transfers(id=${instrument.id})}"><div class="fields"><div class="field-wide"><label for="recipient" th:text="#{transfer.recipient}"></label><input id="recipient" name="recipient" required maxlength="255" th:value="${recipient}" autocapitalize="none" spellcheck="false"><p class="field-hint" th:text="#{transfer.recipientHint}"></p></div>
+<fieldset class="field-wide transfer-document-choice"><legend th:text="#{document.transferTitle}"></legend><p class="field-hint" th:text="#{document.transferHint}"></p><p th:if="${#lists.isEmpty(selectableDocuments)}" th:text="#{document.empty}"></p><label class="workshop-publish" th:each="doc : ${selectableDocuments}"><input type="checkbox" name="documentIds" th:value="${doc.id}" th:checked="${selectedDocuments.contains(doc.id)}"><span th:text="${doc.title}"></span></label></fieldset><div class="field-wide"><label class="workshop-publish"><input type="checkbox" name="confirmed" value="true" required><span th:text="#{transfer.confirm}"></span></label></div></div><button class="button" type="submit" th:text="#{transfer.send}"></button></form>
+</section></body></html>

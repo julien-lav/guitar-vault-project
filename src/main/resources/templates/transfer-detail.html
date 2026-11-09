@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page">
+<a th:href="@{/transfers}" th:text="#{transfer.title}"></a><header class="page-header"><h1 th:text="${transfer.instrumentName}"></h1><p th:text="${#messages.msg('transfer.status.' + transfer.status)}"></p></header>
+<article class="panel"><p><span th:text="${transfer.brand}"></span> · <span th:text="${transfer.manufacturingYear}"></span></p><p><span th:text="#{instrument.serialNumber}"></span>: <span th:text="${transfer.serialNumber}"></span></p><p><span th:text="${transfer.sender.username}"></span> → <span th:text="${transfer.recipient.username}"></span></p><p><time th:text="${transfer.createdAt}"></time></p><p th:if="${transfer.resolvedAt != null}"><time th:text="${transfer.resolvedAt}"></time></p></article>
+<p class="notice" th:text="#{transfer.sharing}"></p><section class="panel"><h2 th:text="#{document.transferTitle}"></h2><p th:text="#{document.transferCount(${#lists.size(transfer.documents)})}"></p><p th:text="#{document.transferAccess}"></p><ul th:if="${isSender or transfer.status.name() == 'ACCEPTED'}"><li th:each="doc : ${transfer.documents}"><a th:if="${isSender or transfer.status.name() == 'ACCEPTED'}" th:href="@{/documents/{id}/download(id=${doc.id})}" th:text="${doc.title}"></a></li></ul></section>
+<div class="actions" th:if="${transfer.status.name() == 'PENDING'}">
+<form th:if="${isSender}" method="post" th:action="@{/transfers/{id}/cancel(id=${transfer.id})}"><button class="button" type="submit" th:text="#{transfer.cancel}"></button></form>
+<form th:unless="${isSender}" method="post" th:action="@{/transfers/{id}/accept(id=${transfer.id})}"><button class="button" type="submit" th:text="#{transfer.accept}"></button></form>
+<form th:unless="${isSender}" method="post" th:action="@{/transfers/{id}/decline(id=${transfer.id})}"><button class="button secondary-button" type="submit" th:text="#{transfer.decline}"></button></form></div>
+<div class="actions" th:if="${transfer.status.name() == 'ACCEPTED'}"><a th:href="@{/instruments/{id}/ownership(id=${transfer.instrument.id})}" th:text="#{transfer.history}"></a><a th:if="${ownsInstrument}" th:href="@{/instruments/{id}(id=${transfer.instrument.id})}" th:text="#{nav.instruments}"></a></div>
+</section></body></html>

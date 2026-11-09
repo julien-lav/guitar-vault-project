@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page">
+<header class="page-header"><div><h1 th:text="#{transfer.title}"></h1><p class="muted" th:text="#{transfer.inboxHint}"></p></div><a th:href="@{/instruments}" th:text="#{nav.instruments}"></a></header>
+<p class="panel" th:if="${#lists.isEmpty(transfers)}" th:text="#{transfer.empty}"></p>
+<article class="panel" th:each="item : ${transfers}"><h2><a th:href="@{/transfers/{id}(id=${item.id})}" th:text="${item.instrumentName}"></a></h2><p><span th:text="${item.sender.username}"></span> → <span th:text="${item.recipient.username}"></span></p><p th:text="${#messages.msg('transfer.status.' + item.status)}"></p></article>
+</section></body></html>

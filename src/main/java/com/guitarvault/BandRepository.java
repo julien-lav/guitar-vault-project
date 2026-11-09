@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BandRepository extends JpaRepository<Band, Long> {
+    boolean existsByIdAndCreatorId(Long id, Long creatorId);
     @org.springframework.data.jpa.repository.Query("""
             select distinct b from Band b left join b.genres g
             where b.moderationHidden = false and (:genre = '' or lower(g) = :genre

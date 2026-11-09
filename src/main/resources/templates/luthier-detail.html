@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page" aria-labelledby="luthier-title">
+<a th:href="${reviewMode ? '/admin/luthiers' : '/luthiers'}" th:text="#{luthier.directory}"></a>
+<header class="page-header"><div><p class="eyebrow" th:text="#{luthier.profile}"></p><h1 id="luthier-title" th:text="${luthier.name}"></h1><p th:text="${luthier.location}"></p></div><span class="badge" th:classappend="${!luthier.verified ? 'neutral' : ''}" th:text="${#messages.msg(luthier.verified ? 'luthier.verified' : 'luthier.unverified')}"></span></header>
+<p class="notice" th:text="#{luthier.verificationHint}"></p>
+<article class="panel"><h2 th:text="#{luthier.specialties}"></h2><p class="instrument-text" th:text="${luthier.specialties}"></p><h2 th:text="#{luthier.description}"></h2><p class="instrument-text" th:text="${luthier.description}"></p><h2 th:text="#{luthier.contact}"></h2><p th:text="${luthier.contact}"></p></article>
+<p class="panel" th:unless="${reviewMode}"><span th:text="#{luthier.requestHint}"></span> <a th:href="@{/instruments}" th:text="#{nav.instruments}"></a></p>
+<section class="panel" th:if="${reviewMode}"><h2 th:text="#{luthier.review}"></h2>
+<div th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></div>
+<form method="post" th:action="@{/admin/luthiers/{id}/verification(id=${luthier.id})}"><input type="hidden" name="version" th:value="${form['version']}">
+<div class="fields"><div><label for="verified" th:text="#{luthier.decision}"></label><select id="verified" name="verified" required><option value="true" th:text="#{luthier.verify}"></option><option value="false" th:selected="${form['verified'] == 'false'}" th:text="#{luthier.revoke}"></option></select></div>
+<div class="field-wide"><label for="evidence" th:text="#{luthier.reviewEvidence}"></label><textarea id="evidence" name="evidence" maxlength="2000" rows="4" required th:text="${form['evidence']}"></textarea></div></div><button class="button" type="submit" th:text="#{luthier.save}"></button></form>
+<article class="assessment-revision" th:each="review : ${reviews}"><p><span th:text="${review.reviewer.username}"></span> · <time th:datetime="${review.createdAt}" th:text="${#temporals.format(review.createdDateTime, 'dd/MM/yyyy HH:mm') + ' UTC'}"></time> · <span th:text="${#messages.msg(review.verified ? 'luthier.verify' : 'luthier.revoke')}"></span></p><p><span th:text="${review.workshopName}"></span> · <span th:text="${review.workshopLocation}"></span> · <span th:text="${review.workshopContact}"></span></p><p class="instrument-text" th:text="${review.evidence}"></p></article>
+</section>
+</section>
+</body></html>

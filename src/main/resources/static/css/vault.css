@@ -522,3 +522,63 @@ fieldset.instrument-section { padding: 0; border: 0; }
 .moderation-media { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 20px; }
 .moderation-media img { max-width: 100%; width: 260px; max-height: 360px; object-fit: contain; }
 .moderation-detail .actions { flex-wrap: wrap; margin-top: 16px; }
+
+/* Luthier directory and attributed professional history. */
+.luthier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 20px; }
+.assessment-revision { border-top: 1px solid var(--border, #d8dee8); margin-top: 24px; padding-top: 20px; overflow-wrap: anywhere; }
+.assessment-revision dt { font-weight: 700; margin-top: 16px; }
+.assessment-revision dd { margin: 6px 0 0; }
+.professional-history { padding-left: 24px; }
+.professional-history li { padding: 16px 0; overflow-wrap: anywhere; }
+.luthier-page > .panel { margin-bottom: 24px; }
+.luthier-page .panel h2:not(:first-child) { margin-top: 24px; }
+.luthier-page .badge { white-space: normal; }
+.luthier-page .badge.neutral { background: #e5e7eb; color: #374151; }
+.luthier-page input[type="checkbox"] { width: 20px; height: 20px; flex-shrink: 0; }
+.luthier-page .workshop-publish { display: flex; align-items: center; gap: 12px; }
+
+.transfer-error { font-family: Arial, sans-serif; padding: 32px 16px; background: #f3f4f6; color: #111827; }
+
+.document-list { padding-left: 22px; overflow-wrap: anywhere; }
+.document-list li { margin: 12px 0; }
+.document-list p { margin: 6px 0; }
+.transfer-document-choice { border: 1px solid #d1d5db; border-radius: 8px; padding: 16px; min-width: 0; }
+.transfer-document-choice .workshop-publish { margin-top: 14px; }
+.report-attachments { margin-top: 22px; border-top: 1px solid #e5e7eb; padding-top: 16px; }
+.instrument-detail > .actions { flex-wrap: wrap; margin-bottom: 20px; }
+.luthier-page .fields > *, .transfer-document-choice .workshop-publish span { min-width: 0; overflow-wrap: anywhere; }
+.luthier-page .actions { flex-wrap: wrap; }
+
+.library-list { list-style: none; padding: 0; }
+.library-list > li { padding: 18px 0; border-bottom: 1px solid #e5e7eb; }
+.library-list > li:last-child { border-bottom: 0; }
+.library-row-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.library-row-heading > a:first-child { font-weight: 600; overflow-wrap: anywhere; min-width: 0; }
+.library-row-heading > a:last-child { flex-shrink: 0; }
+.document-library .fields > * { min-width: 0; }
+.document-library .panel { overflow-wrap: anywhere; }
+
+/* User guides share one Markdown source with the repository. */
+.help-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; }
+.help-grid .panel { margin: 0; }
+.help-grid h2 { font-size: 1.25rem; }
+.help-layout { display: grid; grid-template-columns: minmax(180px, 240px) minmax(0, 1fr); gap: 24px; margin-top: 24px; align-items: start; }
+.help-layout > .panel { margin: 0; min-width: 0; }
+.help-page { overflow-wrap: anywhere; }
+.help-topics h2 { font-size: 1.1rem; margin-top: 0; }
+.help-topics ul { list-style: none; margin: 0; padding: 0; }
+.help-topics li + li { margin-top: 16px; }
+.help-topics [aria-current="page"] { font-weight: 700; color: #111827; text-decoration-thickness: 2px; }
+.help-prose { line-height: 1.7; }
+.help-prose > :first-child { margin-top: 0; }
+.help-prose h2 { margin-top: 2rem; line-height: 1.3; font-size: 1.4rem; }
+.help-prose h3 { line-height: 1.4; }
+.help-prose li + li { margin-top: .6rem; }
+.help-prose ul, .help-prose ol { padding-left: 1.5rem; }
+.help-prose pre { overflow-x: auto; padding: 16px; background: #f3f4f6; border-radius: 8px; }
+.help-prose blockquote { margin-left: 0; padding-left: 16px; border-left: 3px solid #9ca3af; }
+.help-source { margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+@media (max-width: 760px) {
+    .help-layout { grid-template-columns: minmax(0, 1fr); }
+    .help-article { grid-row: 1; }
+}

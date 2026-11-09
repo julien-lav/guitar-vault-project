@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page">
+<header class="page-header"><h1 th:text="#{transfer.history}"></h1><a th:href="@{/transfers}" th:text="#{transfer.title}"></a></header><p class="notice" th:text="#{transfer.historyHint}"></p><p th:if="${#lists.isEmpty(periods)}" th:text="#{transfer.noHistory}"></p>
+<ol class="panel professional-history"><li th:each="period, row : ${periods}"><strong th:text="${#messages.msg(period.yours ? 'transfer.yourPeriod' : 'transfer.otherPeriod')}"></strong> <span th:text="${row.count}"></span><p><time th:text="${period.startedAt}"></time> → <time th:if="${period.endedAt != null}" th:text="${period.endedAt}"></time><span th:if="${period.endedAt == null}" th:text="#{transfer.current}"></span></p><a th:if="${period.yours and period.endedAt != null}" th:href="@{/ownership/{id}/private(id=${period.id})}" th:text="#{transfer.privateArchive}"></a></li></ol>
+</section></body></html>

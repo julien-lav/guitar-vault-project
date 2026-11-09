@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/admin/articles/*/publish", "/admin/articles/*/unpublish", "/admin/articles/*/delete").hasAnyRole("SUPER_ADMIN", "ADMIN")
                         .requestMatchers("/admin", "/admin/articles", "/admin/articles/**").hasAnyRole("SUPER_ADMIN", "ADMIN", "EDITOR")
                         .requestMatchers("/admin/**").hasAnyRole("SUPER_ADMIN", "ADMIN")
-                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/articles", "/articles/**").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/help", "/help/**", "/articles", "/articles/**", "/luthiers", "/luthiers/*").permitAll()
                         .requestMatchers("/", "/signup", "/verify-email", "/resend-verification", "/login", "/error", "/access-denied", "/favicon.ico", "/api/hello", "/css/**", "/js/**", "/forgot-password", "/reset-password").permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(exceptions -> exceptions.accessDeniedPage("/access-denied"))

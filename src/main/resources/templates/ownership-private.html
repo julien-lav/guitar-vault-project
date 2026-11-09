@@ -1,0 +1,6 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page">
+<header class="page-header"><h1 th:text="#{transfer.privateArchive}"></h1><a th:href="@{/instruments/{id}/ownership(id=${period.instrument.id})}" th:text="#{transfer.history}"></a></header><p class="notice" th:text="#{transfer.archiveHint}"></p><p><a th:href="@{/documents}" th:text="#{document.mine}"></a></p>
+<article class="panel"><h2 th:text="#{instrument.notes}"></h2><p class="instrument-text" th:text="${period.notes}"></p><h2 th:text="#{instrument.history}"></h2><p class="instrument-text" th:text="${period.history}"></p><h2 th:text="#{instrument.previousOwner}"></h2><p class="instrument-text" th:text="${period.previousOwner}"></p><div class="photo-gallery"><img th:each="photo : ${photos}" th:src="@{/ownership/{id}/photos/{photoId}(id=${period.id},photoId=${photo.id})}" th:alt="#{instrument.photos}" loading="lazy"></div></article>
+</section></body></html>

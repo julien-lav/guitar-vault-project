@@ -19,8 +19,9 @@ public class BandController {
     private final BandConnectionRepository connections;
     private final ConcertRepository concerts;
     private final ConcertPosterRepository concertPosters;
+    private final BandDateProposalService dateProposals;
 
-    public BandController(BandService service, BandRepository bands, InstrumentService instruments, BandInvitationRepository invitations, BandConnectionRepository connections, ConcertRepository concerts, ConcertPosterRepository concertPosters) {
+    public BandController(BandService service, BandRepository bands, InstrumentService instruments, BandInvitationRepository invitations, BandConnectionRepository connections, ConcertRepository concerts, ConcertPosterRepository concertPosters, BandDateProposalService dateProposals) {
         this.service = service;
         this.bands = bands;
         this.instruments = instruments;
@@ -28,6 +29,7 @@ public class BandController {
         this.connections = connections;
         this.concerts = concerts;
         this.concertPosters = concertPosters;
+        this.dateProposals = dateProposals;
     }
 
     @GetMapping("/bands")
@@ -77,6 +79,7 @@ public class BandController {
         model.addAttribute("pendingConnections", creator ? connections.forBand(id, BandConnection.Status.PENDING) : java.util.List.of());
         if (!model.containsAttribute("connectionForm")) model.addAttribute("connectionForm", Map.of());
         model.addAttribute("canEditBand", creator);
+        model.addAttribute("canProposeDate", !dateProposals.eligibleSenders(actor, id).isEmpty());
         model.addAttribute("isBandMember", band.getMembers().stream().anyMatch(member -> member.getId().equals(actor.getId())));
         model.addAttribute("pendingInvitations", creator ? invitations.findByBandIdAndStatusOrderByIdDesc(id, BandInvitation.Status.PENDING) : java.util.List.of());
         model.addAttribute("myInvitation", invitations.findByBandIdAndInviteeId(id, actor.getId())

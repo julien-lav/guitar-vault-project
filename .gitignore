@@ -33,3 +33,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Isolated browser-test environment and Python bytecode.
+.venv-e2e/
+__pycache__/
+*.pyc

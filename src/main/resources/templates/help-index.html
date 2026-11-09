@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault help-page">
+    <header class="page-header"><div>
+        <h1 th:text="#{help.title}"></h1>
+        <p th:text="#{help.intro}"></p>
+    </div></header>
+    <div class="help-grid">
+        <article class="panel" th:each="guide : ${guides}">
+            <h2><a th:href="@{/help/{slug}(slug=${guide.slug})}" th:text="${guide.title}"></a></h2>
+            <p th:text="${guide.summary}"></p>
+            <a th:href="@{/help/{slug}(slug=${guide.slug})}" th:text="#{help.read}"></a>
+        </article>
+    </div>
+</section>
+</body></html>

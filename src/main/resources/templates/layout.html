@@ -53,12 +53,17 @@
                     <a th:href="@{/dashboard}" th:aria-current="${currentPath == '/dashboard' ? 'page' : null}" th:text="#{nav.dashboard}"></a>
                     <a th:href="@{/profile}" th:aria-current="${currentPath == '/profile/edit' ? 'page' : null}" th:text="#{nav.profile}"></a>
                     <a th:href="@{/instruments}" th:aria-current="${currentPath == '/instruments' ? 'page' : null}" th:text="#{nav.instruments}"></a>
+                    <a th:href="@{/documents}" th:text="#{document.mine}"></a>
+                    <a th:href="@{/transfers}" th:text="#{transfer.title}"></a>
                     <a th:href="@{/wishlist}" th:aria-current="${currentPath == '/wishlist' ? 'page' : null}" th:text="#{nav.wishlist}"></a>
                     <a th:href="@{/dashboard#dashboard-bands}" th:text="#{band.mine}"></a>
                     <a th:href="@{/dashboard#dashboard-studios}" th:text="#{studio.mine}"></a>
                     <a th:href="@{/invitations}" th:aria-current="${currentPath == '/invitations' ? 'page' : null}" th:text="#{nav.invitations}"></a>
                     <a th:href="@{/concert-invitations}" th:aria-current="${currentPath == '/concert-invitations' ? 'page' : null}" th:text="#{concert.invitations}"></a>
+                    <a th:href="@{/date-proposals}" th:aria-current="${currentPath.startsWith('/date-proposals') ? 'page' : null}" th:text="#{proposal.title}"></a>
                     <a th:href="@{/band-connections}" th:aria-current="${currentPath == '/band-connections' ? 'page' : null}" th:text="#{connection.title}"></a>
+                    <a th:href="@{/workshop}" th:text="#{luthier.workshop}"></a>
+                    <a th:href="@{/interventions}" th:text="#{luthier.interventions}"></a>
                     <a th:href="@{/reports}" th:text="#{report.mine}"></a>
                     <a th:href="@{/quotes}" th:aria-current="${currentPath == '/quotes' ? 'page' : null}" th:text="#{nav.quotes}"></a>
                 </div>
@@ -68,9 +73,12 @@
                 <div class="nav-dropdown">
                     <a th:href="@{/articles}" th:aria-current="${currentPath == '/articles' ? 'page' : null}" th:text="#{nav.articles}"></a>
                     <a th:href="@{/studios}" th:aria-current="${currentPath == '/studios' ? 'page' : null}" th:text="#{nav.studios}"></a>
+                    <a th:href="@{/luthiers}" th:text="#{luthier.directory}"></a>
                     <a th:href="@{/bands}" th:aria-current="${currentPath == '/bands' ? 'page' : null}" th:text="#{nav.bands}"></a>
                 </div>
             </details>
+            <a th:href="@{/help}" th:aria-current="${currentPath.startsWith('/help') ? 'page' : null}" th:text="#{help.title}"></a>
+            <a th:if="${isAdmin}" th:href="@{/admin/luthiers}" th:text="#{luthier.review}"></a>
             <a th:if="${isAdmin}" th:href="@{/admin/moderation}" th:text="#{report.moderation}"></a>
             <a th:if="${canWriteArticles}" th:href="@{/admin/articles}" th:text="#{nav.admin}"></a>
         </div>

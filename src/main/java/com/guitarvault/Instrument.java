@@ -71,6 +71,12 @@ public class Instrument {
         this.status = status;
     }
 
+    void transferTo(User recipient) {
+        owner = recipient;
+        // These legacy free-text fields can contain financial or personal information.
+        notes = null; history = null; previousOwner = null;
+        if ("En vente".equals(status)) status = "Actif";
+    }
     public Long getId() { return id; }
     public String getName() { return name; }
     public String getBrand() { return brand; }

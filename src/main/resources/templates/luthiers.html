@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page" aria-labelledby="luthiers-title">
+<header class="page-header"><div><p class="eyebrow">Guitar Vault</p><h1 id="luthiers-title" th:text="${#messages.msg(reviewMode ? 'luthier.review' : 'luthier.directory')}"></h1><p class="muted" th:text="#{luthier.directoryIntro}"></p></div><a class="button" th:href="@{/workshop}" th:text="#{luthier.workshop}"></a></header>
+<p class="notice" th:text="#{luthier.verificationHint}"></p>
+<p class="panel" th:if="${#lists.isEmpty(luthiers)}" th:text="#{luthier.empty}"></p>
+<div class="luthier-grid"><article class="panel" th:each="item : ${luthiers}">
+<h2><a th:href="${reviewMode ? '/admin/luthiers/' + item.id : '/luthiers/' + item.id}" th:text="${item.name}"></a></h2>
+<span class="badge" th:classappend="${!item.verified ? 'neutral' : ''}" th:text="${#messages.msg(item.verified ? 'luthier.verified' : 'luthier.unverified')}"></span>
+<p th:text="${item.location}"></p><p class="instrument-text" th:text="${item.specialties}"></p>
+</article></div>
+</section>
+</body></html>

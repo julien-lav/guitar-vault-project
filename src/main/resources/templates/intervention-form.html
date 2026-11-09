@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page" aria-labelledby="request-title">
+<a th:href="@{/instruments/{id}(id=${instrument.id})}" th:text="${instrument.name}"></a>
+<header class="page-header"><div><h1 id="request-title" th:text="#{luthier.request}"></h1><p class="muted" th:text="#{luthier.shareHint}"></p></div></header>
+<div th:if="${error}" class="notice error" role="alert" data-form-error th:text="${#messages.msg(error)}"></div>
+<p class="panel" th:if="${#lists.isEmpty(luthiers)}"><span th:text="#{luthier.empty}"></span> <a th:href="@{/luthiers}" th:text="#{luthier.directory}"></a></p>
+<form th:unless="${#lists.isEmpty(luthiers)}" class="panel" method="post" th:action="@{/instruments/{id}/interventions(id=${instrument.id})}">
+<div class="fields"><div><label for="luthierId" th:text="#{luthier.choose}"></label><select id="luthierId" name="luthierId" required><option value="" th:text="#{luthier.choose}"></option><option th:each="item : ${luthiers}" th:value="${item.id}" th:selected="${form['luthierId'] == #strings.toString(item.id)}" th:text="${item.name + ' · ' + item.location}"></option></select></div>
+<div><label for="kind" th:text="#{luthier.kind}"></label><select id="kind" name="kind" required><option th:each="kind : ${kinds}" th:value="${kind}" th:selected="${form['kind'] == kind.name()}" th:text="${#messages.msg('luthier.kind.' + kind)}"></option></select></div>
+<div class="field-wide"><label for="description" th:text="#{luthier.requestDescription}"></label><textarea id="description" name="description" required rows="6" maxlength="3000" th:text="${form['description']}"></textarea></div></div>
+<div class="actions"><button class="button" type="submit" th:text="#{luthier.send}"></button><a th:href="@{/instruments/{id}(id=${instrument.id})}" th:text="#{common.cancel}"></a></div></form>
+</section>
+</body></html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault help-page">
+    <a th:href="@{/help}" th:text="#{help.all}"></a>
+    <header class="page-header"><h1 th:text="${guide.title}"></h1></header>
+    <div class="help-layout">
+        <aside class="panel help-topics" th:aria-label="#{help.topics}">
+            <h2 th:text="#{help.topics}"></h2>
+            <ul>
+                <li th:each="topic : ${guides}">
+                    <a th:href="@{/help/{slug}(slug=${topic.slug})}"
+                       th:aria-current="${topic.slug == guide.slug ? 'page' : null}" th:text="${topic.title}"></a>
+                </li>
+            </ul>
+        </aside>
+        <article class="panel help-article">
+            <!-- Only the packaged Markdown renderer output is allowed here. Raw HTML is escaped. -->
+            <div class="help-prose" th:utext="${guide.html}"></div>
+            <footer class="help-source">
+                <p th:text="#{help.sourceHint}"></p>
+                <a th:href="@{/help/{slug}/source(slug=${guide.slug})}" th:text="#{help.source}"></a>
+            </footer>
+        </article>
+    </div>
+</section>
+</body></html>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault" aria-labelledby="proposals-title">
+    <header class="page-header"><div><h1 id="proposals-title" th:text="#{proposal.title}"></h1><p class="muted" th:text="#{proposal.intro}"></p></div><a th:href="@{/band-connections}" th:text="#{connection.title}"></a></header>
+    <p class="panel muted" th:if="${proposalPage.empty}" th:text="#{proposal.empty}"></p>
+    <ul class="report-list"><li class="panel" th:each="proposal : ${proposalPage.content}">
+        <h2><a th:href="@{/date-proposals/{id}(id=${proposal.id})}" th:text="${proposal.sender.name + ' ↔ ' + proposal.recipient.name}"></a></h2>
+        <p><time th:datetime="${proposal.proposedDate}" th:text="${#temporals.format(proposal.proposedDate, 'dd/MM/yyyy')}"></time><span th:if="${!#strings.isEmpty(proposal.venue)}" th:text="${' · ' + proposal.venue}"></span></p>
+        <span class="badge" th:text="${#messages.msg('proposal.status.' + proposal.status)}"></span>
+        <p class="field-hint" th:if="${proposal.status.name() == 'PENDING'}" th:text="${proposal.responder.creator.id == actorId ? #messages.msg('proposal.yourTurn') : #messages.msg('proposal.waiting')}"></p>
+    </li></ul>
+    <nav class="article-pagination" th:if="${proposalPage.totalPages > 1}" th:aria-label="#{notification.pagination}"><a th:if="${proposalPage.hasPrevious()}" th:href="@{/date-proposals(page=${proposalPage.number - 1})}" th:text="#{notification.previous}"></a><span th:text="${(proposalPage.number + 1) + ' / ' + proposalPage.totalPages}"></span><a th:if="${proposalPage.hasNext()}" th:href="@{/date-proposals(page=${proposalPage.number + 1})}" th:text="#{notification.next}"></a></nav>
+</section>
+</body></html>

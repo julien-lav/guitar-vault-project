@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page" aria-labelledby="intervention-title">
+<a th:href="@{/interventions}" th:text="#{luthier.interventions}"></a>
+<header class="page-header"><div><p class="eyebrow" th:text="${#messages.msg('luthier.kind.' + intervention.kind)}"></p><h1 id="intervention-title" th:text="${intervention.instrument.name}"></h1><p><span th:text="${intervention.instrument.brand}"></span> · <span th:text="${intervention.instrument.year}"></span></p></div><span class="badge" th:text="${#messages.msg('luthier.status.' + intervention.status)}"></span></header>
+<p class="notice" th:text="#{luthier.private}"></p><div class="notice error" role="alert" th:if="${error}" th:text="${#messages.msg(error)}"></div><div class="notice error" role="alert" th:if="${documentError}" th:text="${#messages.msg(documentError)}"></div><p class="notice success" role="status" th:if="${documentSuccess}" th:text="${#messages.msg(documentSuccess)}"></p>
+<article class="panel"><h2 th:text="${intervention.luthier.name}"></h2><p><span th:text="#{instrument.serialNumber}"></span>: <span th:text="${intervention.instrument.serialNumber}"></span></p><p class="instrument-text" th:text="${intervention.description}"></p><p><time th:datetime="${intervention.createdAt}" th:text="${#temporals.format(intervention.createdDateTime, 'dd/MM/yyyy HH:mm') + ' UTC'}"></time></p>
+<form th:if="${intervention.status.name() == 'REQUESTED'}" method="post" th:action="@{/interventions/{id}/cancel(id=${intervention.id})}"><button type="submit" th:text="#{luthier.cancelRequest}"></button></form></article>
+<section class="panel" aria-labelledby="assessments-title"><h2 id="assessments-title" th:text="#{luthier.assessments}"></h2><p class="muted" th:text="#{luthier.assessmentHint}"></p><p th:if="${#lists.isEmpty(assessments)}" th:text="#{luthier.noAssessment}"></p>
+<article class="assessment-revision" th:each="report, row : ${assessments}">
+<h3><span th:text="#{luthier.revision}"></span> <span th:text="${report.revision}"></span> · <span th:text="${#messages.msg(row.first ? 'luthier.current' : 'luthier.superseded')}"></span></h3>
+<p><strong th:text="${report.workshopName}"></strong> · <span th:text="${report.authorName}"></span> · <time th:datetime="${report.recordedAt}" th:text="${#temporals.format(report.recordedDateTime, 'dd/MM/yyyy HH:mm') + ' UTC'}"></time></p>
+<p class="badge" th:classappend="${!report.professionalVerified ? 'neutral' : ''}" th:text="${#messages.msg(report.professionalVerified ? 'luthier.verifiedAtSigning' : 'luthier.unverifiedAtSigning')}"></p>
+<dl><dt th:text="#{luthier.examinedOn}"></dt><dd th:text="${#temporals.format(report.examinedOn, 'dd/MM/yyyy')}"></dd><dt th:text="#{luthier.conclusion}"></dt><dd th:text="${#messages.msg('luthier.conclusion.' + report.conclusion)}"></dd><dt th:text="#{luthier.findings}"></dt><dd class="instrument-text" th:text="${report.findings}"></dd><dt th:text="#{luthier.evidence}"></dt><dd class="instrument-text" th:text="${report.evidence}"></dd><dt th:text="#{luthier.limitations}"></dt><dd class="instrument-text" th:text="${report.limitations}"></dd></dl>
+<p th:if="${report.revision > 1}" class="instrument-text"><strong th:text="#{luthier.correctionReason}"></strong>: <span th:text="${report.correctionReason}"></span></p>
+<div th:replace="~{report-documents :: attachments(${report}, ${reportDocuments[report.id]}, ${isLuthier})}"></div></article></section>
+<section class="panel" th:if="${isLuthier and intervention.status.name() != 'CANCELLED'}"><h2 th:text="${#messages.msg(#lists.isEmpty(assessments) ? 'luthier.writeAssessment' : 'luthier.correctAssessment')}"></h2>
+<div th:if="${error}" class="notice error" role="alert" data-form-error th:text="${#messages.msg(error)}"></div>
+<form method="post" th:action="@{/interventions/{id}/assessments(id=${intervention.id})}"><input type="hidden" name="version" th:value="${form['version']}"><div class="fields">
+<div><label for="examinedOn" th:text="#{luthier.examinedOn}"></label><input type="date" id="examinedOn" name="examinedOn" min="0001-01-01" th:max="${today}" required th:value="${form['examinedOn']}"></div>
+<div><label for="conclusion" th:text="#{luthier.conclusion}"></label><select id="conclusion" name="conclusion" required><option value="" th:text="#{luthier.chooseConclusion}"></option><option th:each="choice : ${conclusions}" th:value="${choice}" th:selected="${form['conclusion'] == choice.name()}" th:text="${#messages.msg('luthier.conclusion.' + choice)}"></option></select></div>
+<div class="field-wide"><label for="findings" th:text="#{luthier.findings}"></label><textarea id="findings" name="findings" required rows="6" maxlength="5000" th:text="${form['findings']}"></textarea></div>
+<div class="field-wide"><label for="evidence" th:text="#{luthier.evidence}"></label><textarea id="evidence" name="evidence" required rows="4" maxlength="3000" th:text="${form['evidence']}"></textarea></div>
+<div class="field-wide"><label for="limitations" th:text="#{luthier.limitations}"></label><textarea id="limitations" name="limitations" required rows="4" maxlength="3000" th:text="${form['limitations']}"></textarea></div>
+<div class="field-wide" th:unless="${#lists.isEmpty(assessments)}"><label for="correctionReason" th:text="#{luthier.correctionReason}"></label><textarea id="correctionReason" name="correctionReason" required rows="3" maxlength="1000" th:text="${form['correctionReason']}"></textarea></div>
+</div><p class="field-hint" th:text="#{luthier.signHint}"></p><button class="button" type="submit" th:text="#{luthier.sign}"></button></form>
+</section>
+</section>
+</body></html>

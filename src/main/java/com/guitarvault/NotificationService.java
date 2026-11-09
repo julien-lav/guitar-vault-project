@@ -39,7 +39,7 @@ public class NotificationService {
     @Transactional
     public void markAllRead(User actor) { notifications.markAllRead(actor.getId(), Instant.now()); }
     private static boolean validTarget(String target) {
-        return target != null && target.matches("/(?:bands/[1-9][0-9]*(?:#band-network)?|band-connections|concerts/[1-9][0-9]*|quotes/[1-9][0-9]*)");
+        return target != null && target.matches("/(?:bands/[1-9][0-9]*(?:#band-network)?|band-connections|concerts/[1-9][0-9]*|quotes/[1-9][0-9]*|date-proposals/[1-9][0-9]*|transfers/[1-9][0-9]*)");
     }
     private static ResponseStatusException notFound() { return new ResponseStatusException(HttpStatus.NOT_FOUND); }
 }

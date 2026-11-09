@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page" aria-labelledby="interventions-title">
+<header class="page-header"><div><h1 id="interventions-title" th:text="#{luthier.interventions}"></h1><p class="muted" th:text="#{luthier.private}"></p></div><a th:href="@{/instruments}" th:text="#{nav.instruments}"></a></header>
+<p class="panel" th:if="${#lists.isEmpty(interventions)}" th:text="#{luthier.noInterventions}"></p>
+<article class="panel" th:each="item : ${interventions}"><h2><a th:href="@{/interventions/{id}(id=${item.id})}" th:text="${item.instrument.name}"></a></h2><p><span th:text="${#messages.msg('luthier.kind.' + item.kind)}"></span> · <span th:text="${item.luthier.name}"></span></p><span class="badge" th:text="${#messages.msg('luthier.status.' + item.status)}"></span><p><time th:datetime="${item.createdAt}" th:text="${#temporals.format(item.createdDateTime, 'dd/MM/yyyy HH:mm') + ' UTC'}"></time></p></article>
+</section>
+</body></html>

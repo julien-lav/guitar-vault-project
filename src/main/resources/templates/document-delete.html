@@ -1,0 +1,4 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body><section th:fragment="content" class="vault luthier-page document-library">
+<a th:href="@{/documents/{id}/manage(id=${document.id})}" th:text="#{document.library.manage}"></a><header class="page-header"><h1 th:text="#{document.library.delete}"></h1></header><section class="panel"><h2 th:text="${document.title}"></h2><p th:text="${document.filename}"></p><p class="notice error" th:text="#{document.library.confirmDelete}"></p><form method="post" th:action="@{/documents/{id}/delete(id=${document.id})}"><input type="hidden" name="version" th:value="${document.version}"><div class="actions"><button class="button danger-button" type="submit" th:text="#{document.library.confirmButton}"></button><a th:href="@{/documents/{id}/manage(id=${document.id})}" th:text="#{common.cancel}"></a></div></form></section>
+</section></body></html>

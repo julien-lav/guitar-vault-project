@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.ArrayList;
 import org.springframework.util.MultiValueMap;
 import java.io.IOException;
-import java.io.ByteArrayInputStream;
-import javax.imageio.ImageIO;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -30,9 +28,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class InstrumentController {
     private final InstrumentService instruments;
+    private final LuthierInterventionRepository interventions;
 
-    public InstrumentController(InstrumentService instruments) {
+    public InstrumentController(InstrumentService instruments, LuthierInterventionRepository interventions) {
         this.instruments = instruments;
+        this.interventions = interventions;
     }
 
     @GetMapping("/instruments")
@@ -58,7 +58,11 @@ public class InstrumentController {
 
     @GetMapping("/instruments/{id}")
     public String detail(Principal principal, @PathVariable Long id, Model model) {
-        model.addAttribute("instrument", instruments.ownedInstrument(instruments.currentUser(principal), id));
+        User actor = instruments.currentUser(principal);
+        Instrument owned = instruments.ownedInstrument(actor, id);
+        model.addAttribute("instrument", owned);
+        model.addAttribute("visiblePhotos", owned.getPhotos().stream().filter(p -> p.visibleTo(actor)).toList());
+        model.addAttribute("interventions", interventions.findByInstrumentIdAndRequesterIdOrderByIdDesc(id, actor.getId()));
         model.addAttribute("title", "page.instrumentDetail");
         model.addAttribute("contentTemplate", "instrument-detail");
         return "layout";
@@ -67,7 +71,7 @@ public class InstrumentController {
     @GetMapping("/instruments/{id}/photos/{photoId}")
     public ResponseEntity<byte[]> photo(Principal principal, @PathVariable Long id, @PathVariable Long photoId) {
         var instrument = instruments.ownedInstrument(instruments.currentUser(principal), id);
-        var photo = instrument.getPhotos().stream().filter(item -> item.getId().equals(photoId)).findFirst()
+        var photo = instrument.getPhotos().stream().filter(item -> item.getId().equals(photoId) && item.visibleTo(instruments.currentUser(principal))).findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return ResponseEntity.ok().contentType(MediaType.parseMediaType(photo.getContentType()))
                 .header("Cache-Control", "private, no-store").header("X-Content-Type-Options", "nosniff")
@@ -129,7 +133,7 @@ public class InstrumentController {
                 for (var upload : uploads) {
                     if (upload.getSize() > 5 * 1024 * 1024) throw new IOException("Photo too large");
                     byte[] data = upload.getBytes();
-                    String contentType = imageType(data);
+                    String contentType = ImageUploads.imageType(data);
                     validatedPhotos.add(new PhotoData(contentType, data));
                 }
             } catch (IOException | IllegalArgumentException exception) {
@@ -163,21 +167,4 @@ public class InstrumentController {
         return entries == null ? List.of() : entries.stream().map(String::strip).filter(value -> !value.isEmpty()).toList();
     }
 
-    private static String imageType(byte[] data) throws IOException {
-        try (var stream = ImageIO.createImageInputStream(new ByteArrayInputStream(data))) {
-            var readers = ImageIO.getImageReaders(stream);
-            if (!readers.hasNext()) throw new IOException("Invalid image");
-            var reader = readers.next();
-            try {
-                reader.setInput(stream);
-                String format = reader.getFormatName().toLowerCase(java.util.Locale.ROOT);
-                if (!Set.of("jpeg", "png").contains(format) || reader.getWidth(0) > 10000
-                        || reader.getHeight(0) > 10000 || (long) reader.getWidth(0) * reader.getHeight(0) > 25000000) {
-                    throw new IOException("Unsupported image");
-                }
-                if (reader.read(0) == null) throw new IOException("Invalid image");
-                return "image/" + format;
-            } finally { reader.dispose(); }
-        }
-    }
 }

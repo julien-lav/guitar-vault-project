@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault report-editor" aria-labelledby="proposal-title">
+    <a th:href="@{/bands/{id}(id=${targetBand.id})}" th:text="${targetBand.name}"></a>
+    <header class="page-header"><div><h1 id="proposal-title" th:text="#{proposal.create}"></h1><p class="muted" th:text="#{proposal.intro}"></p></div></header>
+    <div th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></div>
+    <form class="panel" method="post" th:action="@{/bands/{id}/date-proposals(id=${targetBand.id})}">
+        <label for="proposal-sender" th:text="#{proposal.sender}"></label><select id="proposal-sender" name="senderId" required><option th:each="sender : ${senderBands}" th:value="${sender.id}" th:selected="${sender.id.toString() == form['senderId']}" th:text="${sender.name}"></option></select>
+        <div th:replace="~{date-proposal-form :: fields}"></div>
+        <div class="actions"><button class="button" th:text="#{proposal.send}"></button><a th:href="@{/bands/{id}(id=${targetBand.id})}" th:text="#{common.cancel}"></a></div>
+    </form>
+</section>
+<div th:fragment="fields" class="fields">
+    <div><label for="proposal-date" th:text="#{proposal.date}"></label><input id="proposal-date" name="date" type="date" required th:min="${today}" th:value="${form['date']}"></div>
+    <div><label for="proposal-venue" th:text="#{proposal.venue}"></label><input id="proposal-venue" name="venue" maxlength="200" th:value="${form['venue']}"></div>
+    <div class="field-wide"><label for="proposal-message" th:text="#{proposal.message}"></label><textarea id="proposal-message" name="message" maxlength="2000" rows="5" th:text="${form['message']}"></textarea></div>
+</div>
+</body></html>
