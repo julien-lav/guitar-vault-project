@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault appointment-page">
+    <a th:href="@{/workshop/availability}" th:text="#{availability.title}"></a>
+    <header class="page-header"><h1 th:text="#{availability.overview}"></h1><p th:text="${calendar.settings.timeZone}"></p></header>
+    <nav class="panel actions" th:aria-label="#{calendar.navigation}">
+        <a th:if="${previousDate != null}" th:href="@{/workshop/availability/calendar(date=${previousDate},view=${calendarView})}" th:text="#{calendar.previous}"></a>
+        <a th:href="@{/workshop/availability/calendar(view=${calendarView})}" th:text="#{calendar.today}"></a>
+        <a th:if="${nextDate != null}" th:href="@{/workshop/availability/calendar(date=${nextDate},view=${calendarView})}" th:text="#{calendar.next}"></a>
+        <a th:href="@{/workshop/availability/calendar(date=${calendar.date},view='week')}" th:aria-current="${calendarView == 'week' ? 'page' : null}" th:text="#{availability.weekView}"></a>
+        <a th:href="@{/workshop/availability/calendar(date=${calendar.date},view='month')}" th:aria-current="${calendarView == 'month' ? 'page' : null}" th:text="#{calendar.monthView}"></a>
+    </nav>
+    <form class="panel actions" method="get" th:action="@{/workshop/availability/calendar}">
+        <label for="overview-date" th:text="#{availability.date}"></label><input id="overview-date" type="date" name="date" th:value="${calendar.date}" th:min="${calendar.today}" th:max="${calendar.lastDate}" required>
+        <input type="hidden" name="view" th:value="${calendarView}"><button class="button" th:text="#{availability.show}"></button>
+    </form>
+    <div class="workshop-calendar-grid" th:classappend="${calendarView}">
+        <section class="panel" th:each="day, stat : ${overview}" th:style="${calendarView == 'month' and stat.first ? '--first-weekday: ' + day.date.dayOfWeek.value : null}">
+            <h2><time th:datetime="${day.date}" th:text="${#temporals.format(day.date, 'EEE dd/MM/yyyy')}"></time></h2>
+            <p th:if="${day.blocked}" class="badge" th:text="#{availability.blocked}"></p>
+            <p th:unless="${day.blocked}" th:text="#{availability.slotCount(${day.freeSlots})}"></p>
+            <ul><li th:each="booking : ${day.bookings}"><a th:href="@{/appointments/{id}(id=${booking.id})}"><span th:text="${#temporals.format(booking.proposedAt.atZone(calendarZone), 'HH:mm')}"></span> · <span th:text="${booking.title}"></span></a><p th:text="${booking.requester.username}"></p></li></ul>
+            <a th:if="${!day.date.isBefore(calendar.today) and !day.date.isAfter(calendar.lastDate)}" th:href="@{/workshop/availability(date=${day.date})}" th:text="#{availability.dayView}"></a>
+        </section>
+    </div>
+</section></body></html>

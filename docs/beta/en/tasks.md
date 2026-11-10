@@ -2,6 +2,17 @@
 
 Use only the fictitious accounts and files supplied by the facilitator. Choose English in the app. Add the agreed session label to your test instrument and file titles so you can recognise them. Say what you expect to happen before sharing anything. You may use **Help & guides** at any point; tell the facilitator if a guide leaves you unsure.
 
+## Appointment warm-up — owner and luthier
+
+After the luthier has made the workshop discoverable, try this before adding a new test instrument:
+
+- Luthier: enable your availability calendar with a time zone, working days and appointment length. Block a future day off.
+- Owner: find the workshop and request a visit from an available slot. Suggest a future date and time with the workshop’s time zone. Include a fictitious travel detail that should remain private.
+- Luthier: find the request, reply and propose a different time. Explain whether sending your proposal has confirmed it.
+- Owner: find the new proposal and confirm it. Both participants: find the agreed status and earlier proposals, then exchange a follow-up message.
+- Both participants: check that the confirmed slot disappears from new requests. Cancel a test visit and verify that its slot becomes available again.
+- Buyer: check that this appointment conversation is not in your inbox, including after the later instrument transfer.
+
 ## Owner — phase 1
 
 Your goal is to prepare an instrument for an authenticity assessment.

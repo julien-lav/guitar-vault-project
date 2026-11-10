@@ -38,8 +38,9 @@ class NotificationSchemaUpgradeTests {
         service.send(actor, recipient, Notification.Kind.BAND_INVITATION, "Band", "/bands/1");
         service.send(actor, recipient, Notification.Kind.DATE_PROPOSAL, "Band", "/date-proposals/1");
         service.send(actor, recipient, Notification.Kind.DATE_PROPOSAL_RESPONSE, "Band", "/date-proposals/1");
+        service.send(actor, recipient, Notification.Kind.LUTHIER_APPOINTMENT, "Visit", "/appointments/1");
         notifications.flush();
-        assertThat(notifications.count()).isEqualTo(3);
+        assertThat(notifications.count()).isEqualTo(4);
     }
     private User account(String name) {
         User user = new User(); user.setUsername(name); user.setFullName(name); user.setEmail(name + "@example.test");

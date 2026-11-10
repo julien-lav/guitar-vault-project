@@ -40,6 +40,6 @@ La session peut avoir expiré ou l’application avoir redémarré. Reconnectez-
 
 ## Peut-on payer, réserver un studio ou signer une vente ici ?
 
-L’application conserve actuellement les demandes, discussions, montants proposés et transmissions de propriété. Elle ne traite pas les paiements et ne gère pas les réservations ou contrats de vente.
+L’application conserve actuellement les demandes, discussions, montants proposés et transmissions de propriété. Elle ne traite pas les paiements, ne réserve pas de disponibilités studio et ne gère pas les contrats de vente. Un rendez-vous de luthier peut être confirmé lorsque l’autre participant accepte le dernier créneau proposé ; retrouvez-le dans **Mes rendez-vous**.
 
 Consultez les guides [premiers pas](getting-started.md), [gestion des documents](documents.md) ou [transferts de propriété](transfers.md) pour les étapes complètes.

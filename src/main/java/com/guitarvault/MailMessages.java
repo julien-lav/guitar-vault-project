@@ -22,6 +22,16 @@ public class MailMessages {
         this.from = from;
     }
 
+    public void appointmentReminder(User user, LuthierAppointment appointment) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(from); message.setTo(user.getEmail());
+        message.setSubject("Guitar Vault — Appointment reminder / Rappel de rendez-vous");
+        message.setText("Your confirmed appointment is within 24 hours. / Votre rendez-vous confirmé est dans moins de 24 heures.\n\n"
+                + appointment.getProposedLocal() + " " + appointment.getTimeZone() + "\n"
+                + baseUrl + "/appointments/" + appointment.getId()
+                + "\n\nOpen the conversation for current details. / Consultez la conversation pour les détails à jour.");
+        sender.send(message);
+    }
     public void send(User user, String purpose, String path, String token) {
         var locale = LocaleContextHolder.getLocaleContext() == null
                 ? java.util.Locale.FRENCH : LocaleContextHolder.getLocale();

@@ -4,6 +4,7 @@
 <header class="page-header"><div><h1 id="workshop-title" th:text="#{luthier.workshop}"></h1><p class="muted" th:text="#{luthier.workshopIntro}"></p></div><a th:href="@{/interventions}" th:text="#{luthier.interventions}"></a></header>
 <div th:if="${error}" class="notice error" role="alert" data-form-error th:text="${#messages.msg(error)}"></div>
 <p class="notice" th:text="#{luthier.verificationHint}"></p>
+<p th:if="${luthier != null}"><a class="button secondary-button" th:href="@{/workshop/availability}" th:text="#{availability.title}"></a></p>
 <form class="panel" method="post" th:action="@{/workshop}"><input type="hidden" name="version" th:value="${form['version']}">
 <div class="fields">
 <div class="field-wide"><label for="name" th:text="#{luthier.name}"></label><input id="name" name="name" required maxlength="150" th:value="${form['name']}"></div>

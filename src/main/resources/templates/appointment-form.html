@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page appointment-page">
+    <a th:href="@{/luthiers/{id}(id=${workshop.id})}" th:text="${workshop.name}"></a>
+    <header class="page-header"><h1 th:text="#{appointment.request}"></h1></header>
+    <p class="notice" th:text="#{appointment.intro}"></p>
+    <p th:text="${workshop.name + ' · ' + workshop.location}"></p>
+    <p th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></p>
+    <form class="panel actions" th:if="${calendar.settings.enabled}" method="get" th:action="@{/luthiers/{id}/appointments/new(id=${workshop.id})}">
+        <div><label for="slot-date" th:text="#{availability.date}"></label><input id="slot-date" type="date" name="date" th:value="${calendar.date}" th:min="${calendar.today}" th:max="${calendar.lastDate}" required></div><button class="button" type="submit" th:text="#{availability.show}"></button>
+    </form>
+    <form class="panel" method="post" th:action="@{/luthiers/{id}/appointments(id=${workshop.id})}">
+        <div class="fields">
+            <div class="field-wide"><label for="appointment-title" th:text="#{appointment.subject}"></label><input id="appointment-title" name="title" required maxlength="150" th:value="${form['title']}"></div>
+            <div class="field-wide" th:if="${calendar.settings.enabled}">
+                <input type="hidden" name="availabilityVersion" th:value="${calendar.settings.version}">
+                <label for="appointment-slot" th:text="#{availability.choose}"></label><p th:text="${calendar.date + ' · ' + calendar.settings.timeZone}"></p>
+                <select id="appointment-slot" name="slot" required th:disabled="${#lists.isEmpty(calendar.slots)}"><option value="" th:text="#{availability.choose}"></option><option th:each="slot : ${calendar.slots}" th:value="${slot.start}" th:selected="${form['slot'] == slot.start.toString()}" th:text="${#temporals.format(slot.localStart, 'HH:mm') + '–' + #temporals.format(slot.localEnd, 'HH:mm')}"></option></select>
+                <p th:if="${#lists.isEmpty(calendar.slots)}" th:text="#{availability.none}"></p><p class="field-hint" th:text="#{availability.pendingHint}"></p>
+            </div>
+            <th:block th:unless="${calendar.settings.enabled}">
+            <div><label for="appointment-time" th:text="#{appointment.time}"></label><input id="appointment-time" type="datetime-local" name="proposedTime" required th:value="${form['proposedTime']}" aria-describedby="appointment-time-hint"></div>
+            <div><label for="appointment-zone" th:text="#{appointment.zone}"></label><input id="appointment-zone" name="timeZone" list="appointment-zones" required maxlength="80" th:value="${form['timeZone']}" aria-describedby="appointment-time-hint"><datalist id="appointment-zones"><option th:each="zone : ${timeZones}" th:value="${zone}"></option></datalist></div>
+            <p class="field-wide field-hint" id="appointment-time-hint" th:text="#{appointment.timeHint}"></p>
+            </th:block>
+            <div class="field-wide"><label for="appointment-message" th:text="#{appointment.message}"></label><textarea id="appointment-message" name="message" required maxlength="2000" rows="5" th:text="${form['message']}"></textarea></div>
+        </div>
+        <button class="button" type="submit" th:disabled="${calendar.settings.enabled and #lists.isEmpty(calendar.slots)}" th:text="#{appointment.send}"></button>
+    </form>
+</section></body></html>

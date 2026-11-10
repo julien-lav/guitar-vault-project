@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page appointment-page">
+    <a th:href="@{/appointments}" th:text="#{appointment.title}"></a>
+    <header class="page-header"><div><h1 th:text="${appointment.title}"></h1><p><span th:text="${appointment.workshop.name}"></span> · <span th:text="${appointment.requester.username}"></span></p></div><span class="badge" th:text="${#messages.msg('appointment.status.' + appointment.status)}"></span></header>
+    <p class="notice" th:text="#{appointment.privateHint}"></p>
+    <p th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></p>
+    <p th:unless="${appointment.scheduled}" class="notice" th:text="#{appointment.noTime}"></p>
+    <section class="panel" th:if="${appointment.scheduled}">
+        <h2 th:text="#{appointment.latestTime}"></h2>
+        <p><time th:datetime="${appointment.proposedAt}" th:text="${#temporals.format(appointment.proposedLocal, 'dd/MM/yyyy HH:mm')}"></time> <strong th:text="${appointment.timeZone}"></strong></p>
+        <p th:text="#{availability.minutes(${appointment.durationMinutes})}"></p>
+        <p><span th:text="#{appointment.proposedBy}"></span> <span th:text="${appointment.proposer.username}"></span></p>
+        <p th:if="${appointment.status.name() == 'PENDING'}" th:text="#{appointment.pendingHint}"></p>
+        <div class="actions" th:if="${canRespond}">
+            <form th:each="action : ${ {'confirm','decline'} }" method="post" th:action="@{/appointments/{id}/{action}(id=${appointment.id},action=${action})}"><input type="hidden" name="version" th:value="${appointment.version}"><button class="button" type="submit" th:text="${#messages.msg('appointment.' + action)}"></button></form>
+        </div>
+    </section>
+    <section class="panel" th:if="${appointment.open}">
+        <a th:if="${appointment.status.name() == 'CONFIRMED'}" class="button secondary-button" th:href="@{/appointments/{id}/calendar.ics(id=${appointment.id})}" th:text="#{appointment.export}"></a>
+        <p th:text="#{appointment.exportHint}"></p>
+        <form method="post" th:action="@{/appointments/{id}/reminder(id=${appointment.id})}">
+            <input type="hidden" name="version" th:value="${appointment.version}">
+            <label class="workshop-publish"><input id="appointment-reminder" type="checkbox" name="enabled" value="true" th:checked="${reminderEnabled}"><span th:text="#{appointment.reminder}"></span></label>
+            <p class="field-hint" th:text="#{appointment.reminderHint}"></p>
+            <button class="button secondary-button" type="submit" th:text="#{appointment.saveReminder}"></button>
+        </form>
+    </section>
+    <section class="panel"><h2 th:text="#{appointment.conversation}"></h2>
+        <article class="appointment-message" th:each="entry : ${conversation}">
+            <p><strong th:text="${entry.author.username}"></strong> · <time th:datetime="${entry.createdAt}" th:text="${#temporals.format(entry.createdDateTime, 'dd/MM/yyyy HH:mm') + ' UTC'}"></time></p>
+            <p class="field-hint" th:text="${#messages.msg('appointment.event.' + entry.kind)}"></p>
+            <p th:if="${entry.proposedAt != null}"><time th:datetime="${entry.proposedAt}" th:text="${#temporals.format(entry.proposedLocal, 'dd/MM/yyyy HH:mm')}"></time> <span th:text="${entry.timeZone}"></span></p>
+            <p th:if="${entry.proposedAt != null}" th:text="#{availability.minutes(${entry.durationMinutes})}"></p>
+            <p class="instrument-text" th:unless="${#strings.isEmpty(entry.body)}" th:text="${entry.body}"></p>
+        </article>
+    </section>
+    <form th:if="${appointment.open}" class="panel" method="post" th:action="@{/appointments/{id}/messages(id=${appointment.id})}">
+        <input type="hidden" name="version" th:value="${appointment.version}">
+        <label for="appointment-reply" th:text="#{appointment.reply}"></label><textarea id="appointment-reply" name="message" required maxlength="2000" rows="4" th:text="${form['message']}"></textarea>
+        <button class="button" type="submit" th:text="#{appointment.sendReply}"></button>
+    </form>
+    <form th:if="${appointment.status.name() == 'PENDING' and calendar.settings.enabled}" class="panel actions" method="get" th:action="@{/appointments/{id}(id=${appointment.id})}">
+        <div><label for="slot-date" th:text="#{availability.date}"></label><input id="slot-date" type="date" name="date" th:value="${calendar.date}" th:min="${calendar.today}" th:max="${calendar.lastDate}" required></div><button class="button" type="submit" th:text="#{availability.show}"></button>
+    </form>
+    <form th:if="${appointment.status.name() == 'PENDING'}" class="panel" method="post" th:action="@{/appointments/{id}/proposals(id=${appointment.id})}">
+        <h2 th:text="#{appointment.propose}"></h2><input type="hidden" name="version" th:value="${appointment.version}">
+        <div class="fields"><div class="field-wide" th:if="${calendar.settings.enabled}">
+            <input type="hidden" name="availabilityVersion" th:value="${calendar.settings.version}">
+            <label for="proposal-slot" th:text="#{availability.choose}"></label><p th:text="${calendar.date + ' · ' + calendar.settings.timeZone}"></p>
+            <select id="proposal-slot" name="slot" required th:disabled="${#lists.isEmpty(calendar.slots)}"><option value="" th:text="#{availability.choose}"></option><option th:each="slot : ${calendar.slots}" th:value="${slot.start}" th:selected="${form['slot'] == slot.start.toString()}" th:text="${#temporals.format(slot.localStart, 'HH:mm') + '–' + #temporals.format(slot.localEnd, 'HH:mm')}"></option></select>
+            <p th:if="${#lists.isEmpty(calendar.slots)}" th:text="#{availability.none}"></p><p class="field-hint" th:text="#{availability.pendingHint}"></p>
+        </div><th:block th:unless="${calendar.settings.enabled}">
+        <div><label for="proposal-time" th:text="#{appointment.time}"></label><input id="proposal-time" name="proposedTime" type="datetime-local" required th:value="${form['proposedTime']}" aria-describedby="proposal-time-hint"></div>
+        <div><label for="proposal-zone" th:text="#{appointment.zone}"></label><input id="proposal-zone" name="timeZone" list="proposal-zones" required maxlength="80" th:value="${form['timeZone'] != null ? form['timeZone'] : appointment.timeZone}" aria-describedby="proposal-time-hint"><datalist id="proposal-zones"><option th:each="zone : ${timeZones}" th:value="${zone}"></option></datalist></div>
+        <p id="proposal-time-hint" class="field-wide field-hint" th:text="#{appointment.timeHint}"></p>
+        </th:block>
+        <div class="field-wide"><label for="proposal-message" th:text="#{appointment.message}"></label><textarea id="proposal-message" name="message" required maxlength="2000" rows="3" th:text="${form['message']}"></textarea></div></div>
+        <button class="button" type="submit" th:disabled="${calendar.settings.enabled and #lists.isEmpty(calendar.slots)}" th:text="#{appointment.sendProposal}"></button>
+    </form>
+    <section class="panel" th:if="${appointment.open}"><p th:text="#{appointment.cancelHint}"></p><form method="post" th:action="@{/appointments/{id}/cancel(id=${appointment.id})}"><input type="hidden" name="version" th:value="${appointment.version}"><button class="button secondary-button" type="submit" th:text="#{appointment.cancel}"></button></form></section>
+</section></body></html>

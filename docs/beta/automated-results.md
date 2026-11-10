@@ -1,11 +1,11 @@
 # Automated beta baseline
 
-Recorded on 2026-11-09 at 17:02 UTC against the current working tree. This records automated checks, not observations from human participants.
+Recorded on 2026-11-10 at 08:46 UTC against the current working tree. This records automated checks, not observations from human participants.
 
 | Check | Result |
 | --- | --- |
-| Maven regression suite | 275 passed; 0 failures; 0 errors; 1 skipped out of 276 tests |
-| Chromium passport journey | 16 steps passed |
+| Maven regression suite | 284 passed; 0 failures; 0 errors; 1 skipped out of 285 tests |
+| Chromium passport journey | 17 steps passed |
 | Browser errors recorded | 0 |
 | Human usability sessions | Not yet run |
 
@@ -19,6 +19,7 @@ The journey used separate owner, buyer, luthier, administrator and anonymous bro
 - Passed: Log in as two members and a luthier using separate browser sessions.
 - Passed: Read public Markdown guides, follow guide links, download source and switch language.
 - Passed: Publish the luthier workshop through its form.
+- Passed: Musician and luthier privately arrange and confirm an appointment with a counter-proposal.
 - Passed: Owner creates an instrument with private notes, history and a real PNG upload.
 - Passed: Upload a private invoice and certificate; both are private until explicitly selected.
 - Passed: Manage personal labels, filter archived uploads, restore and delete an unused file.
@@ -34,7 +35,7 @@ The journey used separate owner, buyer, luthier, administrator and anonymous bro
 
 ## Review or repeat
 
-Local artifacts are in `target/e2e/20261109T165950Z-7a4b11d8/`: `report.md`, `result.json`, screenshots, role-specific Playwright traces, `server.log` and the copied `maven-tests.log`. These generated artifacts are excluded from Git; the results above are the durable summary. To reproduce:
+Local artifacts are in `target/e2e/20261110T084035Z-5f268b49/`: `report.md`, `result.json`, screenshots, role-specific Playwright traces, `server.log` and the copied `maven-tests.log`. These generated artifacts are excluded from Git; the results above are the durable summary. To reproduce:
 
 ```sh
 ./mvnw -o test

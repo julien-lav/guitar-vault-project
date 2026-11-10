@@ -16,6 +16,7 @@ Use `independent`, `with prompt`, `blocked` or `not attempted`. Time starts when
 
 | Phase / role | Goal | Outcome | Time | Guide used | Exact prompt, wrong turn or observation |
 | --- | --- | --- | --- | --- | --- |
+| Warm-up / owner and luthier | Appointment request, counter-proposal and confirmation | | | | |
 | 1 / owner | Add instrument, notes, photo and documents | | | | |
 | Preparation / luthier | Publish or find workshop | | | | |
 | 1 / owner | Request assessment | | | | |
@@ -36,6 +37,7 @@ Use `independent`, `with prompt`, `blocked` or `not attempted`. Time starts when
 | Owner notes and photo | | | | |
 | Selected certificate before acceptance | | | | |
 | Selected certificate after acceptance | | | | |
+| Separate appointment conversation | | | | |
 | Original appointment/request text | | | | |
 | Report and shared inspection evidence | | | | |
 | Private luthier invoice | | | | |

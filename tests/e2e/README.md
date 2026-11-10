@@ -4,14 +4,15 @@ This test follows one instrument through a complete journey in Chromium:
 
 1. Sign in as an owner, a buyer, and a luthier, using separate browser sessions.
    Read public Help guides without signing in, follow Markdown links, download the exact source, switch language and check mobile layout.
-2. Publish the luthier's workshop through its form.
+2. Publish the luthier's workshop through its form, enable working hours and block a day, then arrange a private appointment with a time zone, counter-proposal, confirmation and follow-up message. Check French mobile layout and deny access to the buyer and administrator, including after the later transfer.
 3. Create an instrument with private notes/history, a PNG photo, recording and concert entries.
 4. Upload a private invoice and a certificate, then request an authenticity assessment; record a report and a correction as the luthier.
 5. Attach private luthier evidence and explicitly shared report evidence, then send a transfer proposal and open it through the buyer's notification.
 6. Select only the certificate, accept, and verify that the same instrument, both report revisions and shared evidence reach the buyer. The buyer downloads the certificate through the UI; its bytes are checked.
 7. Verify the former owner's archive, including the original photo bytes and unselected invoice, and deny access to the buyer, luthier, and an administrator.
 8. Edit personal document labels, filter archived files, restore and confirm deletion of an unused upload; verify a buyer’s archive and personal labels preserve access and the owner’s original labels.
-9. Check mobile layout and French controls, plus browser JavaScript errors and server errors.
+9. Cancel an appointment to free its reserved slot, unblock a working day and check the mobile slot picker.
+10. Check mobile layout and French controls, plus browser JavaScript errors and server errors.
 
 The test drives rendered forms and normal password login. It uses no mocked authentication, database writes, or direct domain-service calls to perform the scenario. The application's standard demo loader supplies only the initial demo accounts and sample data.
 

@@ -5,6 +5,7 @@
 <header class="page-header"><div><p class="eyebrow" th:text="#{luthier.profile}"></p><h1 id="luthier-title" th:text="${luthier.name}"></h1><p th:text="${luthier.location}"></p></div><span class="badge" th:classappend="${!luthier.verified ? 'neutral' : ''}" th:text="${#messages.msg(luthier.verified ? 'luthier.verified' : 'luthier.unverified')}"></span></header>
 <p class="notice" th:text="#{luthier.verificationHint}"></p>
 <article class="panel"><h2 th:text="#{luthier.specialties}"></h2><p class="instrument-text" th:text="${luthier.specialties}"></p><h2 th:text="#{luthier.description}"></h2><p class="instrument-text" th:text="${luthier.description}"></p><h2 th:text="#{luthier.contact}"></h2><p th:text="${luthier.contact}"></p></article>
+<p th:unless="${reviewMode}" class="actions"><a class="button secondary-button" th:if="${currentUsername == null or currentUsername != luthier.user.email}" th:href="@{/luthiers/{id}/contact(id=${luthier.id})}" th:text="#{appointment.contact}"></a><a class="button" th:if="${currentUsername == null or currentUsername != luthier.user.email}" th:href="@{/luthiers/{id}/appointments/new(id=${luthier.id})}" th:text="#{appointment.request}"></a></p>
 <p class="panel" th:unless="${reviewMode}"><span th:text="#{luthier.requestHint}"></span> <a th:href="@{/instruments}" th:text="#{nav.instruments}"></a></p>
 <section class="panel" th:if="${reviewMode}"><h2 th:text="#{luthier.review}"></h2>
 <div th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></div>

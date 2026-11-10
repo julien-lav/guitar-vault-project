@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import argparse
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import json
 import os
 from pathlib import Path
@@ -261,6 +261,77 @@ class Journey:
             expect(luthier.locator("main")).to_contain_text("Professional identity unverified")
             self.screenshot("luthier", "01-workshop.png")
 
+        with self.step("Luthier enables weekly availability and blocks a day off"):
+            self.goto(luthier, "/workshop")
+            luthier.get_by_role("link", name="Workshop availability", exact=True).click()
+            luthier.locator("#availability-enabled").check()
+            luthier.locator("#availability-zone").fill("Europe/Paris")
+            luthier.locator("#availability-duration").select_option("30")
+            luthier.locator("#availability-opens").fill("09:00")
+            luthier.locator("#availability-closes").fill("17:00")
+            for checkbox in luthier.locator('input[name="days"]').all():
+                checkbox.check()
+            luthier.get_by_role("button", name="Save availability", exact=True).click()
+            blocked_day = (datetime.now(timezone.utc) + timedelta(days=9)).strftime("%Y-%m-%d")
+            luthier.locator("#blocked-date").fill(blocked_day)
+            luthier.get_by_role("button", name="Block this date", exact=True).click()
+            expect(luthier.locator("main")).to_contain_text(blocked_day)
+            self.screenshot("luthier", "01a-workshop-availability.png")
+
+        with self.step("Musician and luthier privately arrange and confirm an appointment with a counter-proposal"):
+            self.goto(owner, f"/luthiers/{workshop_id}")
+            owner.get_by_role("link", name="Request an appointment", exact=True).click()
+            appointment_day = (datetime.now(timezone.utc) + timedelta(days=7)).strftime("%Y-%m-%d")
+            owner.locator("#slot-date").fill(appointment_day)
+            owner.get_by_role("button", name="Show available times", exact=True).click()
+            owner.locator("#appointment-title").fill("Private setup appointment")
+            owner.locator("#appointment-slot").select_option(label="10:00–10:30")
+            owner.locator("#appointment-message").fill("APPOINTMENT-ONLY private travel arrangements")
+            owner.get_by_role("button", name="Send appointment request", exact=True).click()
+            expect(owner).to_have_url(re.compile(r"/appointments/\d+$"))
+            appointment_path = urlparse(owner.url).path
+            expect(owner.get_by_role("button", name="Confirm this time", exact=True)).to_have_count(0)
+            self.probe("buyer", appointment_path, 404)
+            self.probe("administrator", appointment_path, 404)
+            self.goto(luthier, "/notifications")
+            luthier.get_by_role("button", name='An appointment conversation has an update: “Private setup appointment”.', exact=True).click()
+            expect(luthier).to_have_url(self.base_url + appointment_path)
+            expect(luthier.locator("main")).to_contain_text("APPOINTMENT-ONLY private travel arrangements")
+            confirmed_day = (datetime.now(timezone.utc) + timedelta(days=8)).strftime("%Y-%m-%d")
+            luthier.locator("#slot-date").fill(confirmed_day)
+            luthier.get_by_role("button", name="Show available times", exact=True).click()
+            luthier.locator("#proposal-slot").select_option(label="11:00–11:30")
+            reserved_slot = luthier.locator("#proposal-slot").input_value()
+            luthier.locator("#proposal-message").fill("Could you come the following day instead?")
+            luthier.get_by_role("button", name="Send new time proposal", exact=True).click()
+            expect(luthier.get_by_role("button", name="Confirm this time", exact=True)).to_have_count(0)
+            self.goto(owner, appointment_path)
+            owner.get_by_role("button", name="Confirm this time", exact=True).click()
+            expect(owner.locator(".badge")).to_have_text("Confirmed")
+            expect(owner.locator(".appointment-message")).to_have_count(3)
+            owner.locator("#appointment-reply").fill("Thank you, see you then.")
+            owner.get_by_role("button", name="Send reply", exact=True).click()
+            self.goto(luthier, appointment_path + "?lang=fr")
+            expect(luthier.locator(".badge")).to_have_text("Confirmé")
+            expect(luthier.locator("main")).to_contain_text("Thank you, see you then.")
+            luthier.set_viewport_size({"width": 390, "height": 844})
+            assert luthier.evaluate("document.documentElement.scrollWidth <= window.innerWidth"), "Appointment page overflows mobile viewport"
+            self.screenshot("luthier", "01a-private-appointment-mobile.png")
+            luthier.set_viewport_size({"width": 1365, "height": 950})
+            self.goto(luthier, "/appointments?lang=en")
+            expect(luthier.get_by_role("link", name="Private setup appointment", exact=True)).to_be_visible()
+            self.goto(owner, appointment_path)
+            self.screenshot("owner", "01b-confirmed-appointment.png")
+            self.goto(buyer, f"/luthiers/{workshop_id}/appointments/new?date={confirmed_day}")
+            expect(buyer.locator(f'#appointment-slot option[value="{reserved_slot}"]')).to_have_count(0)
+            expect(buyer.locator("main")).not_to_contain_text("Private setup appointment")
+            self.goto(buyer, f"/luthiers/{workshop_id}/appointments/new?date={blocked_day}")
+            expect(buyer.get_by_role("button", name="Send appointment request", exact=True)).to_be_disabled()
+            expect(buyer.locator("main")).to_contain_text("No free slots on this date")
+            self.goto(luthier, f"/workshop/availability?date={confirmed_day}")
+            expect(luthier.get_by_role("link", name="Private setup appointment", exact=True)).to_be_visible()
+            expect(luthier.locator(".availability-slots")).not_to_contain_text("11:00–11:30")
+
         with self.step("Owner creates an instrument with private notes, history and a real PNG upload"):
             self.goto(owner, "/instruments")
             owner.locator('main a[href="/instruments/new"]').first.click()
@@ -426,6 +497,8 @@ class Journey:
             self.probe("buyer", intervention_path, 404)
             self.screenshot("buyer", "06-buyer-passport-reports.png")
 
+        self.probe("buyer", appointment_path, 404)
+
         with self.step("Buyer downloads only the selected certificate; unselected and luthier invoices remain private"):
             self.goto(buyer, instrument_path + "/documents")
             expect(buyer.get_by_role("link", name=CERTIFICATE, exact=True)).to_be_visible()
@@ -511,6 +584,21 @@ class Journey:
             expect(buyer.get_by_role("link", name="Transférer mon instrument", exact=True)).to_be_visible()
             self.screenshot("buyer", "09-buyer-french-mobile.png")
             assert not self.browser_errors, "Browser errors: " + "; ".join(self.browser_errors)
+
+        with self.step("Cancellation releases a reserved slot and unblocking restores a working day"):
+            self.goto(owner, appointment_path + "?lang=en")
+            owner.get_by_role("button", name="Cancel appointment", exact=True).click()
+            expect(owner.locator(".badge")).to_have_text("Cancelled")
+            self.goto(buyer, f"/luthiers/{workshop_id}/appointments/new?date={confirmed_day}&lang=en")
+            expect(buyer.locator(f'#appointment-slot option[value="{reserved_slot}"]')).to_have_count(1)
+            buyer.set_viewport_size({"width": 390, "height": 844})
+            assert buyer.evaluate("document.documentElement.scrollWidth <= window.innerWidth"), "Slot picker overflows mobile viewport"
+            self.screenshot("buyer", "10-free-slot-mobile.png")
+            self.goto(luthier, "/workshop/availability?lang=en")
+            luthier.get_by_role("button", name="Unblock", exact=True).click()
+            self.goto(buyer, f"/luthiers/{workshop_id}/appointments/new?date={blocked_day}")
+            expect(buyer.locator("#appointment-slot option")).to_have_count(17)
+            expect(buyer.get_by_role("button", name="Send appointment request", exact=True)).to_be_enabled()
 
     def save_report(self, error=None):
         result = {"status": "failed" if error else "passed", "started_at": self.started_at,

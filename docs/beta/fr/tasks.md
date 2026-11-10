@@ -2,6 +2,17 @@
 
 Utilisez uniquement les comptes et fichiers fictifs fournis par l’animateur. Choisissez le français dans l’application. Ajoutez le libellé de session convenu aux titres de l’instrument et des documents pour les reconnaître. Avant de partager, dites ce que vous pensez qu’il va se passer. Vous pouvez consulter **Aide et guides** à tout moment ; signalez les explications qui restent peu claires.
 
+## Essai de rendez-vous — propriétaire et luthier
+
+Une fois l’atelier visible dans l’annuaire, essayez ce parcours avant d’ajouter le nouvel instrument de test :
+
+- Luthier : activez le calendrier avec un fuseau, des jours travaillés et une durée. Bloquez une future journée d’absence.
+- Propriétaire : trouvez l’atelier et demandez une visite sur un créneau libre. Proposez une date et une heure futures avec le fuseau de l’atelier. Ajoutez un détail de trajet fictif qui doit rester privé.
+- Luthier : retrouvez la demande, répondez et proposez un autre créneau. Expliquez si l’envoi de votre proposition a confirmé le rendez-vous.
+- Propriétaire : retrouvez la proposition et confirmez-la. Tous les deux : retrouvez le statut convenu et les anciennes propositions, puis échangez un message de suivi.
+- Tous les deux : vérifiez que le créneau confirmé disparaît des nouvelles demandes. Annulez une visite de test puis vérifiez que le créneau redevient disponible.
+- Acheteur : vérifiez que cette conversation ne figure pas dans vos rendez-vous, y compris après le transfert d’instrument ultérieur.
+
 ## Propriétaire — phase 1
 
 Votre objectif est de préparer un instrument pour une expertise d’authenticité.

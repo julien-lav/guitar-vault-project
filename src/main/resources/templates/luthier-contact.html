@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page appointment-page">
+    <a th:href="@{/luthiers/{id}(id=${workshop.id})}" th:text="${workshop.name}"></a>
+    <header class="page-header"><h1 th:text="#{appointment.contact}"></h1></header>
+    <p class="notice" th:text="#{appointment.contactHint}"></p>
+    <p th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></p>
+    <form class="panel" method="post" th:action="@{/luthiers/{id}/contact(id=${workshop.id})}">
+        <label for="contact-title" th:text="#{appointment.subject}"></label><input id="contact-title" name="title" required maxlength="150" th:value="${form['title']}">
+        <label for="contact-message" th:text="#{appointment.message}"></label><textarea id="contact-message" name="message" required maxlength="2000" rows="6" th:text="${form['message']}"></textarea>
+        <button class="button" type="submit" th:text="#{appointment.sendReply}"></button>
+    </form>
+</section></body></html>

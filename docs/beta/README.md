@@ -20,14 +20,14 @@ Open <http://localhost:8082>. This local-only demo uses its own persistent datab
 
 The initial demo password is `DemoGuitar2026!`. These are fictitious accounts; use them only on the local demo. If this demo was already loaded, it retains previously changed passwords and data. Do not reset or delete its database to run a session. Use an agreed session label such as `BETA-2026-11-09-A` for new instrument and document titles. The same account in two windows without separate browser profiles will share a session.
 
-Use the [sample files](fixtures/README.md), not real invoices or personal documents. Pick English or French in the app. Give each participant only their corresponding section of [English tasks](en/tasks.md) or [French tasks](fr/tasks.md), plus the session label. Test one phone-sized viewport as well as a desktop. A returning luthier may already have a workshop; update that workshop rather than creating another account.
+Use the [sample files](fixtures/README.md), not real invoices or personal documents. Pick English or French in the app. Give each participant the appointment warm-up and their corresponding role section of [English tasks](en/tasks.md) or [French tasks](fr/tasks.md), plus the session label. Test one phone-sized viewport as well as a desktop. A returning luthier may already have a workshop; update that workshop rather than creating another account.
 
 ## Facilitate without coaching
 
 1. Explain that the app is being tested, not the participant. Ask them to say what they expect an action to do.
 2. Let participants use `/help` whenever they want. Note when they open a guide and whether it answers their question.
 3. Use [session notes](session-notes-template.md) to record completion, time, wrong turns and prompts. If they need a hint, record the exact hint; do not mark that task as independent success.
-4. Run the phases in order: luthier prepares workshop → owner prepares → luthier reports → owner proposes → buyer accepts → owner and buyer review privacy. Pause at each handoff until the next role is ready.
+4. Run the phases in order: luthier prepares workshop → appointment negotiation and confirmation → owner prepares → luthier reports → owner proposes → buyer accepts → owner and buyer review privacy. Pause at each handoff until the next role is ready.
 5. Before each sharing or transfer action, ask the participant to predict who will see the notes, photos, invoice, report and selected certificate. Record their prediction before checking the result.
 6. Ask each person which label or page was least clear, what they expected next, and what they would change first. Use participant IDs in notes, rather than names or email addresses.
 
@@ -37,6 +37,7 @@ A useful planning allowance is 30–45 minutes for the coordinated journey, with
 
 These are the expected outcomes, separate from the participant goals:
 
+- [ ] Before adding an instrument, musician and luthier request, counter-propose and confirm an appointment with an explicit time zone. Only those participants see its conversation, even after the later transfer.
 - [ ] The owner creates one uniquely named instrument with private notes, a photo, an invoice and a certificate.
 - [ ] The luthier publishes or finds their workshop. Its professional identity remains **unverified** unless an administrator has separately reviewed it; profile creation must not imply verification.
 - [ ] The owner requests an authenticity assessment from that workshop. The luthier sees the assigned request without access to the rest of the owner’s collection.

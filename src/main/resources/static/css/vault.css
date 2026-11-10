@@ -582,3 +582,23 @@ fieldset.instrument-section { padding: 0; border: 0; }
     .help-layout { grid-template-columns: minmax(0, 1fr); }
     .help-article { grid-row: 1; }
 }
+
+.appointment-page { overflow-wrap: anywhere; }
+.appointment-page .fields > * { min-width: 0; }
+.appointment-page input, .appointment-page textarea { max-width: 100%; box-sizing: border-box; }
+.appointment-page textarea { display: block; width: 100%; margin: 12px 0 16px; }
+.appointment-message + .appointment-message { border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 16px; }
+
+.availability-days { display: flex; flex-wrap: wrap; gap: 16px; margin: 20px 0; border: 1px solid #d1d5db; border-radius: 8px; }
+.availability-slots { display: flex; flex-wrap: wrap; gap: 12px; list-style: none; padding: 0; }
+.availability-slots li { background: #f3f4f6; padding: 8px 12px; border-radius: 6px; }
+
+.workshop-calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 1rem; }
+.workshop-calendar-grid .panel { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.workshop-calendar-grid h2 { font-size: 1rem; }
+.weekday-hours { margin: 1rem 0; border: 1px solid var(--border, #ddd); border-radius: 8px; padding: 1rem; min-width: 0; }
+
+@media (min-width: 1100px) {
+    .workshop-calendar-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+    .workshop-calendar-grid.month > :first-child { grid-column-start: var(--first-weekday, 1); }
+}

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page appointment-page">
+    <header class="page-header"><div><h1 th:text="#{appointment.title}"></h1><p th:text="#{appointment.inboxHint}"></p></div><a th:href="@{/luthiers}" th:text="#{luthier.directory}"></a></header>
+    <p class="panel" th:if="${appointmentPage.empty}" th:text="#{appointment.empty}"></p>
+    <article class="panel" th:each="item : ${appointmentPage.content}">
+        <h2><a th:href="@{/appointments/{id}(id=${item.id})}" th:text="${item.title}"></a></h2>
+        <p><span th:text="${item.workshop.name}"></span> · <span th:text="${item.requester.username}"></span></p>
+        <p th:if="${item.scheduled}"><time th:datetime="${item.proposedAt}" th:text="${#temporals.format(item.proposedLocal, 'dd/MM/yyyy HH:mm')}"></time> <span th:text="${item.timeZone}"></span></p>
+        <p th:unless="${item.scheduled}" th:text="#{appointment.noTime}"></p>
+        <span class="badge" th:text="${#messages.msg('appointment.status.' + item.status)}"></span>
+    </article>
+    <div class="actions" th:if="${appointmentPage.totalPages > 1}">
+        <a th:if="${appointmentPage.hasPrevious()}" th:href="@{/appointments(page=${appointmentPage.number - 1})}" th:text="#{document.library.previous}"></a>
+        <span th:text="#{document.library.page(${appointmentPage.number + 1},${appointmentPage.totalPages})}"></span>
+        <a th:if="${appointmentPage.hasNext()}" th:href="@{/appointments(page=${appointmentPage.number + 1})}" th:text="#{document.library.next}"></a>
+    </div>
+</section></body></html>

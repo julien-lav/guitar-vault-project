@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page appointment-page">
+    <a th:href="@{/workshop}" th:text="#{luthier.workshop}"></a>
+    <header class="page-header"><div><h1 th:text="#{availability.title}"></h1><p th:text="${workshop.name}"></p></div></header>
+    <p class="notice" th:text="#{availability.intro}"></p><p><a class="button" th:href="@{/workshop/availability/calendar}" th:text="#{availability.overview}"></a></p>
+    <p th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></p>
+    <p class="field-hint" th:text="#{availability.commonHint}"></p>
+    <form class="panel" method="post" th:action="@{/workshop/availability}">
+        <input type="hidden" name="version" th:value="${form['version']}">
+        <label class="workshop-publish"><input id="availability-enabled" type="checkbox" name="enabled" value="true" th:checked="${form['enabled']}"><span th:text="#{availability.enable}"></span></label>
+        <div class="fields">
+            <div><label for="availability-zone" th:text="#{appointment.zone}"></label><input id="availability-zone" name="timeZone" required list="availability-zones" maxlength="80" th:value="${form['timeZone']}"><datalist id="availability-zones"><option th:each="zone : ${timeZones}" th:value="${zone}"></option></datalist></div>
+            <div><label for="availability-duration" th:text="#{availability.duration}"></label><select id="availability-duration" name="duration"><option th:each="duration : ${durations}" th:value="${duration}" th:selected="${form['duration'] == duration}" th:text="#{availability.minutes(${duration})}"></option></select></div>
+            <div><label for="availability-opens" th:text="#{availability.opens}"></label><input id="availability-opens" type="time" name="opens" required th:value="${form['opens']}"></div>
+            <div><label for="availability-closes" th:text="#{availability.closes}"></label><input id="availability-closes" type="time" name="closes" required th:value="${form['closes']}"></div>
+        </div>
+        <fieldset class="availability-days"><legend th:text="#{availability.days}"></legend><label class="workshop-publish" th:each="day : ${days}"><input type="checkbox" name="days" th:value="${day}" th:checked="${form['days'].contains(day.name())}"><span th:text="${#messages.msg('availability.day.' + day)}"></span></label></fieldset>
+        <p class="field-hint" th:text="#{availability.settingsHint}"></p><button class="button" type="submit" th:text="#{availability.save}"></button>
+    </form>
+    <form class="panel" th:if="${calendar.settings.id != null}" method="post" th:action="@{/workshop/availability/hours}">
+        <h2 th:text="#{availability.weeklyHours}"></h2><p th:text="#{availability.weeklyHint}"></p>
+        <input type="hidden" name="version" th:value="${calendar.settings.version}">
+        <fieldset class="weekday-hours" th:each="day : ${days}">
+            <legend th:text="${#messages.msg('availability.day.' + day)}"></legend>
+            <label class="workshop-publish"><input type="checkbox" name="days" th:value="${day}" th:checked="${hoursDays.contains(day.name())}"><span th:text="#{availability.workingDay}"></span></label>
+            <div class="fields">
+                <div th:each="field : ${ {'opens','closes','breakStart','breakEnd'} }"><label th:for="${day + '-' + field}" th:text="${#messages.msg('availability.' + field)}"></label><input type="time" th:id="${day + '-' + field}" th:name="${day + '-' + field}" th:value="${hoursForm[day + '-' + field]}"></div>
+            </div>
+        </fieldset>
+        <button class="button" type="submit" th:text="#{availability.saveWeekly}"></button>
+    </form>
+    <section class="panel" th:if="${calendar.settings.id != null}">
+        <h2 th:text="#{availability.blocks}"></h2><p th:text="#{availability.blockHint}"></p>
+        <form class="actions" method="post" th:action="@{/workshop/availability/blocks}"><input type="hidden" name="version" th:value="${calendar.settings.version}"><div><label for="blocked-date" th:text="#{availability.date}"></label><input id="blocked-date" type="date" name="date" required th:min="${calendar.today}" th:max="${calendar.today.plusDays(365)}"></div><button class="button" type="submit" th:text="#{availability.block}"></button></form>
+        <ul><li th:each="blocked : ${blockedDates}"><form class="actions" method="post" th:action="@{/workshop/availability/blocks/remove}"><input type="hidden" name="version" th:value="${calendar.settings.version}"><input type="hidden" name="date" th:value="${blocked.date}"><span th:text="${blocked.date}"></span><button class="button secondary-button" type="submit" th:text="#{availability.unblock}"></button></form></li></ul>
+    </section>
+    <section class="panel"><h2 th:text="#{availability.dayView}"></h2>
+        <form class="actions" method="get" th:action="@{/workshop/availability}"><div><label for="calendar-date" th:text="#{availability.date}"></label><input id="calendar-date" type="date" name="date" th:value="${calendar.date}" th:min="${calendar.today}" th:max="${calendar.lastDate}" required></div><button class="button" type="submit" th:text="#{availability.show}"></button></form>
+        <p th:text="${calendar.settings.timeZone}"></p>
+        <h3 th:text="#{availability.bookings}"></h3><p th:if="${#lists.isEmpty(bookings)}" th:text="#{availability.noBookings}"></p>
+        <ul><li th:each="booking : ${bookings}"><a th:href="@{/appointments/{id}(id=${booking.id})}" th:text="${booking.title}"></a> · <span th:text="${#temporals.format(booking.proposedAt.atZone(calendarZone), 'HH:mm') + '–' + #temporals.format(booking.endsAt.atZone(calendarZone), 'HH:mm')}"></span> · <span th:text="${booking.requester.username}"></span></li></ul>
+        <h3 th:text="#{availability.freeSlots}"></h3><p th:unless="${calendar.settings.enabled}" th:text="#{availability.off}"></p><p th:if="${calendar.settings.enabled and #lists.isEmpty(calendar.slots)}" th:text="#{availability.none}"></p>
+        <ul class="availability-slots"><li th:each="slot : ${calendar.slots}" th:text="${#temporals.format(slot.localStart, 'HH:mm') + '–' + #temporals.format(slot.localEnd, 'HH:mm')}"></li></ul>
+    </section>
+</section></body></html>

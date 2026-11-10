@@ -40,6 +40,6 @@ Your session may have expired, or the application may have restarted. Sign in ag
 
 ## Can I pay, book a studio or sign a sale contract here?
 
-The app currently records requests, discussions, proposed amounts and ownership handovers. It does not process payments or manage bookings and sale contracts.
+The app currently records requests, discussions, proposed amounts and ownership handovers. It does not process payments, reserve studio availability or manage sale contracts. A luthier appointment can be confirmed when the other participant agrees to the latest proposed time; find this in **My appointments**.
 
 Read [getting started](getting-started.md), [document management](documents.md) or [ownership transfers](transfers.md) for the full steps.

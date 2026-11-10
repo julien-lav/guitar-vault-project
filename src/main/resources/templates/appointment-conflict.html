@@ -1,0 +1,2 @@
+<!DOCTYPE html>
+<html lang="fr" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title th:text="#{appointment.unavailable}"></title><link rel="stylesheet" th:href="@{/css/vault.css}"></head><body class="transfer-error"><main class="vault"><h1 th:text="#{appointment.unavailable}"></h1><p class="notice error" role="alert" th:text="${#messages.msg(error)}"></p><a th:href="@{/appointments}" th:text="#{appointment.title}"></a></main></body></html>

@@ -13,7 +13,7 @@ If the link has expired, use the verification resend option on the login page. I
 
 ## Find your next action
 
-- **My space** opens your dashboard, profile, instruments, documents, transfers, invitations, workshop and requests.
+- **My space** opens your dashboard, profile, instruments, documents, transfers, invitations, appointments, workshop and requests.
 - **Discover** opens articles and the studio, band and luthier directories. Some directories require sign-in.
 - The **bell** opens your notifications. Open a notification to reach the relevant request or proposal.
 - The language menu switches between **English** and **Français** and remembers your choice.

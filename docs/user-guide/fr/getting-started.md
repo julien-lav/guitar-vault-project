@@ -13,7 +13,7 @@ Si le lien a expiré, utilisez l’option de renvoi de vérification sur la page
 
 ## Trouver votre prochaine action
 
-- **Mon espace** donne accès au tableau de bord, au profil, aux instruments, documents, transferts, invitations, atelier et demandes.
+- **Mon espace** donne accès au tableau de bord, au profil, aux instruments, documents, transferts, invitations, rendez-vous, atelier et demandes.
 - **Découvrir** ouvre les articles et les annuaires de studios, groupes et luthiers. Certains annuaires nécessitent une connexion.
 - La **cloche** ouvre les notifications. Ouvrez une notification pour rejoindre la demande ou proposition concernée.
 - Le menu de langue permet de choisir **Français** ou **English** et mémorise votre choix.

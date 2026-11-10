@@ -63,6 +63,7 @@
                     <a th:href="@{/date-proposals}" th:aria-current="${currentPath.startsWith('/date-proposals') ? 'page' : null}" th:text="#{proposal.title}"></a>
                     <a th:href="@{/band-connections}" th:aria-current="${currentPath == '/band-connections' ? 'page' : null}" th:text="#{connection.title}"></a>
                     <a th:href="@{/workshop}" th:text="#{luthier.workshop}"></a>
+                    <a th:href="@{/appointments}" th:aria-current="${currentPath.startsWith('/appointments') ? 'page' : null}" th:text="#{appointment.title}"></a>
                     <a th:href="@{/interventions}" th:text="#{luthier.interventions}"></a>
                     <a th:href="@{/reports}" th:text="#{report.mine}"></a>
                     <a th:href="@{/quotes}" th:aria-current="${currentPath == '/quotes' ? 'page' : null}" th:text="#{nav.quotes}"></a>
