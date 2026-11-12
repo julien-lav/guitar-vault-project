@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class DashboardController {
+    private final DashboardOverviewService dashboardOverview;
     private final InstrumentService instruments;
     private final BandRepository bands;
     private final StudioRepository studios;
@@ -19,7 +20,8 @@ public class DashboardController {
     private final BandInvitationRepository invitations;
 
     public DashboardController(InstrumentService instruments, BandRepository bands, StudioRepository studios,
-                               WishlistRepository wishlist, StudioQuoteRepository quotes, ProfileService profiles, BandInvitationRepository invitations) {
+                               WishlistRepository wishlist, StudioQuoteRepository quotes, ProfileService profiles, BandInvitationRepository invitations, DashboardOverviewService dashboardOverview) {
+        this.dashboardOverview = dashboardOverview;
         this.instruments = instruments;
         this.bands = bands;
         this.studios = studios;
@@ -29,6 +31,8 @@ public class DashboardController {
         this.invitations = invitations;
     }
 
+    @org.springframework.web.bind.annotation.ModelAttribute
+    public void privatePage(jakarta.servlet.http.HttpServletResponse response) { response.setHeader("Cache-Control", "private, no-store"); }
     @GetMapping("/dashboard")
     public String dashboard(Principal principal, Model model) {
         User owner = instruments.currentUser(principal);
@@ -43,7 +47,11 @@ public class DashboardController {
                 Map.of("label", "stats.active", "value", count(collection, "Actif")),
                 Map.of("label", "status.repair", "value", count(collection, "À réparer")),
                 Map.of("label", "status.sale", "value", count(collection, "En vente"))));
-        model.addAttribute("instruments", collection.stream().limit(5).toList());
+        var recent = collection.stream().limit(5).toList();
+        model.addAttribute("instruments", recent);
+        var activity = dashboardOverview.forUser(owner, recent);
+        model.addAttribute("attentionItems", activity.tasks()); model.addAttribute("upcomingVisits", activity.visits());
+        model.addAttribute("collectionPhotos", activity.photos());
         Long id = owner.getId();
         model.addAttribute("dashboardProfile", profiles.view(id));
         model.addAttribute("myBands", bands.findTop3ByMembersIdOrderByNameAsc(id));

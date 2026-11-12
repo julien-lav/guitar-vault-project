@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page shop-page">
+<header class="page-header"><h1 th:text="#{shop.directory}"></h1><a th:href="@{/my-shop}" th:text="#{shop.mine}"></a></header>
+<p th:text="#{shop.directoryHint}"></p>
+<form method="get" th:action="@{/shops}" class="article-filters"><div><label for="shop-search" th:text="#{shop.search}"></label><input id="shop-search" name="q" maxlength="150" th:value="${q}"></div><button class="button" type="submit" th:text="#{shop.searchButton}"></button></form>
+<p class="panel" th:if="${shopPage.empty}" th:text="#{shop.empty}"></p>
+<div class="shop-grid"><article class="panel" th:each="shop : ${shopPage.content}"><h2><a th:href="@{/shops/{id}(id=${shop.id})}" th:text="${shop.name}"></a></h2><p th:text="${shop.location}"></p><p class="instrument-text" th:text="${shop.description}"></p></article></div>
+<div class="actions"><a th:if="${shopPage.hasPrevious()}" th:href="@{/shops(q=${q},page=${shopPage.number - 1})}" th:text="#{notification.previous}"></a><a th:if="${shopPage.hasNext()}" th:href="@{/shops(q=${q},page=${shopPage.number + 1})}" th:text="#{notification.next}"></a></div>
+</section></body></html>

@@ -59,3 +59,27 @@ A report attachment is **Private** by default. The author can instead share it w
 Professional reports follow the instrument after an accepted transfer. Avoid writing personal or financial information in report text if it should remain private. A verified workshop identity and an author’s authenticity assessment are distinct: check each report’s evidence and limitations.
 
 Read [document access](documents.md) and [what follows a transfer](transfers.md).
+
+## Follow a repair from intake to collection
+
+For a physical workshop visit, add the instrument to your collection and request an intervention from the workshop. Your appointment page links to your instruments with that workshop preselected. Booking a visit alone does not create a repair or approve a quote.
+
+1. The assigned luthier opens the intervention and selects **Record instrument intake**, recording its condition, accessories and requested work when it arrives.
+2. The luthier sends a quote with the total including applicable taxes, currency, scope, parts, timing and terms. Supported currencies are EUR, USD, GBP, CAD and CHF. Payment is arranged directly with the workshop.
+3. The instrument owner reviews the latest quote and chooses **Approve this quote** or **Decline this quote**. Before approval, the luthier can revise it; every version remains in **Workshop activity**. An older form cannot approve a newer quote.
+4. After approval, the luthier selects **Start work** and records progress. An approved quote stays in the history. Use **Propose additional work** if a discovery requires a different agreement.
+5. The luthier records collection instructions and selects **Notify owner: ready for collection**. The owner receives an in-app notification linking to the intervention.
+6. Once the instrument is handed back, the luthier selects **Record collection**. The intervention list shows the workshop stage. Signing a report and recording collection are separate actions.
+
+Before approval, either participant can cancel the work with a reason and return arrangements. After approval, the luthier records any cancellation. Cancellation closes the job and retains its activity; it does not confirm that an instrument was physically returned. A closed job cannot be reopened. Create a new intervention for later work.
+
+An instrument with an active workshop job cannot be transferred, even when a report has already been signed. Collection or cancellation closes the job. Intake notes, quotes, approvals and progress are private to the original requester and assigned workshop; they do not follow the instrument to a buyer. Record the work performed in a signed report below the workshop activity so it becomes part of the instrument’s service history. Leave prices, personal details and private collection arrangements out of that report.
+
+
+## Approve additional work during a repair
+
+When a luthier discovers a problem during work, **Propose additional work** pauses the repair. The proposal must explain the discovery, describe the complete revised scope (including the existing work), give a replacement total including applicable taxes in the same currency, and set an estimated completion date. The owner sees the current agreement, revised total and difference side by side. This is a new total, not an additional charge to add again.
+
+Only the owner can choose **Approve revised agreement and resume work** or **Decline this change**. Approval replaces the current agreement and resumes work; earlier quotes, approvals and proposals remain in **Workshop activity**. If the luthier revises a pending proposal, reopen the page before approving it. If its estimated completion date has passed, ask the luthier for an updated proposal.
+
+Refusal keeps the current agreement unchanged and leaves the repair paused. The luthier can send another proposal, cancel with return arrangements, or explain why the original scope can safely continue and choose **Resume existing approved work only**. Resuming withdraws the proposal; it does not authorise additional work. Work cannot be marked ready or collected while paused. The same private-access and transfer restrictions apply to change requests as to the original repair.

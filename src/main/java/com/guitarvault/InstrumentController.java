@@ -35,6 +35,8 @@ public class InstrumentController {
         this.interventions = interventions;
     }
 
+    @org.springframework.web.bind.annotation.ModelAttribute
+    public void privatePage(jakarta.servlet.http.HttpServletResponse response) { response.setHeader("Cache-Control", "private, no-store"); }
     @GetMapping("/instruments")
     public String instruments(Principal principal, Model model) {
         model.addAttribute("instruments", instruments.instrumentsFor(instruments.currentUser(principal)));

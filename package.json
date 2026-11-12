@@ -1,0 +1,14 @@
+{
+  "name": "guitar-vault-ui",
+  "private": true,
+  "description": "Local, reproducible CSS build for the Spring Boot and Thymeleaf interface",
+  "scripts": {
+    "build:css": "tailwindcss -i src/main/frontend/app.css -o src/main/resources/static/css/app.css --minify",
+    "watch:css": "tailwindcss -i src/main/frontend/app.css -o src/main/resources/static/css/app.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.5",
+    "daisyui": "5.7.50",
+    "tailwindcss": "4.3.5"
+  }
+}

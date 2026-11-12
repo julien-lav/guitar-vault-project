@@ -8,7 +8,7 @@ import java.time.ZoneOffset;
 @Entity
 @Table(name = "notifications", indexes = @Index(name = "idx_notification_recipient_read", columnList = "recipient_id,read_at,id"))
 public class Notification {
-    public enum Kind { BAND_INVITATION, BAND_CONNECTION_REQUEST, CONCERT_INVITATION, QUOTE_REQUEST, QUOTE_MESSAGE, DATE_PROPOSAL, DATE_PROPOSAL_RESPONSE, INSTRUMENT_TRANSFER, INSTRUMENT_TRANSFER_RESPONSE, LUTHIER_APPOINTMENT }
+    public enum Kind { BAND_INVITATION, BAND_CONNECTION_REQUEST, CONCERT_INVITATION, QUOTE_REQUEST, QUOTE_MESSAGE, DATE_PROPOSAL, DATE_PROPOSAL_RESPONSE, INSTRUMENT_TRANSFER, INSTRUMENT_TRANSFER_RESPONSE, LUTHIER_APPOINTMENT, WORKSHOP_JOB, SHOP_CONVERSATION }
     /** A varchar keeps existing H2 schemas compatible when new notification kinds are added. */
     @Converter
     public static class KindConverter implements AttributeConverter<Kind, String> {

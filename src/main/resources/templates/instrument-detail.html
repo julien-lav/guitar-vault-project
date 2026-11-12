@@ -1,41 +1,27 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"><head><title>Instrument</title></head><body>
-<section th:fragment="content" class="vault instrument-detail" aria-labelledby="instrument-title">
-    <header class="page-header">
-        <div><p class="eyebrow" th:text="#{collection.label}"></p><h1 id="instrument-title" th:text="${instrument.name}"></h1>
-        <p class="muted"><span th:text="${instrument.brand}"></span> · <span th:text="${instrument.year != null ? instrument.year : #messages.msg('instrument.unknownYear')}"></span> · <span th:text="${#messages.msg(optionKeys.get(instrument.status))}"></span></p></div>
-        <a th:href="@{/instruments}" th:text="#{instrument.back}"></a>
-    </header>
-    <div class="actions">
-        <a th:href="@{/instruments/{id}/documents(id=${instrument.id})}" th:text="#{document.title}"></a>
-        <a class="button" th:href="@{/instruments/{id}/transfers/new(id=${instrument.id})}" th:text="#{transfer.new}"></a>
-        <a th:href="@{/instruments/{id}/ownership(id=${instrument.id})}" th:text="#{transfer.history}"></a>
-        <a th:href="@{/instruments/{id}/passport-reports(id=${instrument.id})}" th:text="#{transfer.reports}"></a>
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault instrument-detail v-passport" aria-labelledby="instrument-title">
+    <a class="passport-back" th:href="@{/instruments}"><svg th:replace="~{ui :: icon('arrow')}"></svg><span th:text="#{instrument.back}"></span></a>
+    <header class="v-page-heading passport-header"><div><p class="eyebrow" th:text="#{ui.instrumentPassport}"></p><h1 id="instrument-title" th:text="${instrument.name}"></h1><p class="muted"><span th:text="${instrument.brand}"></span> · <span th:text="${instrument.year != null ? instrument.year : #messages.msg('instrument.unknownYear')}"></span></p></div><span class="badge" th:classappend="${instrument.status == 'À réparer' ? 'repair' : (instrument.status == 'En vente' ? 'sale' : '')}" th:text="${#messages.msg(optionKeys.get(instrument.status))}"></span></header>
+    <div class="passport-grid">
+        <div class="passport-content" data-passport-tabs>
+            <nav class="passport-tabs" th:aria-label="#{ui.passportSections}"><a id="tab-overview" href="#passport-overview" data-passport-tab th:text="#{ui.overview}"></a><a id="tab-story" href="#passport-story" data-passport-tab th:text="#{ui.storyNotes}"></a><a id="tab-service" href="#passport-service" data-passport-tab th:text="#{ui.serviceHistory}"></a><a id="tab-music" href="#passport-music" data-passport-tab th:text="#{ui.recordingsShows}"></a></nav>
+            <section id="passport-overview" data-passport-panel>
+                <div class="photo-gallery passport-gallery" th:unless="${#lists.isEmpty(visiblePhotos)}"><img th:each="photo : ${visiblePhotos}" th:src="@{/instruments/{id}/photos/{photoId}(id=${instrument.id},photoId=${photo.id})}" th:alt="${instrument.name}" loading="lazy"></div>
+                <div class="passport-no-photo" th:if="${#lists.isEmpty(visiblePhotos)}"><svg th:replace="~{ui :: icon('guitar')}"></svg><p th:text="#{ui.noPhoto}"></p></div>
+                <p class="passport-private"><svg th:replace="~{ui :: icon('lock')}"></svg><span th:text="#{ui.collectionPrivate}"></span></p>
+            </section>
+            <section id="passport-story" data-passport-panel>
+                <article class="panel passport-text-panel"><h2 th:text="#{instrument.history}"></h2><p class="instrument-text" th:if="${!#strings.isEmpty(instrument.history)}" th:text="${instrument.history}"></p><p th:if="${#strings.isEmpty(instrument.history)}" th:text="#{ui.noHistory}"></p><th:block th:if="${!#strings.isEmpty(instrument.previousOwner)}"><h3 th:text="#{instrument.previousOwner}"></h3><p class="instrument-text" th:text="${instrument.previousOwner}"></p></th:block></article>
+                <article class="panel passport-text-panel"><h2 th:text="#{instrument.notes}"></h2><p class="instrument-text" th:if="${!#strings.isEmpty(instrument.notes)}" th:text="${instrument.notes}"></p><p th:if="${#strings.isEmpty(instrument.notes)}" th:text="#{ui.noNotes}"></p><p class="passport-private"><svg th:replace="~{ui :: icon('lock')}"></svg><span th:text="#{ui.notesPrivate}"></span></p></article>
+            </section>
+            <section id="passport-service" data-passport-panel aria-labelledby="professional-history"><article class="panel passport-text-panel"><h2 id="professional-history" th:text="#{luthier.history}"></h2><p class="muted" th:text="#{luthier.private}"></p><p th:if="${#lists.isEmpty(interventions)}" th:text="#{luthier.noInterventions}"></p><ol class="professional-history"><li th:each="item : ${interventions}"><a th:href="@{/interventions/{id}(id=${item.id})}" th:text="${#messages.msg('luthier.kind.' + item.kind)}"></a><span th:text="${item.luthier.name}"></span> · <time th:datetime="${item.createdAt}" th:text="${#temporals.format(item.createdDateTime, 'dd/MM/yyyy HH:mm') + ' UTC'}"></time><span class="badge" th:text="${#messages.msg('luthier.status.' + item.status)}"></span></li></ol></article></section>
+            <section id="passport-music" data-passport-panel><article class="panel passport-text-panel"><h2 th:text="#{instrument.recordings}"></h2><ul th:unless="${#lists.isEmpty(instrument.recordings)}"><li th:each="entry : ${instrument.recordings}" th:text="${entry}"></li></ul><p th:if="${#lists.isEmpty(instrument.recordings)}" th:text="#{ui.noRecordings}"></p></article><article class="panel passport-text-panel"><h2 th:text="#{instrument.concerts}"></h2><ul th:unless="${#lists.isEmpty(instrument.concerts)}"><li th:each="entry : ${instrument.concerts}" th:text="${entry}"></li></ul><p th:if="${#lists.isEmpty(instrument.concerts)}" th:text="#{ui.noShows}"></p></article></section>
+        </div>
+        <aside class="v-side-card passport-sidebar" th:aria-label="#{ui.passportDetails}"><header class="v-section-heading"><h2 th:text="#{ui.atGlance}"></h2><svg th:replace="~{ui :: icon('guitar')}"></svg></header>
+            <dl class="passport-facts"><div><dt th:text="#{field.brand}"></dt><dd th:text="${instrument.brand}"></dd></div><div><dt th:text="#{field.year}"></dt><dd th:text="${instrument.year != null ? instrument.year : #messages.msg('instrument.unknownYear')}"></dd></div><div th:if="${!#strings.isEmpty(instrument.serialNumber)}"><dt th:text="#{instrument.serialNumber}"></dt><dd th:text="${instrument.serialNumber}"></dd></div><div><dt th:text="#{field.status}"></dt><dd th:text="${#messages.msg(optionKeys.get(instrument.status))}"></dd></div></dl>
+            <div class="passport-shortcuts"><a class="ui:dui-btn ui:dui-btn-primary" th:href="@{/instruments/{id}/documents(id=${instrument.id})}"><svg th:replace="~{ui :: icon('document')}"></svg><span th:text="#{document.title}"></span></a><a class="ui:dui-btn ui:dui-btn-outline" th:href="@{/instruments/{id}/interventions/new(id=${instrument.id})}" th:text="#{luthier.request}"></a></div>
+            <ul class="passport-links"><li><a th:href="@{/instruments/{id}/passport-reports(id=${instrument.id})}" th:text="#{transfer.reports}"></a></li><li><a th:href="@{/instruments/{id}/ownership(id=${instrument.id})}"><svg th:replace="~{ui :: icon('document')}"></svg><span th:text="#{transfer.history}"></span></a></li><li><a th:href="@{/instruments/{id}/transfers/new(id=${instrument.id})}"><svg th:replace="~{ui :: icon('transfer')}"></svg><span th:text="#{transfer.new}"></span></a></li></ul>
+            <p class="passport-private"><svg th:replace="~{ui :: icon('lock')}"></svg><span th:text="#{ui.transferHint}"></span></p>
+        </aside>
     </div>
-    <div class="panel">
-        <section class="instrument-section" th:if="${!#strings.isEmpty(instrument.serialNumber)}"><h2 th:text="#{instrument.serialNumber}"></h2><p class="instrument-text" th:text="${instrument.serialNumber}"></p></section>
-        <section class="instrument-section" th:if="${!#strings.isEmpty(instrument.previousOwner)}"><h2 th:text="#{instrument.previousOwner}"></h2><p class="instrument-text" th:text="${instrument.previousOwner}"></p></section>
-        <section class="instrument-section" th:unless="${#lists.isEmpty(visiblePhotos)}">
-            <h2 th:text="#{instrument.photos}"></h2>
-            <div class="photo-gallery"><img th:each="photo : ${visiblePhotos}" th:src="@{/instruments/{id}/photos/{photoId}(id=${instrument.id},photoId=${photo.id})}" th:alt="${instrument.name}" loading="lazy" /></div>
-        </section>
-        <section class="instrument-section" th:if="${!#strings.isEmpty(instrument.history)}"><h2 th:text="#{instrument.history}"></h2><p class="instrument-text" th:text="${instrument.history}"></p></section>
-        <section class="instrument-section" th:if="${!#strings.isEmpty(instrument.notes)}"><h2 th:text="#{instrument.notes}"></h2><p class="instrument-text" th:text="${instrument.notes}"></p></section>
-        <section class="instrument-section" th:unless="${#lists.isEmpty(instrument.recordings)}"><h2 th:text="#{instrument.recordings}"></h2><ul><li th:each="entry : ${instrument.recordings}" th:text="${entry}"></li></ul></section>
-        <section class="instrument-section" th:unless="${#lists.isEmpty(instrument.concerts)}"><h2 th:text="#{instrument.concerts}"></h2><ul><li th:each="entry : ${instrument.concerts}" th:text="${entry}"></li></ul></section>
-    </div>
-    <section class="panel" aria-labelledby="professional-history">
-        <h2 id="professional-history" th:text="#{luthier.history}"></h2>
-        <p class="muted" th:text="#{luthier.private}"></p>
-        <a class="button" th:href="@{/instruments/{id}/interventions/new(id=${instrument.id})}" th:text="#{luthier.request}"></a>
-        <p th:if="${#lists.isEmpty(interventions)}" th:text="#{luthier.noInterventions}"></p>
-        <ol class="professional-history">
-            <li th:each="item : ${interventions}">
-                <a th:href="@{/interventions/{id}(id=${item.id})}" th:text="${#messages.msg('luthier.kind.' + item.kind)}"></a>
-                <span th:text="${item.luthier.name}"></span> · <time th:datetime="${item.createdAt}" th:text="${#temporals.format(item.createdDateTime, 'dd/MM/yyyy HH:mm') + ' UTC'}"></time>
-                <span class="badge" th:text="${#messages.msg('luthier.status.' + item.status)}"></span>
-            </li>
-        </ol>
-    </section>
-</section>
-</body></html>
+</section></body></html>

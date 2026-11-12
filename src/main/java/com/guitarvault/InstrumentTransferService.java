@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class InstrumentTransferService {
     @jakarta.persistence.PersistenceContext private jakarta.persistence.EntityManager entityManager;
+    private final WorkshopJobRepository jobs;
     private final NotificationService notifications;
     private final DocumentService documents;
     private final InstrumentRepository instruments;
@@ -18,7 +19,8 @@ public class InstrumentTransferService {
     private final UserRepository users;
     private final LuthierInterventionRepository interventions;
     public InstrumentTransferService(InstrumentRepository instruments, InstrumentTransferRepository transfers,
-            InstrumentOwnershipRepository ownerships, UserRepository users, LuthierInterventionRepository interventions, NotificationService notifications, DocumentService documents) {
+            InstrumentOwnershipRepository ownerships, UserRepository users, LuthierInterventionRepository interventions, NotificationService notifications, DocumentService documents, WorkshopJobRepository jobs) {
+        this.jobs = jobs;
         this.instruments = instruments; this.transfers = transfers; this.ownerships = ownerships;
         this.users = users; this.interventions = interventions; this.notifications = notifications; this.documents = documents;
     }
@@ -70,7 +72,7 @@ public class InstrumentTransferService {
         Instant now = Instant.now();
         if (decision == InstrumentTransfer.Status.ACCEPTED) {
             if (!transfer.getSender().isEnabled() || !transfer.getRecipient().isEnabled()) throw conflict("transfer.inactive");
-            if (interventions.existsByInstrumentIdAndStatus(instrument.getId(), LuthierIntervention.Status.REQUESTED)) throw conflict("transfer.workPending");
+            if (jobs.hasActiveJob(instrument.getId()) || interventions.existsByInstrumentIdAndStatus(instrument.getId(), LuthierIntervention.Status.REQUESTED)) throw conflict("transfer.workPending");
             InstrumentOwnership previous = ownerships.findByInstrumentIdAndEndedAtIsNull(instrument.getId())
                     .orElseThrow(() -> conflict("transfer.stale"));
             if (!previous.getOwner().getId().equals(transfer.getSender().getId())) throw conflict("transfer.stale");

@@ -14,6 +14,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Controller
 public class LuthierController {
+    private final WorkshopJobRepository jobs;
+    private final WorkshopJobEventRepository jobEvents;
+    private final WorkshopJobService jobService;
     private final LuthierService luthiers;
     private final DocumentService documents;
     private final InstrumentService instruments;
@@ -24,9 +27,19 @@ public class LuthierController {
     private final AdminAccess admins;
     public LuthierController(LuthierService luthiers, InstrumentService instruments, LuthierProfileRepository profiles,
             LuthierInterventionRepository interventions, LuthierAssessmentRepository assessments,
-            LuthierVerificationRepository verifications, AdminAccess admins, DocumentService documents) {
+            LuthierVerificationRepository verifications, AdminAccess admins, DocumentService documents, WorkshopJobRepository jobs, WorkshopJobEventRepository jobEvents, WorkshopJobService jobService) {
+        this.jobs = jobs; this.jobEvents = jobEvents; this.jobService = jobService;
         this.luthiers = luthiers; this.documents = documents; this.instruments = instruments; this.profiles = profiles;
         this.interventions = interventions; this.assessments = assessments; this.verifications = verifications; this.admins = admins;
+    }
+    @ModelAttribute
+    public void privatePages(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response) {
+        if (!request.getRequestURI().startsWith("/luthiers")) response.setHeader("Cache-Control", "private, no-store");
+    }
+    @ExceptionHandler(ResponseStatusException.class)
+    public String conflict(ResponseStatusException e, Model model, jakarta.servlet.http.HttpServletResponse response) {
+        if (e.getStatusCode() != HttpStatus.CONFLICT) throw e;
+        response.setStatus(409); return "workshop-job-conflict";
     }
     @GetMapping("/luthiers")
     public String directory(Model model) {
@@ -92,16 +105,20 @@ public class LuthierController {
     @GetMapping("/interventions")
     public String inbox(Principal principal, Model model) {
         User actor = instruments.currentUser(principal);
-        model.addAttribute("interventions", interventions.findByRequesterIdOrLuthierUserIdOrderByIdDesc(actor.getId(), actor.getId()));
+        var inbox = interventions.findByRequesterIdOrLuthierUserIdOrderByIdDesc(actor.getId(), actor.getId());
+        model.addAttribute("interventions", inbox);
+        var stages = new LinkedHashMap<Long, WorkshopJob.Stage>();
+        if (!inbox.isEmpty()) for (var job : jobs.findByInterventionIn(inbox)) stages.put(job.getIntervention().getId(), job.getStage());
+        model.addAttribute("jobStages", stages);
         return page(model, "interventions", "luthier.interventions");
     }
     @GetMapping("/instruments/{id}/interventions/new")
-    public String requestForm(Principal principal, @PathVariable Long id, Model model) {
+    public String requestForm(Principal principal, @PathVariable Long id, @RequestParam(required = false) Long luthierId, Model model) {
         User actor = instruments.currentUser(principal);
         model.addAttribute("instrument", instruments.ownedInstrument(actor, id));
         model.addAttribute("luthiers", luthiers.directory().stream().filter(p -> !p.getUser().getId().equals(actor.getId())).toList());
         model.addAttribute("kinds", LuthierIntervention.Kind.values());
-        if (!model.containsAttribute("form")) model.addAttribute("form", Map.of());
+        if (!model.containsAttribute("form")) model.addAttribute("form", luthierId == null ? Map.of() : Map.of("luthierId", luthierId.toString()));
         return page(model, "intervention-form", "luthier.request");
     }
     @PostMapping("/instruments/{id}/interventions")
@@ -109,13 +126,27 @@ public class LuthierController {
         Map<String, String> form = clean(params, "luthierId", "kind", "description");
         try {
             return "redirect:/interventions/" + luthiers.request(instruments.currentUser(principal), id, form).getId();
-        } catch (IllegalArgumentException e) { error(model, form, e); return requestForm(principal, id, model); }
+        } catch (IllegalArgumentException e) { error(model, form, e); return requestForm(principal, id, null, model); }
+    }
+    @PostMapping("/interventions/{id}/job/{action:receive|quote|approve|decline|start|update|ready|collect|cancel|request-change|approve-change|decline-change|resume-original}")
+    public String jobAction(Principal principal, @PathVariable Long id, @PathVariable String action,
+            @RequestParam long version, @RequestParam Map<String, String> params, Model model) {
+        try { jobService.act(instruments.currentUser(principal), id, version, action, params); }
+        catch (IllegalArgumentException e) {
+            model.addAttribute("jobForm", clean(params, "message", "amount", "currency", "scope", "completionOn"));
+            model.addAttribute("error", e.getMessage()); return intervention(principal, id, model);
+        }
+        return "redirect:/interventions/" + id;
     }
     @GetMapping("/interventions/{id}")
     public String intervention(Principal principal, @PathVariable Long id, Model model) {
         User actor = instruments.currentUser(principal);
         LuthierIntervention i = luthiers.visible(actor, id);
         List<LuthierAssessment> history = assessments.findByInterventionIdOrderByRevisionDesc(id);
+        var job = jobs.findByInterventionId(id).orElse(null);
+        model.addAttribute("job", job);
+        model.addAttribute("jobEvents", job == null ? List.of() : jobEvents.findByJobIdOrderByIdAsc(job.getId()));
+        if (!model.containsAttribute("jobForm")) model.addAttribute("jobForm", Map.of());
         model.addAttribute("intervention", i);
         model.addAttribute("assessments", history);
         model.addAttribute("reportDocuments", documents.reportAttachments(actor, history));

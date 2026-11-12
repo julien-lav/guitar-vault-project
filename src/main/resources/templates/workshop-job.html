@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="job" class="panel workshop-job" aria-labelledby="workshop-job-title">
+    <h2 id="workshop-job-title" th:text="#{job.title}"></h2>
+    <p class="muted" th:text="#{job.private}"></p>
+    <form th:if="${job == null and isLuthier and intervention.status.name() == 'REQUESTED'}" method="post" th:action="@{/interventions/{id}/job/receive(id=${intervention.id})}">
+        <input type="hidden" name="version" value="-1">
+        <label for="intake-notes" th:text="#{job.intake}"></label>
+        <textarea id="intake-notes" name="message" rows="3" required maxlength="3000" th:text="${jobForm['message']}"></textarea>
+        <button class="button" type="submit" th:text="#{job.action.receive}"></button>
+    </form>
+    <p th:if="${job == null and !isLuthier}" th:text="#{job.waiting}"></p>
+    <th:block th:if="${job != null}">
+        <p class="badge" th:text="${#messages.msg('job.stage.' + job.stage)}"></p>
+        <div th:if="${job.amount != null}">
+            <h3 th:text="#{job.quote}"></h3>
+            <p><strong th:text="${job.amount + ' ' + job.currency}"></strong></p>
+            <p class="instrument-text" th:text="${job.scope}"></p>
+            <p th:if="${job.estimatedCompletionOn != null}"><span th:text="#{job.change.completion}"></span>: <time th:text="${job.estimatedCompletionOn}"></time></p>
+            <p class="field-hint" th:text="#{job.quoteHint}"></p>
+        </div>
+        <form th:if="${isLuthier and (job.stage.name() == 'RECEIVED' or job.stage.name() == 'QUOTED' or job.stage.name() == 'QUOTE_DECLINED')}" method="post" th:action="@{/interventions/{id}/job/quote(id=${intervention.id})}">
+            <h3 th:text="#{job.action.quote}"></h3>
+            <input type="hidden" name="version" th:value="${job.version}">
+            <div class="fields"><div><label for="quote-amount" th:text="#{job.amount}"></label><input id="quote-amount" type="number" name="amount" min="0" max="999999999.99" step="0.01" required th:value="${jobForm['amount']}"></div>
+            <div><label for="quote-currency" th:text="#{job.currency}"></label><select id="quote-currency" name="currency"><option th:each="currency : ${ {'EUR','USD','GBP','CAD','CHF'} }" th:value="${currency}" th:selected="${jobForm['currency'] == currency}" th:text="${currency}"></option></select></div></div>
+            <label for="quote-scope" th:text="#{job.scope}"></label><textarea id="quote-scope" name="message" rows="4" maxlength="3000" required th:text="${jobForm['message']}"></textarea>
+            <button class="button" type="submit" th:text="#{job.action.quote}"></button>
+        </form>
+        <div class="actions" th:if="${!isLuthier and job.stage.name() == 'QUOTED'}">
+            <form th:each="action : ${ {'approve','decline'} }" method="post" th:action="@{/interventions/{id}/job/{action}(id=${intervention.id},action=${action})}"><input type="hidden" name="version" th:value="${job.version}"><button class="button" type="submit" th:text="${#messages.msg('job.action.' + action)}"></button></form>
+        </div>
+        <form th:if="${isLuthier and job.stage.name() == 'APPROVED'}" method="post" th:action="@{/interventions/{id}/job/start(id=${intervention.id})}"><input type="hidden" name="version" th:value="${job.version}"><button class="button" type="submit" th:text="#{job.action.start}"></button></form>
+        <form th:if="${isLuthier and job.stage.name() == 'IN_PROGRESS'}" method="post" th:action="@{/interventions/{id}/job/update(id=${intervention.id})}">
+            <input type="hidden" name="version" th:value="${job.version}"><label for="progress-notes" th:text="#{job.progress}"></label><textarea id="progress-notes" name="message" rows="3" required maxlength="3000" th:text="${jobForm['message']}"></textarea>
+            <div class="actions"><button class="button" type="submit" th:text="#{job.action.update}"></button><button class="button" type="submit" th:formaction="@{/interventions/{id}/job/ready(id=${intervention.id})}" th:text="#{job.action.ready}"></button></div>
+        </form>
+        <section th:if="${job.stage.name() == 'CHANGE_PENDING' or job.stage.name() == 'CHANGE_DECLINED'}" class="notice workshop-change" aria-labelledby="change-title">
+            <h3 id="change-title" th:text="#{job.change.title}"></h3>
+            <p role="status" th:text="#{job.change.paused}"></p>
+            <p class="instrument-text" th:text="${job.changeReason}"></p>
+            <p><strong th:text="#{job.change.total}"></strong>: <span th:text="${job.proposedAmount + ' ' + job.currency}"></span></p>
+            <p><span th:text="#{job.change.delta}"></span>: <span th:text="${job.changeInTotal + ' ' + job.currency}"></span></p>
+            <p class="instrument-text" th:text="${job.proposedScope}"></p>
+            <p><span th:text="#{job.change.completion}"></span>: <time th:text="${job.proposedCompletionOn}"></time></p>
+            <p class="field-hint" th:text="#{job.change.approvalHint}"></p>
+            <div class="actions" th:if="${!isLuthier and job.stage.name() == 'CHANGE_PENDING'}">
+                <form th:each="action : ${ {'approve-change','decline-change'} }" method="post" th:action="@{/interventions/{id}/job/{action}(id=${intervention.id},action=${action})}"><input type="hidden" name="version" th:value="${job.version}"><button class="button" type="submit" th:text="${#messages.msg('job.action.' + action)}"></button></form>
+            </div>
+            <form th:if="${isLuthier}" method="post" th:action="@{/interventions/{id}/job/resume-original(id=${intervention.id})}">
+                <input type="hidden" name="version" th:value="${job.version}">
+                <label for="resume-reason" th:text="#{job.change.resumeReason}"></label><textarea id="resume-reason" name="message" rows="2" maxlength="3000" required></textarea>
+                <p class="field-hint" th:text="#{job.change.resumeHint}"></p><button class="button secondary-button" type="submit" th:text="#{job.action.resume-original}"></button>
+            </form>
+        </section>
+        <form th:if="${isLuthier and (job.stage.name() == 'IN_PROGRESS' or job.stage.name() == 'CHANGE_PENDING' or job.stage.name() == 'CHANGE_DECLINED')}" method="post" th:action="@{/interventions/{id}/job/request-change(id=${intervention.id})}">
+            <h3 th:text="#{job.action.request-change}"></h3><p class="field-hint" th:text="#{job.change.formHint}"></p>
+            <input type="hidden" name="version" th:value="${job.version}">
+            <label for="change-reason" th:text="#{job.change.reason}"></label><textarea id="change-reason" name="message" rows="3" maxlength="3000" required th:text="${jobForm['message']}"></textarea>
+            <div class="fields"><div><label for="change-total" th:text="#{job.change.total}"></label><input id="change-total" name="amount" type="number" min="0" max="999999999.99" step="0.01" required th:value="${jobForm['amount']}"><p th:text="${job.currency}"></p></div>
+            <div><label for="change-completion" th:text="#{job.change.completion}"></label><input id="change-completion" name="completionOn" type="date" th:min="${today}" max="9999-12-31" required th:value="${jobForm['completionOn']}"></div></div>
+            <label for="change-scope" th:text="#{job.change.scope}"></label><textarea id="change-scope" name="scope" rows="4" maxlength="3000" required th:text="${jobForm['scope']}"></textarea>
+            <button class="button" type="submit" th:text="#{job.action.request-change}"></button>
+        </form>
+        <form th:if="${isLuthier and job.stage.name() == 'READY'}" method="post" th:action="@{/interventions/{id}/job/collect(id=${intervention.id})}"><input type="hidden" name="version" th:value="${job.version}"><p th:text="#{job.collectionHint}"></p><button class="button" type="submit" th:text="#{job.action.collect}"></button></form>
+        <form th:if="${!job.closed and (isLuthier or job.stage.name() == 'RECEIVED' or job.stage.name() == 'QUOTED' or job.stage.name() == 'QUOTE_DECLINED')}" method="post" th:action="@{/interventions/{id}/job/cancel(id=${intervention.id})}">
+            <input type="hidden" name="version" th:value="${job.version}"><label for="job-cancel-reason" th:text="#{job.cancelReason}"></label><textarea id="job-cancel-reason" name="message" required maxlength="3000" rows="2"></textarea><button class="button secondary-button" type="submit" th:text="#{job.action.cancel}"></button>
+        </form>
+        <h3 th:text="#{job.history}"></h3>
+        <ol class="job-events"><li th:each="event : ${jobEvents}">
+            <p><strong th:text="${#messages.msg('job.event.' + event.action)}"></strong> · <span th:text="${event.author.username}"></span> · <time th:datetime="${event.createdAt}" th:text="${#temporals.format(event.createdDateTime, 'dd/MM/yyyy HH:mm') + ' UTC'}"></time></p>
+            <p th:if="${event.amount != null}" th:text="${event.amount + ' ' + event.currency}"></p><p class="instrument-text" th:text="${event.message}"></p><p class="instrument-text" th:if="${event.scope != null}" th:text="${event.scope}"></p><p th:if="${event.completionOn != null}"><span th:text="#{job.change.completion}"></span>: <time th:text="${event.completionOn}"></time></p>
+        </li></ol>
+    </th:block>
+</section>
+</body></html>

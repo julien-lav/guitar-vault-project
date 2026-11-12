@@ -4,6 +4,7 @@
     <a th:href="@{/appointments}" th:text="#{appointment.title}"></a>
     <header class="page-header"><div><h1 th:text="${appointment.title}"></h1><p><span th:text="${appointment.workshop.name}"></span> · <span th:text="${appointment.requester.username}"></span></p></div><span class="badge" th:text="${#messages.msg('appointment.status.' + appointment.status)}"></span></header>
     <p class="notice" th:text="#{appointment.privateHint}"></p>
+    <section class="panel" th:unless="${#lists.isEmpty(repairInstruments)}"><h2 th:text="#{job.title}"></h2><p th:text="#{job.appointmentHint}"></p><ul><li th:each="item : ${repairInstruments}"><a th:href="@{/instruments/{id}/interventions/new(id=${item.id},luthierId=${appointment.workshop.id})}" th:text="${item.name}"></a></li></ul></section>
     <p th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></p>
     <p th:unless="${appointment.scheduled}" class="notice" th:text="#{appointment.noTime}"></p>
     <section class="panel" th:if="${appointment.scheduled}">

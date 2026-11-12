@@ -248,3 +248,80 @@ if (notificationBell) {
     document.addEventListener('visibilitychange', refreshNotifications);
     window.addEventListener('pageshow', event => { if (event.persisted) refreshNotifications(); });
 }
+
+// Native details keep navigation usable before JavaScript loads and without it.
+const workspaceNavigation = document.querySelector('[data-workspace-nav]');
+if (workspaceNavigation) {
+    const mobileNavigation = window.matchMedia('(max-width: 900px)');
+    const resizeNavigation = () => { workspaceNavigation.open = !mobileNavigation.matches; };
+    resizeNavigation();
+    mobileNavigation.addEventListener('change', resizeNavigation);
+    workspaceNavigation.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && mobileNavigation.matches && workspaceNavigation.open) {
+            workspaceNavigation.open = false;
+            workspaceNavigation.querySelector('summary').focus();
+        }
+    });
+}
+
+// Progressive enhancement: every passport section remains readable without JS.
+const passport = document.querySelector('[data-passport-tabs]');
+if (passport) {
+    const tabs = [...passport.querySelectorAll('[data-passport-tab]')];
+    const panels = [...passport.querySelectorAll('[data-passport-panel]')];
+    passport.querySelector('.passport-tabs').setAttribute('role', 'tablist');
+    tabs.forEach(tab => {
+        tab.setAttribute('role', 'tab');
+        tab.setAttribute('aria-controls', tab.hash.slice(1));
+    });
+    panels.forEach(panel => {
+        panel.setAttribute('role', 'tabpanel');
+        panel.setAttribute('aria-labelledby', tabs.find(tab => tab.hash === '#' + panel.id).id);
+        panel.tabIndex = 0;
+    });
+    const selectTab = (tab, focus = false) => {
+        tabs.forEach(item => {
+            const selected = item === tab;
+            item.setAttribute('aria-selected', String(selected));
+            item.tabIndex = selected ? 0 : -1;
+        });
+        panels.forEach(panel => { panel.hidden = '#' + panel.id !== tab.hash; });
+        if (focus) tab.focus();
+    };
+    const fromHash = () => selectTab(tabs.find(tab => tab.hash === location.hash) || tabs[0]);
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', event => {
+            event.preventDefault();
+            selectTab(tab);
+            if (location.hash !== tab.hash) history.pushState(null, '', tab.hash);
+        });
+        tab.addEventListener('keydown', event => {
+            let next;
+            if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+            if (event.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
+            if (event.key === 'Home') next = 0;
+            if (event.key === 'End') next = tabs.length - 1;
+            if (next === undefined) return;
+            event.preventDefault();
+            selectTab(tabs[next], true);
+            history.replaceState(null, '', tabs[next].hash);
+        });
+    });
+    window.addEventListener('hashchange', fromHash);
+    window.addEventListener('popstate', fromHash);
+    fromHash();
+}
+
+const revealAnchor = () => {
+    if (!location.hash) return;
+    const target = document.getElementById(location.hash.slice(1));
+    if (!target) return;
+    let node = target;
+    while (node) {
+        if (node.tagName === 'DETAILS') node.open = true;
+        node = node.parentElement;
+    }
+    if (!target.closest('[data-passport-tabs]')) target.scrollIntoView();
+};
+window.addEventListener('hashchange', revealAnchor);
+revealAnchor();

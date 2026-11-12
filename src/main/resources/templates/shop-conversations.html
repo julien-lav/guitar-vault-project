@@ -1,0 +1,7 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page shop-page">
+<h1 th:text="#{shop.conversations}"></h1><p th:text="#{shop.private}"></p><p th:if="${conversationPage.empty}" th:text="#{shop.noConversations}"></p>
+<article class="panel" th:each="item : ${conversationPage.content}"><h2><a th:href="@{/shop-conversations/{id}(id=${item.id})}" th:text="${item.title}"></a></h2><p th:text="${item.shop.name}"></p><p class="badge" th:text="${#messages.msg('appointment.status.' + item.status)}"></p><p th:if="${item.scheduled}"><time th:text="${#temporals.format(item.proposedLocal, 'dd/MM/yyyy HH:mm')}"></time> <span th:text="${item.timeZone}"></span></p></article>
+<div class="actions"><a th:if="${conversationPage.hasPrevious()}" th:href="@{/shop-conversations(page=${conversationPage.number - 1})}" th:text="#{notification.previous}"></a><a th:if="${conversationPage.hasNext()}" th:href="@{/shop-conversations(page=${conversationPage.number + 1})}" th:text="#{notification.next}"></a></div>
+</section></body></html>

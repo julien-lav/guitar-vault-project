@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page shop-page">
+<a th:href="@{/my-shop}" th:text="#{shop.mine}"></a><h1 th:text="#{shop.addInstrument}"></h1><p th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></p>
+<p class="notice" th:text="#{shop.listingPrivacy}"></p>
+<form class="panel" method="post" enctype="multipart/form-data" th:action="@{${listing == null ? '/my-shop/listings' : '/my-shop/listings/' + listing.id}}"><input type="hidden" name="version" th:value="${form['version']}">
+<th:block th:if="${listing == null}"><label for="listing-source" th:text="#{shop.existing}"></label><select id="listing-source" name="instrumentId"><option value="" th:text="#{shop.newPassport}"></option><option th:each="item : ${instruments}" th:value="${item.id}" th:selected="${form['instrumentId'] == item.id.toString()}" th:text="${item.name}"></option></select><p th:text="#{shop.newHint}"></p>
+<div class="fields"><div><label for="listing-title" th:text="#{shop.instrumentName}"></label><input id="listing-title" name="title" maxlength="100" th:value="${form['title']}"></div><div><label for="listing-brand" th:text="#{shop.brand}"></label><input id="listing-brand" name="brand" maxlength="100" th:value="${form['brand']}"></div><div><label for="listing-year" th:text="#{shop.year}"></label><input id="listing-year" name="year" type="number" min="1" th:max="${currentYear}" th:value="${form['year']}"></div></div></th:block>
+<h2 th:if="${listing != null}" th:text="${listing.title}"></h2>
+<label for="listing-description" th:text="#{shop.saleDescription}"></label><textarea id="listing-description" name="description" rows="5" required maxlength="3000" th:text="${form['description']}"></textarea>
+<div class="fields"><div><label for="listing-price" th:text="#{shop.price}"></label><input id="listing-price" name="price" type="number" min="0" max="999999999.99" step="0.01" required th:value="${form['price']}"></div>
+<div><label for="listing-currency" th:text="#{job.currency}"></label><select id="listing-currency" name="currency"><option th:each="currency : ${ {'EUR','USD','GBP','CAD','CHF'} }" th:value="${currency}" th:selected="${form['currency'] == currency}" th:text="${currency}"></option></select></div>
+<div><label for="listing-stock" th:text="#{shop.stock}"></label><select id="listing-stock" name="stock"><option th:each="stock : ${ {'AVAILABLE','RESERVED','SOLD'} }" th:value="${stock}" th:selected="${form['stock'] == stock}" th:text="${#messages.msg('shop.stock.' + stock)}"></option></select></div></div>
+<label for="listing-photo" th:text="#{shop.photo}"></label><input id="listing-photo" name="photo" type="file" accept="image/jpeg,image/png"><p th:text="#{shop.photoHint}"></p>
+<th:block th:if="${listing != null and listing.photo}"><img class="shop-photo" th:src="@{/shop-listings/{id}/photo(id=${listing.id})}" th:alt="${listing.title}"><label class="workshop-publish"><input name="removePhoto" type="checkbox" value="true"><span th:text="#{shop.removePhoto}"></span></label></th:block>
+<label class="workshop-publish"><input name="published" type="checkbox" value="true" th:checked="${form['published'] == 'true'}"><span th:text="#{shop.publishListing}"></span></label>
+<button class="button" type="submit" th:text="#{shop.saveListing}"></button></form>
+</section></body></html>

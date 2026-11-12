@@ -117,19 +117,7 @@ public class AppointmentService {
         User recipient = a.getRequester().getId().equals(actor.getId()) ? a.getWorkshop().getUser() : a.getRequester();
         notifications.send(actor, recipient, Notification.Kind.LUTHIER_APPOINTMENT, a.getTitle(), "/appointments/" + a.getId());
     }
-    private static Instant time(String value, String zone) {
-        try {
-            if (!ZoneId.getAvailableZoneIds().contains(zone)) throw new IllegalArgumentException();
-            var local = LocalDateTime.parse(value);
-            if (local.getYear() < 1 || local.getYear() > 9999) throw new IllegalArgumentException();
-            var offsets = ZoneId.of(zone).getRules().getValidOffsets(local);
-            // Reject nonexistent and ambiguous local times instead of silently moving the appointment.
-            if (offsets.size() != 1) throw new IllegalArgumentException();
-            var instant = local.atOffset(offsets.getFirst()).toInstant();
-            if (!instant.isAfter(Instant.now())) throw new IllegalArgumentException();
-            return instant;
-        } catch (RuntimeException e) { throw new IllegalArgumentException("appointment.timeError"); }
-    }
+    private static Instant time(String value, String zone) { return AppointmentTimes.parse(value, zone); }
     private static String required(String value, int max) {
         if (value == null || value.isBlank() || value.strip().length() > max) throw new IllegalArgumentException("appointment.fieldsError");
         return value.strip();

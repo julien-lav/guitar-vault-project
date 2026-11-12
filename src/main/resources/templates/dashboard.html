@@ -1,18 +1,34 @@
-<!DOCTYPE html>
-<html lang="fr" xmlns:th="http://www.thymeleaf.org"><body>
-<section th:fragment="content" class="vault dashboard" aria-labelledby="dashboard-title">
-    <header class="page-header"><div><p class="eyebrow" th:text="#{dashboard.space}"></p><h1 id="dashboard-title" th:text="#{dashboard.greeting(${displayName})}"></h1><p class="muted" th:text="#{dashboard.personalIntro}"></p></div><a class="button" th:href="@{/studios}" th:text="#{quote.findStudio}"></a></header>
-    <div th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></div>
-    <section class="panel dashboard-profile" aria-labelledby="dashboard-profile-title">
-        <div class="dashboard-profile-summary"><img th:if="${dashboardProfile.hasPhoto}" class="profile-avatar" th:src="@{/musicians/{id}/photo(id=${dashboardProfile.id})}" th:alt="#{profile.photoAlt(${dashboardProfile.displayName})}" width="64" height="64"><div><h2 id="dashboard-profile-title" th:text="#{nav.profile}"></h2><p class="muted" th:text="${dashboardProfile.displayName}"></p><div class="profile-activities"><span class="badge" th:each="activity : ${dashboardProfile.activities}" th:text="${#messages.msg('profile.activity.' + activity)}"></span></div></div></div>
-        <div class="actions"><a th:href="@{/profile}" th:text="#{dashboard.viewProfile}"></a><a th:href="@{/profile/edit}" th:text="#{profile.edit}"></a></div>
-    </section>
-    <div class="dashboard-overview" th:aria-label="#{dashboard.overview}">
-        <a class="panel" href="#dashboard-bands"><span th:text="#{band.mine}"></span><strong th:text="${overview['bands']}"></strong></a>
-        <a class="panel" href="#dashboard-studios"><span th:text="#{studio.mine}"></span><strong th:text="${overview['studios']}"></strong></a>
-        <a class="panel" th:href="@{/wishlist}"><span th:text="#{nav.wishlist}"></span><strong th:text="${overview['wishlist']}"></strong></a>
-        <a class="panel" href="#dashboard-projects"><span th:text="#{dashboard.projects}"></span><strong th:text="${overview['projects']}"></strong></a>
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault dashboard v-dashboard" aria-labelledby="dashboard-title">
+    <header class="v-page-heading"><div><p class="eyebrow" th:text="#{dashboard.space}"></p><h1 id="dashboard-title" th:text="#{dashboard.greeting(${displayName})}"></h1><p class="muted" th:text="#{ui.dashboardIntro}"></p></div><div class="v-heading-actions"><a class="ui:dui-btn ui:dui-btn-primary" th:href="@{/instruments/new}"><span th:text="#{instrument.add}"></span></a></div></header>
+    <p th:if="${success}" class="notice success" role="status" th:text="${#messages.msg(success)}"></p>
+    <div class="v-stats" th:aria-label="#{dashboard.summary}"><div class="v-stat" th:each="stat : ${stats}"><strong class="v-stat-number" th:text="${stat.value}"></strong><span class="v-stat-label" th:text="${#messages.msg(stat.label)}"></span></div></div>
+    <div class="v-dashboard-grid">
+        <section aria-labelledby="dashboard-collection-title"><header class="v-section-heading"><h2 id="dashboard-collection-title" th:text="#{collection.label}"></h2><a th:href="@{/instruments}" th:text="#{dashboard.viewAll}"></a></header>
+            <div class="v-empty-collection" th:if="${#lists.isEmpty(instruments)}"><svg th:replace="~{ui :: icon('guitar')}"></svg><h2 th:text="#{collection.emptyTitle}"></h2><p th:text="#{collection.emptyText}"></p><a class="ui:dui-btn ui:dui-btn-primary" th:href="@{/instruments/new}" th:text="#{collection.first}"></a></div>
+            <div class="v-collection-grid" th:unless="${#lists.isEmpty(instruments)}">
+                <a class="v-instrument-card ui:dui-card" th:each="item : ${instruments}" th:href="@{/instruments/{id}(id=${item.id})}">
+                    <div class="v-instrument-image"><img th:if="${collectionPhotos.containsKey(item.id)}" th:src="@{/instruments/{id}/photos/{photo}(id=${item.id},photo=${collectionPhotos[item.id]})}" alt="" loading="lazy"><th:block th:unless="${collectionPhotos.containsKey(item.id)}"><svg th:replace="~{ui :: icon('guitar')}"></svg></th:block><span class="badge" th:classappend="${item.status == 'À réparer' ? 'repair' : (item.status == 'En vente' ? 'sale' : '')}" th:text="${#messages.msg(optionKeys.get(item.status))}"></span></div>
+                    <div class="v-instrument-caption"><h3 th:text="${item.name}"></h3><p><span th:text="${item.brand}"></span> · <span th:text="${item.year != null ? item.year : #messages.msg('instrument.unknownYear')}"></span></p></div>
+                </a>
+            </div>
+        </section>
+        <div class="v-dashboard-side">
+            <section class="v-side-card" aria-labelledby="dashboard-attention-title"><header class="v-section-heading"><h2 id="dashboard-attention-title" th:text="#{ui.attention}"></h2><svg th:replace="~{ui :: icon('message')}"></svg></header>
+                <div class="v-empty-state" th:if="${#lists.isEmpty(attentionItems) and toAnswerCount == 0 and invitationCount == 0}"><svg th:replace="~{ui :: icon('check')}"></svg><strong th:text="#{ui.caughtUp}"></strong><p th:text="#{ui.caughtUpHint}"></p></div>
+                <ul class="v-task-list"><li th:each="item : ${attentionItems}"><a th:href="@{${item.url}}"><span class="v-task-icon"><svg th:replace="~{ui :: icon('document')}"></svg></span><span><strong th:text="${item.title}"></strong><small th:text="${#messages.msg(item.label)}"></small></span><svg th:replace="~{ui :: icon('chevron')}"></svg></a></li>
+                    <li th:if="${toAnswerCount > 0}"><a th:href="@{/quotes}"><span class="v-task-icon"><svg th:replace="~{ui :: icon('music')}"></svg></span><span><strong th:text="#{ui.studioRequests(${toAnswerCount})}"></strong><small th:text="#{dashboard.toAnswer}"></small></span><svg th:replace="~{ui :: icon('chevron')}"></svg></a></li>
+                    <li th:if="${invitationCount > 0}"><a th:href="@{/invitations}"><span class="v-task-icon"><svg th:replace="~{ui :: icon('music')}"></svg></span><span><strong th:text="#{invitation.count(${invitationCount})}"></strong><small th:text="#{nav.invitations}"></small></span><svg th:replace="~{ui :: icon('chevron')}"></svg></a></li>
+                </ul>
+            </section>
+            <section class="v-side-card" aria-labelledby="dashboard-visits-title"><header class="v-section-heading"><h2 id="dashboard-visits-title" th:text="#{ui.upcoming}"></h2><svg th:replace="~{ui :: icon('calendar')}"></svg></header>
+                <div class="v-empty-state" th:if="${#lists.isEmpty(upcomingVisits)}"><p th:text="#{ui.noVisits}"></p><a th:href="@{/luthiers}" th:text="#{ui.findCare}"></a></div>
+                <ul class="v-visit-list"><li th:each="visit : ${upcomingVisits}"><a th:href="@{${visit.url}}"><time class="v-date-block" th:datetime="${visit.at}"><b th:text="${#temporals.format(visit.local, 'dd')}"></b><small th:text="${#temporals.format(visit.local, 'MMM')}"></small></time><span class="v-visit-detail"><strong th:text="${visit.title}"></strong><span th:text="${visit.venue}"></span><span th:text="${#temporals.format(visit.local, 'HH:mm') + ' · ' + visit.zone}"></span></span></a></li></ul>
+            </section>
+            <section class="v-side-card v-discover-card"><svg th:replace="~{ui :: icon('compass')}"></svg><h2 th:text="#{ui.discoverTitle}"></h2><p th:text="#{ui.discoverHint}"></p><div class="v-explore-links"><a th:href="@{/shops}"><span th:text="#{shop.directory}"></span><svg th:replace="~{ui :: icon('arrow')}"></svg></a><a th:href="@{/luthiers}"><span th:text="#{luthier.directory}"></span><svg th:replace="~{ui :: icon('arrow')}"></svg></a></div></section>
+        </div>
     </div>
+    <details class="v-projects" id="dashboard-music"><summary th:text="#{ui.musicProjects}"></summary><div class="v-projects-content">
     <section class="panel dashboard-section" aria-labelledby="dashboard-invitations"><div class="panel-heading"><h2 id="dashboard-invitations" th:text="#{nav.invitations}"></h2><a th:href="@{/invitations}" th:text="#{dashboard.viewAllItems}"></a></div><p class="muted" th:text="#{invitation.count(${invitationCount})}"></p><ul class="dashboard-list"><li th:each="invitation : ${bandInvitations}"><a th:href="@{/bands/{id}(id=${invitation.band.id})}" th:text="${invitation.band.name}"></a><a th:href="@{/invitations}" th:text="#{invitation.review}"></a></li></ul></section>
     <section class="panel dashboard-requests" aria-labelledby="dashboard-attention">
         <div class="panel-heading"><h2 id="dashboard-attention" th:text="#{dashboard.followUp}"></h2><a th:href="@{/quotes}" th:text="#{quote.view}"></a></div>
@@ -29,12 +45,7 @@
         <section class="panel" id="dashboard-bands" aria-labelledby="dashboard-bands-title"><div class="panel-heading"><h2 id="dashboard-bands-title" th:text="#{band.mine}"></h2><a th:href="@{/bands#my-bands-title}" th:text="#{dashboard.viewAllItems}"></a></div><ul class="dashboard-list" th:unless="${#lists.isEmpty(myBands)}"><li th:each="band : ${myBands}"><a th:href="@{/bands/{id}(id=${band.id})}" th:text="${band.name}"></a></li></ul><p class="muted" th:if="${#lists.isEmpty(myBands)}" th:text="#{band.noMembership}"></p><a th:href="@{/bands/new}" th:text="#{band.create}"></a></section>
         <section class="panel" id="dashboard-studios" aria-labelledby="dashboard-studios-title"><div class="panel-heading"><h2 id="dashboard-studios-title" th:text="#{studio.mine}"></h2><a th:href="@{/studios#my-studios-title}" th:text="#{dashboard.viewAllItems}"></a></div><ul class="dashboard-list" th:unless="${#lists.isEmpty(myStudios)}"><li th:each="studio : ${myStudios}"><a th:href="@{/studios/{id}(id=${studio.id})}" th:text="${studio.name}"></a></li></ul><p class="muted" th:if="${#lists.isEmpty(myStudios)}" th:text="#{studio.none}"></p><a th:href="@{/studios/new}" th:text="#{studio.create}"></a></section>
     </div>
-    <section class="dashboard-section" aria-labelledby="dashboard-collection-title">
-        <div class="panel-heading"><h2 id="dashboard-collection-title" th:text="#{collection.label}"></h2><a class="button" th:href="@{/instruments/new}" th:text="#{instrument.add}"></a></div>
-        <div class="stats" th:aria-label="#{dashboard.summary}"><div class="stat" th:each="stat : ${stats}"><span class="muted" th:text="${#messages.msg(stat.label)}"></span><strong class="stat-value" th:text="${stat.value}"></strong></div></div>
-        <div class="panel"><div class="panel-heading"><h3 th:text="#{dashboard.recent}"></h3><a th:if="${!#lists.isEmpty(instruments)}" th:href="@{/instruments}" th:text="#{dashboard.viewAll}"></a></div><div th:replace="~{instruments :: collection}"></div></div>
-    </section>
     <section class="panel dashboard-section" aria-labelledby="dashboard-wishlist-title"><div class="panel-heading"><h2 id="dashboard-wishlist-title" th:text="#{nav.wishlist}"></h2><a th:href="@{/wishlist}" th:text="#{wishlist.view}"></a></div><ul class="dashboard-list" th:unless="${#lists.isEmpty(wishes)}"><li th:each="wish : ${wishes}"><a th:href="@{/wishlist/{id}/edit(id=${wish.id})}" th:text="${wish.brand + ' · ' + wish.name}"></a></li></ul><p class="muted" th:if="${#lists.isEmpty(wishes)}" th:text="#{wishlist.emptyText}"></p><a th:href="@{/wishlist/new}" th:text="#{wishlist.add}"></a></section>
-    <section class="panel dashboard-discover" aria-labelledby="dashboard-discover-title"><h2 id="dashboard-discover-title" th:text="#{nav.discover}"></h2><p class="muted" th:text="#{dashboard.discoverIntro}"></p><div class="actions"><a th:href="@{/studios}" th:text="#{nav.studios}"></a><a th:href="@{/bands}" th:text="#{nav.bands}"></a><a th:href="@{/articles}" th:text="#{nav.articles}"></a></div></section>
-</section>
-</body></html>
+
+    </div></details>
+</section></body></html>

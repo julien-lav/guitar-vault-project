@@ -59,3 +59,27 @@ Une pièce de rapport est **Privée** par défaut. L’auteur peut choisir de la
 Les rapports professionnels suivent l’instrument après un transfert accepté. Évitez d’y écrire des informations personnelles ou financières qui doivent rester privées. La vérification d’identité d’un atelier et son appréciation d’authenticité sont distinctes : consultez les preuves et limites de chaque rapport.
 
 Consultez les guides [accès aux documents](documents.md) et [contenu transmis avec un instrument](transfers.md).
+
+## Suivre des travaux de la réception au retrait
+
+Pour un dépôt en atelier, ajoutez l’instrument à votre collection et demandez une intervention à cet atelier. La page du rendez-vous propose vos instruments avec cet atelier présélectionné. Réserver un rendez-vous ne crée pas de travaux et ne vaut pas acceptation d’un devis.
+
+1. Le luthier désigné ouvre l’intervention et choisit **Enregistrer la réception**, en précisant l’état, les accessoires et les travaux demandés lors du dépôt.
+2. Il envoie un devis avec le montant total, taxes applicables comprises, la devise, les travaux, les pièces, les délais et les conditions. Les devises proposées sont EUR, USD, GBP, CAD et CHF. Le paiement se convient directement avec l’atelier.
+3. Le propriétaire consulte le dernier devis et choisit **Accepter ce devis** ou **Refuser ce devis**. Avant acceptation, le luthier peut le réviser ; toutes les versions restent dans **Activité de l’atelier**. Un ancien formulaire ne permet pas d’accepter un nouveau devis.
+4. Après acceptation, le luthier choisit **Commencer les travaux**, puis enregistre l’avancement. Un devis accepté reste dans l’historique. Utilisez **Proposer des travaux supplémentaires** si une découverte nécessite un nouvel accord.
+5. Le luthier précise les consignes de retrait et choisit **Prévenir le propriétaire : prêt à être retiré**. Le propriétaire reçoit une notification dans l’application avec un lien vers l’intervention.
+6. Après restitution de l’instrument, le luthier choisit **Enregistrer le retrait**. La liste des interventions affiche l’étape des travaux. La signature d’un rapport et l’enregistrement du retrait sont deux actions distinctes.
+
+Avant acceptation, chacun peut annuler les travaux en précisant le motif et les modalités de restitution. Après acceptation, le luthier enregistre l’annulation éventuelle. L’annulation clôt le dossier et conserve son activité ; elle ne confirme pas une restitution physique. Un dossier clos ne peut pas être rouvert. Créez une nouvelle intervention pour des travaux ultérieurs.
+
+Le transfert d’un instrument est bloqué tant qu’un dossier d’atelier reste actif, même si un rapport a déjà été signé. Le retrait ou l’annulation clôt le dossier. Les notes de réception, devis, accords et mises à jour restent privés entre le demandeur d’origine et l’atelier désigné ; ils ne sont pas transmis à l’acheteur. Décrivez les travaux réalisés dans un rapport signé sous l’activité de l’atelier pour les inscrire dans l’historique d’entretien de l’instrument. N’y incluez pas les prix, données personnelles ou modalités privées de retrait.
+
+
+## Accepter des travaux supplémentaires en cours de réparation
+
+Si le luthier découvre un problème pendant les travaux, **Proposer des travaux supplémentaires** suspend la réparation. La proposition doit expliquer la découverte, décrire l’ensemble des travaux révisés (travaux existants compris), indiquer un nouveau montant total, taxes applicables comprises, dans la même devise, et préciser une date de fin estimée. Le propriétaire peut comparer l’accord actuel, le nouveau total et leur écart. Il s’agit d’un montant de remplacement, pas d’un supplément à additionner une seconde fois.
+
+Seul le propriétaire peut choisir **Accepter l’accord révisé et reprendre les travaux** ou **Refuser cette modification**. L’acceptation remplace l’accord actuel et reprend les travaux ; les anciens devis, accords et propositions restent dans **Activité de l’atelier**. Si le luthier révise une proposition en attente, rouvrez la page avant de l’accepter. Si sa date de fin estimée est passée, demandez une proposition actualisée.
+
+Le refus conserve l’accord actuel et laisse les travaux suspendus. Le luthier peut envoyer une nouvelle proposition, annuler en précisant les modalités de restitution, ou expliquer pourquoi les travaux initiaux peuvent continuer sans risque et choisir **Reprendre uniquement les travaux déjà acceptés**. Cette reprise retire la proposition et n’autorise aucun travail supplémentaire. Les travaux ne peuvent pas être déclarés prêts ou retirés tant qu’ils sont suspendus. La confidentialité et les restrictions de transfert sont identiques à celles des travaux initiaux.

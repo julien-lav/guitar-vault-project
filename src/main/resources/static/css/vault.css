@@ -602,3 +602,26 @@ fieldset.instrument-section { padding: 0; border: 0; }
     .workshop-calendar-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
     .workshop-calendar-grid.month > :first-child { grid-column-start: var(--first-weekday, 1); }
 }
+
+.workshop-job { overflow-wrap: anywhere; }
+.workshop-job form { margin: 24px 0; }
+.workshop-job .actions form { margin: 0; }
+.workshop-job textarea { display: block; margin-bottom: 16px; }
+.workshop-job .job-events { padding-left: 24px; }
+.workshop-job .job-events li { border-top: 1px solid #e5e7eb; padding: 12px 0; }
+
+.workshop-change { background: #fffbeb; border-inline-start: 4px solid #d97706; }
+.workshop-job button { max-width: 100%; white-space: normal; }
+
+.shop-page { overflow-wrap: anywhere; }
+.shop-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.shop-page .shop-grid .panel { margin-bottom: 0; min-width: 0; }
+.shop-photo { width: 100%; max-width: 360px; height: auto; aspect-ratio: 4 / 3; object-fit: contain; background: #f9fafb; border-radius: 8px; }
+.shop-detail-photo { display: block; max-width: 100%; width: 680px; max-height: 560px; object-fit: contain; }
+.shop-price { font-size: 1.4rem; font-weight: 700; }
+.shop-page form > input, .shop-page form > textarea, .shop-page form > select { margin-bottom: 20px; }
+.shop-page .workshop-publish { margin: 16px 0; }
+.shop-stock-row { border-top: 1px solid #e5e7eb; margin-top: 20px; padding-top: 12px; }
+.shop-page button { max-width: 100%; white-space: normal; }
+@media (max-width: 900px) { .shop-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .shop-grid { grid-template-columns: minmax(0, 1fr); } }

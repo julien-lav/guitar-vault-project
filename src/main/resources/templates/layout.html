@@ -1,110 +1,45 @@
 <!DOCTYPE html>
-<html th:lang="${#locale.language}" lang="fr" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title th:text="${pageTitle != null ? pageTitle : #messages.msg(title)}">Guitar Vault</title>
-    <meta th:if="${pageDescription != null}" name="description" th:content="${pageDescription}">
-    <script th:src="@{/js/ui.js}" defer></script>
-    <link rel="stylesheet" th:href="@{/css/vault.css}">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background: #f3f4f6;
-            color: #111827;
-        }
-        nav {
-            background: #111827;
-            color: white;
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-right: 16px;
-            font-weight: bold;
-        }
-        nav { flex-wrap: wrap; gap: 16px; }
-        nav form { display: inline; }
-        nav button { background: transparent; color: white; border: 1px solid #9ca3af; border-radius: 6px; padding: 8px 12px; cursor: pointer; font: inherit; }
-        .container {
-            padding: 32px;
-        }
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-    </style>
-</head>
-<body>
-    <a class="skip-link" href="#main-content" th:text="#{nav.skip}"></a>
-    <nav class="site-nav" th:aria-label="#{nav.main}">
-        <a class="site-brand" th:href="@{/}">Guitar Vault</a>
-        <div class="site-nav-primary">
-            <details class="nav-menu" th:if="${currentUsername != null}">
-                <summary th:text="#{nav.mySpace}"></summary>
-                <div class="nav-dropdown">
-                    <a th:href="@{/dashboard}" th:aria-current="${currentPath == '/dashboard' ? 'page' : null}" th:text="#{nav.dashboard}"></a>
-                    <a th:href="@{/profile}" th:aria-current="${currentPath == '/profile/edit' ? 'page' : null}" th:text="#{nav.profile}"></a>
-                    <a th:href="@{/instruments}" th:aria-current="${currentPath == '/instruments' ? 'page' : null}" th:text="#{nav.instruments}"></a>
-                    <a th:href="@{/documents}" th:text="#{document.mine}"></a>
-                    <a th:href="@{/transfers}" th:text="#{transfer.title}"></a>
-                    <a th:href="@{/wishlist}" th:aria-current="${currentPath == '/wishlist' ? 'page' : null}" th:text="#{nav.wishlist}"></a>
-                    <a th:href="@{/dashboard#dashboard-bands}" th:text="#{band.mine}"></a>
-                    <a th:href="@{/dashboard#dashboard-studios}" th:text="#{studio.mine}"></a>
-                    <a th:href="@{/invitations}" th:aria-current="${currentPath == '/invitations' ? 'page' : null}" th:text="#{nav.invitations}"></a>
-                    <a th:href="@{/concert-invitations}" th:aria-current="${currentPath == '/concert-invitations' ? 'page' : null}" th:text="#{concert.invitations}"></a>
-                    <a th:href="@{/date-proposals}" th:aria-current="${currentPath.startsWith('/date-proposals') ? 'page' : null}" th:text="#{proposal.title}"></a>
-                    <a th:href="@{/band-connections}" th:aria-current="${currentPath == '/band-connections' ? 'page' : null}" th:text="#{connection.title}"></a>
-                    <a th:href="@{/workshop}" th:text="#{luthier.workshop}"></a>
-                    <a th:href="@{/appointments}" th:aria-current="${currentPath.startsWith('/appointments') ? 'page' : null}" th:text="#{appointment.title}"></a>
-                    <a th:href="@{/interventions}" th:text="#{luthier.interventions}"></a>
-                    <a th:href="@{/reports}" th:text="#{report.mine}"></a>
-                    <a th:href="@{/quotes}" th:aria-current="${currentPath == '/quotes' ? 'page' : null}" th:text="#{nav.quotes}"></a>
-                </div>
-            </details>
-            <details class="nav-menu">
-                <summary th:text="#{nav.discover}"></summary>
-                <div class="nav-dropdown">
-                    <a th:href="@{/articles}" th:aria-current="${currentPath == '/articles' ? 'page' : null}" th:text="#{nav.articles}"></a>
-                    <a th:href="@{/studios}" th:aria-current="${currentPath == '/studios' ? 'page' : null}" th:text="#{nav.studios}"></a>
-                    <a th:href="@{/luthiers}" th:text="#{luthier.directory}"></a>
-                    <a th:href="@{/bands}" th:aria-current="${currentPath == '/bands' ? 'page' : null}" th:text="#{nav.bands}"></a>
-                </div>
-            </details>
-            <a th:href="@{/help}" th:aria-current="${currentPath.startsWith('/help') ? 'page' : null}" th:text="#{help.title}"></a>
-            <a th:if="${isAdmin}" th:href="@{/admin/luthiers}" th:text="#{luthier.review}"></a>
-            <a th:if="${isAdmin}" th:href="@{/admin/moderation}" th:text="#{report.moderation}"></a>
-            <a th:if="${canWriteArticles}" th:href="@{/admin/articles}" th:text="#{nav.admin}"></a>
-        </div>
-        <div class="nav-actions">
-            <a class="notification-bell" th:if="${currentUsername != null}" th:href="@{/notifications}" th:aria-label="#{notification.bell(${unreadNotificationCount})}" th:aria-current="${currentPath == '/notifications' ? 'page' : null}" data-notification-bell th:attr="data-unread=${unreadNotificationCount},data-notification-label=#{notification.bellPattern}">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>
-                <span class="notification-count" data-notification-count aria-hidden="true" th:attr="hidden=${unreadNotificationCount == 0 ? 'hidden' : null}" th:text="${unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}"></span>
-                <span class="sr-only" data-notification-announcement role="status" aria-live="polite"></span>
-            </a>
-            <div class="nav-account" th:if="${currentUsername == null}"><a th:href="@{/signup}" th:text="#{nav.signup}"></a><a th:href="@{/login}" th:text="#{nav.login}"></a></div>
-            <div class="nav-account" th:if="${currentUsername != null}"><span class="nav-username" th:text="${currentUsername}"></span><form method="post" th:action="@{/logout}"><button type="submit" th:text="#{nav.logout}"></button></form></div>
-            <details class="language-menu">
-                <summary><span class="sr-only" th:text="#{language.label}"></span><span class="language-flag" aria-hidden="true" th:text="${#locale.language == 'en' ? '🇬🇧' : '🇫🇷'}">🇫🇷</span> <span th:text="${#locale.language == 'en' ? 'English' : 'Français'}"></span></summary>
-                <div class="language-options" aria-label="Language / Langue">
-                    <a th:href="${languageUrls['fr']}" lang="fr" hreflang="fr" th:aria-current="${#locale.language == 'fr' ? 'true' : null}">Français</a>
-                    <a th:href="${languageUrls['en']}" lang="en" hreflang="en" th:aria-current="${#locale.language == 'en' ? 'true' : null}">English</a>
-                </div>
-            </details>
-        </div>
-    </nav>
-
-    <main class="container" id="main-content" tabindex="-1">
-        <div class="card" th:replace="~{${contentTemplate} :: content}">
-            Contenu
-        </div>
-    </main>
-</body>
-</html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}" lang="fr" data-theme="vault">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title th:text="${pageTitle != null ? pageTitle : #messages.msg(title)}">Guitar Vault</title>
+<meta th:if="${pageDescription != null}" name="description" th:content="${pageDescription}">
+<script th:src="@{/js/ui.js}" defer></script><link rel="stylesheet" th:href="@{/css/app.css}">
+</head><body th:classappend="${currentUsername != null ? 'has-workspace' : 'public-site'}">
+<a class="skip-link" href="#main-content" th:text="#{nav.skip}"></a>
+<nav class="site-nav" th:aria-label="#{nav.main}">
+    <a class="site-brand" th:href="${currentUsername != null ? '/dashboard' : '/'}"><span class="brand-mark"><svg th:replace="~{ui :: icon('guitar')}"></svg></span><span>Guitar Vault<small th:text="#{ui.brandLine}"></small></span></a>
+    <div class="site-nav-primary">
+        <details class="nav-menu"><summary><span th:text="#{nav.discover}"></span></summary><div class="nav-dropdown">
+            <a th:href="@{/shops}" th:text="#{shop.directory}"></a><a th:href="@{/luthiers}" th:text="#{luthier.directory}"></a><a th:href="@{/studios}" th:text="#{nav.studios}"></a><a th:href="@{/bands}" th:text="#{nav.bands}"></a><a th:href="@{/articles}" th:text="#{nav.articles}"></a>
+        </div></details>
+        <a class="header-help" th:href="@{/help}" th:aria-current="${currentPath.startsWith('/help') ? 'page' : null}" th:text="#{help.title}"></a>
+    </div>
+    <div class="nav-actions">
+        <a class="notification-bell header-icon" th:if="${currentUsername != null}" th:href="@{/notifications}" th:aria-label="#{notification.bell(${unreadNotificationCount})}" th:aria-current="${currentPath == '/notifications' ? 'page' : null}" data-notification-bell th:attr="data-unread=${unreadNotificationCount},data-notification-label=#{notification.bellPattern}"><svg th:replace="~{ui :: icon('bell')}"></svg><span class="notification-count" data-notification-count aria-hidden="true" th:attr="hidden=${unreadNotificationCount == 0 ? 'hidden' : null}" th:text="${unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}"></span><span class="sr-only" data-notification-announcement role="status" aria-live="polite"></span></a>
+        <div class="nav-account" th:if="${currentUsername == null}"><a th:href="@{/login}" th:text="#{nav.login}"></a><a class="ui:dui-btn ui:dui-btn-primary ui:dui-btn-sm" th:href="@{/signup}" th:text="#{nav.signup}"></a></div>
+        <details class="language-menu"><summary><span class="sr-only" th:text="#{language.label}"></span><span aria-hidden="true" th:text="${#locale.language == 'en' ? 'EN' : 'FR'}"></span></summary><div class="language-options"><a th:href="${languageUrls['fr']}" lang="fr" hreflang="fr" th:aria-current="${#locale.language == 'fr' ? 'true' : null}">Français</a><a th:href="${languageUrls['en']}" lang="en" hreflang="en" th:aria-current="${#locale.language == 'en' ? 'true' : null}">English</a></div></details>
+        <details class="nav-menu account-menu" th:if="${currentUsername != null}"><summary class="header-icon"><svg th:replace="~{ui :: icon('user')}"></svg><span class="sr-only" th:text="#{ui.account}"></span></summary><div class="nav-dropdown"><p class="account-email" th:text="${currentUsername}"></p><a th:href="@{/profile}" th:text="#{nav.profile}"></a><a th:href="@{/profile/edit}" th:text="#{profile.edit}"></a><a th:href="@{/reports}" th:text="#{report.mine}"></a><form method="post" th:action="@{/logout}"><button type="submit" th:text="#{nav.logout}"></button></form></div></details>
+    </div>
+</nav>
+<aside class="workspace-sidebar" th:if="${currentUsername != null}">
+    <details class="workspace-nav" open data-workspace-nav><summary><svg th:replace="~{ui :: icon('menu')}"></svg><span th:text="#{nav.mySpace}"></span><svg th:replace="~{ui :: icon('chevron')}"></svg></summary>
+    <nav class="workspace-links" th:aria-label="#{ui.workspaceNavigation}">
+        <p class="v-nav-heading" th:text="#{ui.yourVault}"></p>
+        <a th:replace="~{ui :: navLink('/dashboard','grid','nav.dashboard',${currentPath == '/dashboard'})}"></a>
+        <a th:replace="~{ui :: navLink('/instruments','guitar','collection.label',${currentPath.startsWith('/instruments')})}"></a>
+        <a th:replace="~{ui :: navLink('/documents','document','document.mine',${currentPath.startsWith('/documents')})}"></a>
+        <a th:replace="~{ui :: navLink('/wishlist','heart','nav.wishlist',${currentPath.startsWith('/wishlist')})}"></a>
+        <a th:replace="~{ui :: navLink('/transfers','transfer','transfer.title',${currentPath.startsWith('/transfers')})}"></a>
+        <p class="v-nav-heading" th:text="#{ui.activity}"></p>
+        <a th:replace="~{ui :: navLink('/notifications','message','ui.inbox',${currentPath.startsWith('/notifications')})}"></a>
+        <details class="sidebar-group" th:open="${currentPath.startsWith('/appointments') or currentPath.startsWith('/shop-conversations')}"><summary><svg th:replace="~{ui :: icon('calendar')}"></svg><span th:text="#{ui.visits}"></span></summary><div class="sidebar-submenu"><a th:href="@{/appointments}" th:text="#{ui.workshopVisits}"></a><a th:href="@{/shop-conversations}" th:text="#{ui.shopVisits}"></a></div></details>
+        <a th:replace="~{ui :: navLink('/interventions','tools','luthier.interventions',${currentPath.startsWith('/interventions')})}"></a>
+        <p class="v-nav-heading" th:text="#{ui.workspaces}"></p>
+        <details class="sidebar-group" th:open="${currentPath.startsWith('/my-shop') or currentPath.startsWith('/workshop')}"><summary><svg th:replace="~{ui :: icon('shop')}"></svg><span th:text="#{ui.professionalTools}"></span></summary><div class="sidebar-submenu"><a th:href="@{/my-shop}" th:text="#{shop.mine}"></a><a th:href="@{/workshop}" th:text="#{luthier.workshop}"></a><a th:href="@{/dashboard#dashboard-studios}" th:text="#{studio.mine}"></a><a th:href="@{/quotes}" th:text="#{nav.quotes}"></a></div></details>
+        <details class="sidebar-group"><summary><svg th:replace="~{ui :: icon('music')}"></svg><span th:text="#{ui.musicProjects}"></span></summary><div class="sidebar-submenu"><a th:href="@{/dashboard#dashboard-bands}" th:text="#{band.mine}"></a><a th:href="@{/invitations}" th:text="#{nav.invitations}"></a><a th:href="@{/concert-invitations}" th:text="#{concert.invitations}"></a><a th:href="@{/date-proposals}" th:text="#{proposal.title}"></a><a th:href="@{/band-connections}" th:text="#{connection.title}"></a></div></details>
+        <div class="sidebar-admin" th:if="${isAdmin or canWriteArticles}"><p class="v-nav-heading" th:text="#{ui.administration}"></p><a th:if="${canWriteArticles}" th:href="@{/admin/articles}" th:text="#{nav.admin}"></a><a th:if="${isAdmin}" th:href="@{/admin/luthiers}" th:text="#{luthier.review}"></a><a th:if="${isAdmin}" th:href="@{/admin/moderation}" th:text="#{report.moderation}"></a></div>
+        <p class="sidebar-privacy"><svg th:replace="~{ui :: icon('lock')}"></svg><span th:text="#{ui.privateDefault}"></span></p>
+    </nav></details>
+</aside>
+<main class="container app-content" id="main-content" tabindex="-1"><div th:replace="~{${contentTemplate} :: content}"></div><footer class="app-footer"><span>Guitar Vault</span><span th:text="#{ui.footer}"></span></footer></main>
+</body></html>

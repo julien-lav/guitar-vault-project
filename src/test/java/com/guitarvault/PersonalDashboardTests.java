@@ -135,7 +135,7 @@ class PersonalDashboardTests {
         assertThat(publicHtml).contains("href=\"#main-content\"", "id=\"main-content\"");
         String html = mvc.perform(get("/dashboard").with(user(alice.getEmail())))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
-        String personal = menu(html, "Mon espace");
+        String personal = html.substring(html.indexOf("<nav class=\"workspace-links\""), html.indexOf("</aside>"));
         assertThat(personal).contains("href=\"/dashboard\"", "aria-current=\"page\"", "href=\"/quotes\"",
                 "href=\"/dashboard#dashboard-bands\"", "href=\"/dashboard#dashboard-studios\"");
         assertThat(menu(html, "Découvrir")).contains("href=\"/articles\"", "href=\"/bands\"", "href=\"/studios\"");
@@ -145,8 +145,9 @@ class PersonalDashboardTests {
 
     private static String menu(String html, String title) {
         var matcher = java.util.regex.Pattern.compile(
-                "<details class=\"nav-menu\"[^>]*>\\s*<summary[^>]*>" + java.util.regex.Pattern.quote(title)
-                        + "</summary>(.*?)</details>", java.util.regex.Pattern.DOTALL).matcher(html);
+                "<details class=\"nav-menu\"[^>]*>\\s*<summary[^>]*>.*?"
+                        + java.util.regex.Pattern.quote(title) + ".*?</summary>(.*?)</details>",
+                java.util.regex.Pattern.DOTALL).matcher(html);
         assertThat(matcher.find()).as("Navigation menu %s", title).isTrue();
         return matcher.group(1);
     }

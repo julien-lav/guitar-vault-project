@@ -1,0 +1,4 @@
+<!DOCTYPE html><html xmlns:th="http://www.thymeleaf.org"><body>
+<svg th:fragment="icon(name)" class="v-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><use th:href="@{${'/icons.svg#' + name}}"></use></svg>
+<a th:fragment="navLink(url, icon, label, active)" class="v-nav-link" th:classappend="${active ? 'is-active' : ''}" th:href="@{${url}}" th:aria-current="${active ? 'page' : null}"><svg th:replace="~{ui :: icon(${icon})}"></svg><span th:text="${#messages.msg(label)}"></span></a>
+</body></html>

@@ -19,4 +19,9 @@ public interface LuthierAppointmentRepository extends JpaRepository<LuthierAppoi
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select a from LuthierAppointment a where a.id = :id and (a.requester.id = :actor or a.workshop.user.id = :actor)")
     Optional<LuthierAppointment> findForUpdate(Long id, Long actor);
+    @Query("select a from LuthierAppointment a where (a.requester.id = :actor or a.workshop.user.id = :actor) and a.status = com.guitarvault.LuthierAppointment.Status.CONFIRMED and a.proposedAt > :now order by a.proposedAt, a.id")
+    List<LuthierAppointment> upcoming(Long actor, Instant now, Pageable page);
+    @Query("select a from LuthierAppointment a where (a.requester.id = :actor or a.workshop.user.id = :actor) and a.status = com.guitarvault.LuthierAppointment.Status.PENDING and a.proposedAt > :now and a.proposer.id <> :actor order by a.id desc")
+    List<LuthierAppointment> awaitingActor(Long actor, Instant now, Pageable page);
+
 }

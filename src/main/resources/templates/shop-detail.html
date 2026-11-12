@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page shop-page">
+<a th:href="@{/shops}" th:text="#{shop.directory}"></a>
+<header class="page-header"><div><h1 th:text="${shop.name}"></h1><p th:text="${shop.location}"></p></div></header>
+<section class="panel"><p class="instrument-text" th:text="${shop.description}"></p><h2 th:text="#{shop.hours}"></h2><p class="instrument-text" th:text="${shop.openingHours}"></p><h2 th:text="#{shop.publicContact}"></h2><p class="instrument-text" th:text="${shop.contact}"></p><p class="muted" th:text="#{shop.identityHint}"></p>
+<div class="actions"><a class="button" th:href="@{/shops/{id}/contact(id=${shop.id})}" th:text="#{shop.contact}"></a><a class="button" th:href="@{/shops/{id}/appointments/new(id=${shop.id})}" th:text="#{shop.book}"></a></div></section>
+<h2 th:text="#{shop.inventory}"></h2><form method="get" class="article-filters" th:action="@{/shops/{id}(id=${shop.id})}"><div><label for="inventory-search" th:text="#{shop.searchInventory}"></label><input id="inventory-search" name="q" maxlength="150" th:value="${q}"></div><button class="button" type="submit" th:text="#{shop.searchButton}"></button></form>
+<p th:if="${listingPage.empty}" th:text="#{shop.noStock}"></p>
+<div class="shop-grid"><article class="panel" th:each="item : ${listingPage.content}"><a th:href="@{/shop-listings/{id}(id=${item.id})}"><img th:if="${item.photo}" class="shop-photo" th:src="@{/shop-listings/{id}/photo(id=${item.id})}" alt="" loading="lazy"><h3 th:text="${item.title}"></h3></a><p><span th:text="${item.brand}"></span> · <span th:text="${item.year}"></span></p><p class="shop-price" th:text="${item.price + ' ' + item.currency}"></p><p class="badge" th:text="${#messages.msg('shop.stock.' + item.stock)}"></p></article></div>
+<div class="actions"><a th:if="${listingPage.hasPrevious()}" th:href="@{/shops/{id}(id=${shop.id},q=${q},page=${listingPage.number - 1})}" th:text="#{notification.previous}"></a><a th:if="${listingPage.hasNext()}" th:href="@{/shops/{id}(id=${shop.id},q=${q},page=${listingPage.number + 1})}" th:text="#{notification.next}"></a></div>
+</section></body></html>

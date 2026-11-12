@@ -80,6 +80,8 @@ public class AppointmentController {
         var actor = instruments.currentUser(principal);
         var a = service.visible(actor, id);
         model.addAttribute("appointment", a);
+        model.addAttribute("repairInstruments", a.getRequester().getId().equals(actor.getId())
+                ? instruments.instrumentsFor(actor) : List.of());
         model.addAttribute("calendar", availability.calendar(a.getWorkshop(), date));
         model.addAttribute("conversation", messages.findByAppointmentIdOrderByIdAsc(id));
         model.addAttribute("canRespond", a.isScheduled() && a.getStatus() == LuthierAppointment.Status.PENDING && !a.getProposer().getId().equals(actor.getId()));
@@ -115,7 +117,7 @@ public class AppointmentController {
     @ExceptionHandler(ResponseStatusException.class)
     public String conflict(ResponseStatusException e, Model model, HttpServletResponse response) {
         if (e.getStatusCode() != HttpStatus.CONFLICT) throw e;
-        response.setStatus(409); model.addAttribute("error", e.getReason()); return "appointment-conflict";
+        response.setStatus(409); model.addAttribute("error", e.getReason() == null ? "appointment.stale" : e.getReason()); return "appointment-conflict";
     }
     private static void zones(Model model) { model.addAttribute("timeZones", ZoneId.getAvailableZoneIds().stream().sorted().toList()); }
     private static Map<String, String> values(Map<String, String> params) {

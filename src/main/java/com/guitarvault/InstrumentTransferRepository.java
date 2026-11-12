@@ -13,4 +13,6 @@ public interface InstrumentTransferRepository extends JpaRepository<InstrumentTr
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select t from InstrumentTransfer t where t.id = :id")
     Optional<InstrumentTransfer> findForUpdate(Long id);
+    java.util.List<InstrumentTransfer> findByRecipientIdAndStatusOrderByIdDesc(Long actor, InstrumentTransfer.Status status, org.springframework.data.domain.Pageable page);
+
 }

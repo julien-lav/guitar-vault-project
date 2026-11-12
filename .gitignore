@@ -38,3 +38,6 @@ build/
 .venv-e2e/
 __pycache__/
 *.pyc
+
+# Local frontend dependencies (compiled CSS is checked in).
+node_modules/

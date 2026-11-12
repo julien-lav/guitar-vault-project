@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class LuthierService {
+    private final WorkshopJobRepository jobs;
     private final LuthierProfileRepository profiles;
     private final LuthierInterventionRepository interventions;
     private final LuthierAssessmentRepository assessments;
@@ -20,7 +21,8 @@ public class LuthierService {
     private final InstrumentRepository instrumentRecords;
     public LuthierService(LuthierProfileRepository profiles, LuthierInterventionRepository interventions,
             LuthierAssessmentRepository assessments, LuthierVerificationRepository verifications,
-            AdminAccess admins, InstrumentRepository instrumentRecords) {
+            AdminAccess admins, InstrumentRepository instrumentRecords, WorkshopJobRepository jobs) {
+        this.jobs = jobs;
         this.profiles = profiles; this.interventions = interventions; this.assessments = assessments;
         this.verifications = verifications; this.admins = admins; this.instrumentRecords = instrumentRecords;
     }
@@ -85,7 +87,7 @@ public class LuthierService {
     public void cancel(User actor, Long id) {
         LuthierIntervention i = interventions.findForUpdate(id).orElseThrow(LuthierService::notFound);
         authorize(actor, i);
-        if (i.getStatus() != LuthierIntervention.Status.REQUESTED) throw conflict();
+        if (i.getStatus() != LuthierIntervention.Status.REQUESTED || jobs.findByInterventionId(id).isPresent()) throw conflict();
         i.cancel();
     }
     @Transactional

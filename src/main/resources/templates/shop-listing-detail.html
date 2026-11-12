@@ -1,0 +1,8 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page shop-page">
+<a th:href="@{/shops/{id}(id=${listing.shop.id})}" th:text="${listing.shop.name}"></a>
+<header class="page-header"><div><h1 th:text="${listing.title}"></h1><p><span th:text="${listing.brand}"></span> · <span th:text="${listing.year}"></span></p></div><span class="badge" th:text="${#messages.msg('shop.stock.' + listing.stock)}"></span></header>
+<section class="panel"><img th:if="${listing.photo}" class="shop-detail-photo" th:src="@{/shop-listings/{id}/photo(id=${listing.id})}" th:alt="${listing.title}"><p class="shop-price" th:text="${listing.price + ' ' + listing.currency}"></p><p class="instrument-text" th:text="${listing.description}"></p><p th:text="#{shop.priceHint}"></p><p><span th:text="${listing.shop.name}"></span> · <span th:text="${listing.shop.location}"></span></p>
+<div class="actions" th:if="${listing.stock.name() != 'SOLD'}"><a class="button" th:href="@{/shops/{id}/contact(id=${listing.shop.id},listingId=${listing.id})}" th:text="#{shop.enquire}"></a><a class="button" th:href="@{/shops/{id}/appointments/new(id=${listing.shop.id},listingId=${listing.id})}" th:text="#{shop.book}"></a></div></section>
+</section></body></html>

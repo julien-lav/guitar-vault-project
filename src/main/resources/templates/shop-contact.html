@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"><body>
+<section th:fragment="content" class="vault luthier-page shop-page">
+<a th:href="@{/shops/{id}(id=${shop.id})}" th:text="${shop.name}"></a><h1 th:text="${#messages.msg(scheduled ? 'shop.book' : 'shop.contact')}"></h1><p th:if="${error}" class="notice error" role="alert" th:text="${#messages.msg(error)}"></p>
+<p th:text="#{shop.private}"></p><p th:if="${listing != null}" th:text="${listing.title + ' · ' + listing.price + ' ' + listing.currency}"></p>
+<form class="panel" method="post" th:action="@{${scheduled ? '/shops/' + shop.id + '/appointments' : '/shops/' + shop.id + '/contact'}}"><input th:if="${listing != null}" type="hidden" name="listingId" th:value="${listing.id}">
+<label for="shop-subject" th:text="#{appointment.subject}"></label><input id="shop-subject" name="title" required maxlength="150" th:value="${form['title']}">
+<label for="shop-message" th:text="#{appointment.message}"></label><textarea id="shop-message" name="message" required maxlength="2000" rows="4" th:text="${form['message']}"></textarea>
+<th:block th:if="${scheduled}"><div th:replace="~{shop-time :: fields}"></div></th:block><button class="button" type="submit" th:text="#{shop.send}"></button></form>
+</section></body></html>
